@@ -1241,28 +1241,11 @@
                 <div class="severity-chart-container">
                     <canvas id="severityChart"></canvas>
                     <div class="severity-chart-label">
-                        <span class="severity-chart-total">267</span>
-                        <span class="severity-chart-text">Total incidents</span>
+                        <span class="severity-chart-total" data-severity-value>0</span>
+                        <span class="severity-chart-text" data-severity-label>Total incidents</span>
                     </div>
                 </div>
-                <div class="severity-legend">
-                    <div class="legend-item">
-                        <span class="legend-dot" style="background-color: #EF3340;"></span>
-                        <span>Critical / High · 23 incidents (8.6%)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot" style="background-color: #FF6A14;"></span>
-                        <span>Medium · 121 incidents (45.3%)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot" style="background-color: #009CDE;"></span>
-                        <span>Low · 103 incidents (38.6%)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot" style="background-color: #9CA3AF;"></span>
-                        <span>Informational · 20 incidents (7.5%)</span>
-                    </div>
-                </div>
+                <div class="severity-legend" id="severityLegend"></div>
                 <div class="severity-insights">
                     <p class="severity-insight"><strong>High / Critical</strong> incidents are low volume but drive urgent engagement, aligning with the 18% after-hours call rate.</p>
                     <p class="severity-insight"><strong>Medium</strong> severity remains the largest share (121 escalations) — a key candidate for additional automation.</p>
@@ -1682,38 +1665,94 @@
           });
 
           // Severity Mix Doughnut
-          const severityCtx = document.getElementById('severityChart').getContext('2d');
-          new Chart(severityCtx, {
-              type: 'doughnut',
-              data: {
-                  labels: ['Critical / High', 'Medium', 'Low', 'Informational'],
-                  datasets: [{
-                      data: [23, 121, 103, 20],
-                      backgroundColor: ['#EF3340', '#FF6A14', '#009CDE', '#9CA3AF'],
-                      borderWidth: 0
-                  }]
-              },
-              options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  cutout: '65%',
-                  plugins: {
-                      legend: {
-                          display: false
-                      },
-                      tooltip: {
-                          callbacks: {
-                              label: function(context) {
-                                  const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
-                                  const value = context.raw;
-                                  const percentage = ((value / total) * 100).toFixed(1);
-                                  return context.label + ': ' + value + ' incidents (' + percentage + '%)';
+          const severityMetrics = [
+              { label: 'Critical / High', count: 23, color: '#EF3340' },
+              { label: 'Medium', count: 121, color: '#FF6A14' },
+              { label: 'Low', count: 103, color: '#009CDE' },
+              { label: 'Informational', count: 20, color: '#9CA3AF' }
+          ];
+          const severityTotal = severityMetrics.reduce((sum, entry) => sum + entry.count, 0);
+          const severityValueEl = document.querySelector('[data-severity-value]');
+          const severityLabelEl = document.querySelector('[data-severity-label]');
+          const severityLegendEl = document.getElementById('severityLegend');
+          const getDisplayPercentage = (count) => {
+              const fixed = ((count / severityTotal) * 100).toFixed(1);
+              return fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed;
+          };
+
+          if (severityLegendEl) {
+              severityLegendEl.innerHTML = '';
+              severityMetrics.forEach((entry) => {
+                  const legendItem = document.createElement('div');
+                  legendItem.className = 'legend-item';
+                  legendItem.innerHTML = `
+                      <span class="legend-dot" style="background-color: ${entry.color};"></span>
+                      <span>${entry.label} · ${entry.count} incidents (${getDisplayPercentage(entry.count)}%)</span>
+                  `;
+                  severityLegendEl.appendChild(legendItem);
+              });
+          }
+
+          const resetSeverityCenter = () => {
+              if (!severityValueEl || !severityLabelEl) {
+                  return;
+              }
+              severityValueEl.textContent = severityTotal;
+              severityLabelEl.textContent = 'Total incidents';
+          };
+
+          const severityCanvas = document.getElementById('severityChart');
+          let severityChart;
+
+          if (severityCanvas) {
+              const severityCtx = severityCanvas.getContext('2d');
+              severityChart = new Chart(severityCtx, {
+                  type: 'doughnut',
+                  data: {
+                      labels: severityMetrics.map((entry) => entry.label),
+                      datasets: [{
+                          data: severityMetrics.map((entry) => entry.count),
+                          backgroundColor: severityMetrics.map((entry) => entry.color),
+                          borderWidth: 0
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      cutout: '65%',
+                      plugins: {
+                          legend: {
+                              display: false
+                          },
+                          tooltip: {
+                              callbacks: {
+                                  label: function(context) {
+                                      const value = context.raw;
+                                      const percentage = getDisplayPercentage(value);
+                                      return context.label + ': ' + value + ' incidents (' + percentage + '%)';
+                                  }
                               }
                           }
                       }
                   }
-              }
-          });
+              });
+
+              severityCanvas.addEventListener('mousemove', (event) => {
+                  const elements = severityChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+                  if (elements.length && severityValueEl && severityLabelEl) {
+                      const index = elements[0].index;
+                      const entry = severityMetrics[index];
+                      severityValueEl.textContent = getDisplayPercentage(entry.count) + '%';
+                      severityLabelEl.textContent = entry.label + ' (' + entry.count + ')';
+                  } else {
+                      resetSeverityCenter();
+                  }
+              });
+
+              severityCanvas.addEventListener('mouseleave', resetSeverityCenter);
+          }
+
+          resetSeverityCenter();
 
         // MITRE ATT&CK STACKED Bar Chart
         const mitreCtx = document.getElementById('mitreChart').getContext('2d');
