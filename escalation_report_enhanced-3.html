@@ -624,7 +624,7 @@
                 </h1>
                 <p style="font-weight: 600; color: #343741; margin-bottom: 4px;">Lennar Corporation</p>
                 <p style="color: rgba(52, 55, 65, 0.75); font-size: 14px;">Period: August 1-31, 2025 (31 days)</p>
-                <p style="color: rgba(52, 55, 65, 0.6); font-size: 12px;">Production incidents escalated to client. Rolling 90-day benchmarks from the Critical Operations Reporting Repository (CORR) platform.</p>
+                <p style="color: rgba(52, 55, 65, 0.6); font-size: 12px;">Production incidents escalated to client. Rolling 90-day benchmarks from the Cyber Operations Risk & Response&trade; (CORR) platform.</p>
             </div>
             <div class="badge">Target Met</div>
         </div>
@@ -660,7 +660,7 @@
                 </div>
             </div>
             <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-top: 32px; text-align: center; font-style: italic;">
-                Sources: Critical Operations Reporting Repository (CORR) platform — Analyst Utilization & Coverage metadata; Report Extract — Incident Id (col 1), Escalated Datetime (US/Central) (col 20), CS SOC Time to Respond (TTR) (hh:mm) (col 37).
+                Sources: Cyber Operations Risk & Response&trade; (CORR) platform — Analyst Utilization & Coverage metadata; Report Extract — Incident Id (col 1), Escalated Datetime (US/Central) (col 20), CS SOC Time to Respond (TTR) (hh:mm) (col 37).
             </p>
         </div>
 
@@ -700,7 +700,7 @@
                     </div>
                 </div>
                 <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); margin-top: 16px; font-style: italic;">
-                    Sources: Report Extract — Incident Id (col 1), CS SOC Verdict (col 12), Escalated Datetime (US/Central) (col 20); Critical Operations Reporting Repository (CORR) platform — Non-escalated alert volume.
+                    Sources: Report Extract — Incident Id (col 1), CS SOC Verdict (col 12), Escalated Datetime (US/Central) (col 20); Cyber Operations Risk & Response&trade; (CORR) platform — Non-escalated alert volume.
                 </p>
             </div>
         </div>
@@ -734,7 +734,7 @@
                         <strong>Trend Analysis:</strong> Continuous improvement across all metrics. Mean Time to Respond (MTTR) decreased 25% to 126 minutes, while Mean Time to Detect (MTTD) improved 22% to 42 minutes, and false positive rate dropped 24% over three periods, demonstrating effective tuning and process maturation.
                     </p>
                 </div>
-                <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); margin-top: 8px; font-style: italic;">Data source: Critical Operations Reporting Repository (CORR) platform rolling 90-day averages</p>
+                <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); margin-top: 8px; font-style: italic;">Data source: Cyber Operations Risk & Response&trade; (CORR) platform rolling 90-day averages</p>
                 <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); margin-top: 4px; font-style: italic;">Visualization note: Mean Time to Respond (MTTR) and Mean Time to Detect (MTTD) render on the left axis in minutes; False Positive % renders on the right axis.</p>
             </div>
         </div>
@@ -1110,24 +1110,24 @@
                                   <p class="detection-metric-detail">243 actionable escalations (TP + BTP) of 267 total</p>
                                   <p class="detection-metric-trend">Aligned with 88% response target compliance</p>
                               </div>
-                              <div class="detection-metric detection-metric-warning">
-                                  <p class="detection-metric-label">False Positive Rate</p>
-                                  <p class="detection-metric-value" style="color: #FF6A14;">9.0%</p>
-                                  <p class="detection-metric-detail">Target &lt; 10% | ↓ 3.1 pts vs prior period</p>
-                                  <p class="detection-metric-trend">Only Cortex XDR remains above threshold (11.2%)</p>
-                              </div>
-                              <div class="detection-metric">
-                                  <p class="detection-metric-label">Client-Validated Outcomes</p>
-                                  <p class="detection-metric-value" style="color: #009CDE;">86.9%</p>
-                                  <p class="detection-metric-detail">Share of escalations your team confirmed as accurate (benign true positives)</p>
-                                  <p class="detection-metric-trend">Backed by 4 min MTTD and rapid analyst follow-up</p>
-                              </div>
-                              <div class="detection-metric detection-metric-positive">
-                                  <p class="detection-metric-label">Signal-to-Noise Ratio</p>
-                                  <p class="detection-metric-value" style="color: #004C97;">10.1 : 1</p>
-                                  <p class="detection-metric-detail">Actionable outcomes (true + benign true positives) per false positive</p>
-                                  <p class="detection-metric-trend">243 validated escalations vs 24 false positives this period</p>
-                              </div>
+                                <div class="detection-metric detection-metric-warning">
+                                    <p class="detection-metric-label">False Positive Rate</p>
+                                    <p class="detection-metric-value" style="color: #FF6A14;">9.0%</p>
+                                    <p class="detection-metric-detail">Target &lt; 10% | ↓ 3.1 pts vs prior period</p>
+                                    <p class="detection-metric-trend">Only Cortex XDR remains above threshold (11.2%)</p>
+                                </div>
+                                <div class="detection-metric">
+                                    <p class="detection-metric-label">Client-Validated Outcomes</p>
+                                    <p class="detection-metric-value" style="color: #009CDE;">86.9%</p>
+                                    <p class="detection-metric-detail">Share of escalations your team confirmed as accurate (benign true positives) via the Trusted Behavior Registry&reg; (TBR&reg;)</p>
+                                    <p class="detection-metric-trend">Backed by 4 min MTTD and rapid analyst follow-up</p>
+                                </div>
+                                <div class="detection-metric detection-metric-positive">
+                                    <p class="detection-metric-label">Signal-to-Noise Ratio</p>
+                                    <p class="detection-metric-value" style="color: #004C97;">10.1 : 1</p>
+                                    <p class="detection-metric-detail">Actionable outcomes (true + benign true positives) per false positive</p>
+                                    <p class="detection-metric-trend">243 validated escalations vs 24 false positives this period</p>
+                                </div>
                           </div>
                           <div class="info-box" style="background-color: rgba(0, 156, 222, 0.08); border: 1px solid rgba(0, 156, 222, 0.2); margin-top: 20px;">
                               <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
@@ -1136,7 +1136,7 @@
                           </div>
                       </div>
                   </div>
-                  <p class="detection-footnote">Source: CS SOC Verdict (col 12); Report Extract incident counts.</p>
+                    <p class="detection-footnote">Source: CS SOC Verdict (col 12); Trusted Behavior Registry&reg; (TBR&reg;) validations; Report Extract incident counts.</p>
               </div>
         </div>
 
@@ -1360,7 +1360,7 @@
         <!-- Footer -->
         <div class="footer">
             <p style="font-weight: 600; margin-bottom: 4px;">Report Generated: November 5, 2025</p>
-        <p style="margin-bottom: 4px;">Data Sources: Excel Escalation Export (45 columns) + Critical Operations Reporting Repository (CORR) platform (90-day trends and benchmarks)</p>
+        <p style="margin-bottom: 4px;">Data Sources: Excel Escalation Export (45 columns) + Cyber Operations Risk & Response&trade; (CORR) platform (90-day trends and benchmarks)</p>
             <p style="margin-bottom: 4px;">All metrics calculated from source data. Improvement recommendations auto-generated based on configured thresholds.</p>
             <p>Questions? Your Customer Success Manager is here to help.</p>
         </div>
