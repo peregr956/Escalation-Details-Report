@@ -504,56 +504,55 @@
               font-style: italic;
           }
 
-          .severity-card .card-content {
-              display: flex;
-              flex-direction: column;
-              gap: 20px;
-          }
+        .severity-card .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-          .severity-chart-container {
-              width: 100%;
-              height: 220px;
-          }
+        .severity-chart-container {
+            width: 100%;
+            height: 220px;
+            position: relative;
+        }
 
-          .severity-breakdown {
-              display: grid;
-              gap: 12px;
-          }
+        .severity-chart-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: #343741;
+        }
 
-          .severity-row {
-              display: grid;
-              gap: 6px;
-          }
+        .severity-chart-total {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+        }
 
-          .severity-row-header {
-              display: flex;
-              justify-content: space-between;
-              align-items: baseline;
-          }
+        .severity-chart-text {
+            font-size: 12px;
+            color: #6b7280;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
 
-          .severity-label {
-              font-size: 14px;
-              color: #343741;
-              font-weight: 600;
-          }
+        .severity-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            font-size: 14px;
+            color: #4b5563;
+        }
 
-          .severity-value {
-              font-size: 14px;
-              color: #4b5563;
-              font-weight: 500;
-          }
-
-          .severity-progress {
-              background: #e5e7eb;
-              border-radius: 999px;
-              height: 8px;
-              overflow: hidden;
-          }
-
-          .severity-progress-bar {
-              height: 100%;
-              border-radius: 999px;
-          }
+        .severity-legend .legend-item span:last-child {
+            display: inline-block;
+        }
 
           .severity-insights {
               display: grid;
@@ -1241,43 +1240,27 @@
             <div class="card-content">
                 <div class="severity-chart-container">
                     <canvas id="severityChart"></canvas>
+                    <div class="severity-chart-label">
+                        <span class="severity-chart-total">267</span>
+                        <span class="severity-chart-text">Total incidents</span>
+                    </div>
                 </div>
-                <div class="severity-breakdown">
-                    <div class="severity-row">
-                        <div class="severity-row-header">
-                            <span class="severity-label" style="color: #EF3340;">Critical / High</span>
-                            <span class="severity-value">23 incidents • 8.6%</span>
-                        </div>
-                        <div class="severity-progress">
-                            <div class="severity-progress-bar" style="width: 9%; background-color: #EF3340;"></div>
-                        </div>
+                <div class="severity-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background-color: #EF3340;"></span>
+                        <span>Critical / High · 23 incidents (8.6%)</span>
                     </div>
-                    <div class="severity-row">
-                        <div class="severity-row-header">
-                            <span class="severity-label" style="color: #FF6A14;">Medium</span>
-                            <span class="severity-value">121 incidents • 45.3%</span>
-                        </div>
-                        <div class="severity-progress">
-                            <div class="severity-progress-bar" style="width: 45%; background-color: #FF6A14;"></div>
-                        </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background-color: #FF6A14;"></span>
+                        <span>Medium · 121 incidents (45.3%)</span>
                     </div>
-                    <div class="severity-row">
-                        <div class="severity-row-header">
-                            <span class="severity-label" style="color: #009CDE;">Low</span>
-                            <span class="severity-value">103 incidents • 38.6%</span>
-                        </div>
-                        <div class="severity-progress">
-                            <div class="severity-progress-bar" style="width: 39%; background-color: #009CDE;"></div>
-                        </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background-color: #009CDE;"></span>
+                        <span>Low · 103 incidents (38.6%)</span>
                     </div>
-                    <div class="severity-row">
-                        <div class="severity-row-header">
-                            <span class="severity-label" style="color: #6b7280;">Informational</span>
-                            <span class="severity-value">20 incidents • 7.5%</span>
-                        </div>
-                        <div class="severity-progress">
-                            <div class="severity-progress-bar" style="width: 8%; background-color: #9CA3AF;"></div>
-                        </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background-color: #9CA3AF;"></span>
+                        <span>Informational · 20 incidents (7.5%)</span>
                     </div>
                 </div>
                 <div class="severity-insights">
