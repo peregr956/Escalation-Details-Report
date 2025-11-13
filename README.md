@@ -69,6 +69,8 @@ Sample highlights include:
 
 The report is built on data from **CORR** (Cyber Operations Risk Response Platform) and draws 95% of its metrics from the **Escalation to Client Details Excel Export**.
 
+An extract of the Escalation to Client Details Excel Export is provided in the Github Repo as "Report Extract"
+
 Each section references its corresponding Excel column to ensure transparency and traceability.
 
 ## Design and Automation Requirements
