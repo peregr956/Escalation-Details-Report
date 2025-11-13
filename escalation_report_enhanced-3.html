@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escalation to Client Details Report - Critical Start</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', system-ui, sans-serif;
+            background-color: #f9fafb;
+            color: #343741;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #004C97;
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            background-color: #009CDE;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .stat-detail {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .improvement-delta {
+            font-weight: 600;
+            font-size: 16px;
+            color: #009CDE;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table thead tr {
+            border-bottom: 2px solid #009CDE;
+        }
+
+        .table th {
+            padding: 12px 8px;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 12px 8px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-better {
+            background-color: rgba(0, 156, 222, 0.2);
+            color: #004C97;
+        }
+
+        .status-worse {
+            background-color: rgba(255, 106, 20, 0.2);
+            color: #FF6A14;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 16px;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 32px;
+            height: 4px;
+        }
+
+        .info-box {
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .summary-item {
+            padding-left: 12px;
+            border-left: 4px solid #009CDE;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            color: #009CDE;
+            font-size: 14px;
+        }
+
+        .summary-value {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .product-item, .method-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: #f9fafb;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .percentage-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .improvement-item {
+            border-radius: 6px;
+            margin-bottom: 16px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .priority-high {
+            background-color: #EF3340;
+        }
+
+        .priority-medium {
+            background-color: #FF6A14;
+        }
+
+        .priority-low {
+            background-color: #009CDE;
+        }
+
+        .value-item {
+            display: flex;
+            align-items: start;
+            gap: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #009CDE;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .footer {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 24px;
+        }
+
+        .cost-avoidance-card {
+            background: linear-gradient(to bottom right, rgba(0, 156, 222, 0.15), rgba(0, 76, 151, 0.1));
+            border: 2px solid #009CDE;
+        }
+
+        .cost-component {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .highlight-box {
+            background-color: rgba(0, 156, 222, 0.1);
+            border: 1px solid #009CDE;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        /* Hero Impact Section */
+        .hero-section {
+            background: linear-gradient(135deg, #009CDE 0%, #004C97 100%);
+            border-radius: 12px;
+            padding: 48px 32px;
+            margin-bottom: 48px;
+            box-shadow: 0 4px 12px rgba(0, 76, 151, 0.15);
+        }
+
+        .hero-title {
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .hero-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .hero-metric {
+            text-align: center;
+            padding: 32px 24px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-number {
+            font-size: 64px;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .hero-label {
+            font-size: 18px;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .hero-context {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.5;
+        }
+
+        /* Tier spacing */
+        .tier-1-spacing {
+            margin-bottom: 48px;
+        }
+
+        .tier-2-spacing {
+            margin-bottom: 32px;
+        }
+
+        @media print {
+            .container {
+                max-width: 100%;
+            }
+            .card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <img src="critical-start-logo.png" alt="Critical Start" style="height: 40px; margin-bottom: 16px;">
+                <h1 style="font-size: 24px; font-weight: 700; color: #004C97; margin-bottom: 8px;">
+                    Escalation to Client Details Report — Signature Tier
+                </h1>
+                <p style="font-weight: 600; color: #343741; margin-bottom: 4px;">Lennar Corporation</p>
+                <p style="color: #6b7280; font-size: 14px;">Period: August 1-31, 2025 (31 days)</p>
+                <p style="color: #9ca3af; font-size: 12px;">Production incidents escalated to client. Rolling 90-day benchmarks from CORR.</p>
+            </div>
+            <div class="badge">Target Met</div>
+        </div>
+
+        <!-- TIER 1: Hero Impact Section -->
+        <div class="hero-section tier-1-spacing">
+            <h2 class="hero-title">What We Delivered This Period</h2>
+            <p class="hero-subtitle">Real protection, measurable outcomes.</p>
+            
+            <div class="hero-grid">
+                <div class="hero-metric">
+                    <div class="hero-number">452</div>
+                    <div class="hero-label">Hours of Expert Analysis</div>
+                    <div class="hero-context">Security operations your team didn't have to staff</div>
+                </div>
+                
+                <div class="hero-metric">
+                    <div class="hero-number">1,843</div>
+                    <div class="hero-label">Alerts Resolved</div>
+                    <div class="hero-context">Handled by CS SOC without escalation—noise filtered so you could focus</div>
+                </div>
+                
+                <div class="hero-metric">
+                    <div class="hero-number">24/7</div>
+                    <div class="hero-label">Coverage Provided</div>
+                    <div class="hero-context">744 hours of continuous monitoring and response</div>
+                </div>
+                
+                <div class="hero-metric">
+                    <div class="hero-number">88%</div>
+                    <div class="hero-label">Target Compliance</div>
+                    <div class="hero-context">Response targets met across all incident severities</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary - ENHANCED -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Executive Summary</h2>
+            </div>
+            <div class="card-content">
+                <div style="margin-bottom: 16px;">
+                    <p style="font-size: 32px; font-weight: 700; color: #343741;">267 Incidents Escalated</p>
+                    <p style="color: #6b7280;">Average 8.9 per day requiring your team's attention</p>
+                    <p style="font-size: 14px; color: #9ca3af; margin-top: 4px;">
+                        Additionally: 1,843 alerts resolved by CS SOC without escalation (59.5 per day)
+                    </p>
+                </div>
+                
+                <div class="highlight-box">
+                    <p style="font-weight: 600; color: #004C97; margin-bottom: 8px;">Period Highlights</p>
+                    <p style="font-size: 14px; color: #4b5563; line-height: 1.7;">
+                        Your security posture remained strong this reporting period. We maintained 88% target compliance across all incident severities, with 90th percentile response time at 87 minutes. Of the 267 incidents escalated, we identified 11 true positive threats and contained them before business impact. False positive rate held at 9.0%, reflecting our ongoing commitment to signal over noise.
+                    </p>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <p class="summary-title">Threat Outcomes</p>
+                        <p class="summary-value">11 threats contained, zero breaches</p>
+                    </div>
+                    <div class="summary-item">
+                        <p class="summary-title">24/7 Protection</p>
+                        <p class="summary-value">49% handled after-hours</p>
+                    </div>
+                    <div class="summary-item">
+                        <p class="summary-title">Detection Quality</p>
+                        <p class="summary-value">9.0% false positive rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 2: Performance & Trust Zone -->
+        <!-- 3-Month Performance Trend -->
+        <div class="card tier-2-spacing">
+            <div class="card-header">
+                <h2 class="card-title">Getting Better Every Period</h2>
+            </div>
+            <div class="card-content">
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #009CDE;"></div>
+                        <span>MTTR</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #004C97;"></div>
+                        <span>MTTD</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #EF3340; border: 2px dashed #EF3340; background: none;"></div>
+                        <span>False Positive %</span>
+                    </div>
+                </div>
+                <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1);">
+                    <p style="font-size: 14px; color: #4b5563;">
+                        <strong>Trend Analysis:</strong> Continuous improvement across all metrics. MTTR decreased 25%, MTTD improved 22%, and false positive rate dropped 24% over three periods, demonstrating effective tuning and process maturation.
+                    </p>
+                </div>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 8px; font-style: italic;">Data source: CORR Platform rolling 90-day averages</p>
+            </div>
+        </div>
+
+        <!-- INCIDENT SPOTLIGHT - NEW -->
+
+        <!-- Target Metrics - NOW WITH 4 CARDS INCLUDING P90 -->
+        <div class="grid-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-size: 14px;">P90 Response Time</h3>
+                </div>
+                <div class="card-content">
+                    <p class="stat-value" style="color: #343741;">87m</p>
+                    <p class="improvement-delta">↓ 25% vs 90-day avg</p>
+                    <p class="stat-detail" style="margin-top: 8px;">Target &lt; 90m | 90th percentile</p>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 4px; font-style: italic;">CS SOC TTR (col 37)</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-size: 14px;">Critical/High Priority</h3>
+                </div>
+                <div class="card-content">
+                    <p class="stat-value" style="color: #343741;">91% <span style="font-size: 14px; color: #6b7280;">≤1h</span></p>
+                    <p class="improvement-delta">↑ 4% improvement</p>
+                    <p class="stat-detail" style="margin-top: 8px;">Target ≥90% | n=132</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-size: 14px;">Medium/Low MTTR</h3>
+                </div>
+                <div class="card-content">
+                    <p class="stat-value" style="color: #343741;">0:52:00</p>
+                    <p class="improvement-delta">↓ 18% improvement</p>
+                    <p class="stat-detail" style="margin-top: 8px;">Target &lt; 90m | n=135</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-size: 14px;">Mean Time to Detect</h3>
+                </div>
+                <div class="card-content">
+                    <p class="stat-value" style="color: #343741;">0:04:00</p>
+                    <p class="improvement-delta">↓ 12% improvement</p>
+                    <p class="stat-detail" style="margin-top: 8px;">Target &lt; 15m | n=267</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Industry Comparison -->
+        <div class="card tier-2-spacing">
+            <div class="card-header">
+                <h2 class="card-title">Industry Comparison</h2>
+            </div>
+            <div class="card-content">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Metric</th>
+                            <th style="text-align: center;">Your Performance</th>
+                            <th style="text-align: center;">Industry Average</th>
+                            <th style="text-align: center;">Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 500;">MTTR (hrs)</td>
+                            <td style="text-align: center; font-weight: 700;">2.1</td>
+                            <td style="text-align: center;">3.2</td>
+                            <td style="text-align: center;">
+                                <span class="status-badge status-better">34% Better</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">MTTD (hrs)</td>
+                            <td style="text-align: center; font-weight: 700;">0.7</td>
+                            <td style="text-align: center;">1.1</td>
+                            <td style="text-align: center;">
+                                <span class="status-badge status-better">36% Better</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">Incidents/Day</td>
+                            <td style="text-align: center; font-weight: 700;">8.9</td>
+                            <td style="text-align: center;">11.4</td>
+                            <td style="text-align: center;">
+                                <span class="status-badge status-better">22% Better</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 12px;">Benchmarks from CORR Platform: Signature Tier MDR clients in similar industries (mid-market construction/real estate)</p>
+            </div>
+        </div>
+
+        <!-- TIER 3: Coverage & Capability Zone -->
+        <!-- Value Delivered -->
+        <div class="card cost-avoidance-card">
+            <div class="card-header">
+                <h2 class="card-title">Value Delivered This Period</h2>
+            </div>
+            <div class="card-content">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <p style="font-size: 48px; font-weight: 700; color: #004C97;">$7.55M</p>
+                    <p style="font-size: 14px; color: #6b7280; margin-top: 8px;">Combined security operations and threat prevention value</p>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="cost-component">
+                        <p class="stat-label" style="font-weight: 600; margin-bottom: 4px;">Security Operations</p>
+                        <p style="font-size: 24px; font-weight: 700; color: #004C97;">$38K</p>
+                        <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">452 hours of expert analysis</p>
+                        <p style="font-size: 12px; color: #6b7280;">Labor your team didn't have to provide</p>
+                    </div>
+                    
+                    <div class="cost-component">
+                        <p class="stat-label" style="font-weight: 600; margin-bottom: 4px;">24/7 Coverage</p>
+                        <p style="font-size: 24px; font-weight: 700; color: #004C97;">$163K</p>
+                        <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">744 hours of continuous protection</p>
+                        <p style="font-size: 12px; color: #6b7280;">vs. internal 24/7 SOC staffing</p>
+                    </div>
+                    
+                    <div class="cost-component">
+                        <p class="stat-label" style="font-weight: 600; margin-bottom: 4px;">Threat Prevention</p>
+                        <p style="font-size: 24px; font-weight: 700; color: #004C97;">$7.34M</p>
+                        <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">11 threats contained</p>
+                        <p style="font-size: 12px; color: #6b7280;">Conservative breach cost model</p>
+                    </div>
+                </div>
+
+                <div class="info-box" style="background: white; border: 1px solid #009CDE;">
+                    <p style="font-size: 12px; color: #6b7280;">
+                        <strong>Methodology:</strong> Operations value: 452 analyst hours × $85/hr loaded cost. Coverage value: Full-time SOC analyst cost ($110K annually) × coverage ratio. Threat prevention: Contained threats × industry average breach cost ($4.45M) × conservative probability factor (15%). All calculations use industry-standard benchmarks and are configurable.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Breakdown -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Detection Sources & Quality</h2>
+            </div>
+            <div class="card-content">
+                <div class="product-item">
+                    <div>
+                        <p style="font-weight: 600; color: #343741;">Palo Alto Cortex XDR</p>
+                        <p style="font-size: 14px; color: #6b7280;">189 incidents (70.8% of total)</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 14px; color: #6b7280;">False Positive Rate</p>
+                        <p style="font-size: 20px; font-weight: 700; color: #FF6A14;">11.2%</p>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div>
+                        <p style="font-weight: 600; color: #343741;">Microsoft Sentinel</p>
+                        <p style="font-size: 14px; color: #6b7280;">52 incidents (19.5% of total)</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 14px; color: #6b7280;">False Positive Rate</p>
+                        <p style="font-size: 20px; font-weight: 700; color: #009CDE;">5.8%</p>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div>
+                        <p style="font-weight: 600; color: #343741;">CrowdStrike Falcon</p>
+                        <p style="font-size: 14px; color: #6b7280;">26 incidents (9.7% of total)</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 14px; color: #6b7280;">False Positive Rate</p>
+                        <p style="font-size: 20px; font-weight: 700; color: #009CDE;">7.7%</p>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: #9ca3af; font-style: italic; margin-top: 12px;">Source: Excel Extract columns 7 (Product) and 12 (CS SOC Verdict)</p>
+            </div>
+        </div>
+
+        <!-- Escalation Methods - UPDATED -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">How Incidents Reach You</h2>
+            </div>
+            <div class="card-content">
+                <div class="method-item">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div class="percentage-circle" style="background-color: #009CDE;">86%</div>
+                        <div>
+                            <p style="font-weight: 600; color: #343741;">Playbook (Automated)</p>
+                            <p style="font-size: 14px; color: #6b7280;">229 incidents</p>
+                            <p style="font-size: 12px; color: #9ca3af; font-style: italic;">Rule-based automated escalation</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="method-item">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div class="percentage-circle" style="background-color: #FF6A14;">14%</div>
+                        <div>
+                            <p style="font-weight: 600; color: #343741;">CS SOC (Analyst Escalation)</p>
+                            <p style="font-size: 14px; color: #6b7280;">38 incidents</p>
+                            <p style="font-size: 12px; color: #9ca3af; font-style: italic;">Analyst-driven escalation requiring human judgment</p>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: #9ca3af; font-style: italic; margin-top: 12px;">Source: Excel Extract column 9 (Initial Escalation Method)</p>
+            </div>
+        </div>
+
+        <!-- Operational Load - UPDATED WITH CLARITY -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">CS SOC Alert Resolution (Non-Escalated)</h2>
+            </div>
+            <div class="card-content">
+                <div class="grid-2">
+                    <div>
+                        <canvas id="operationalLoadChart"></canvas>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+                        <div>
+                            <p class="stat-label">Business Hours (8am-6pm Mon-Fri)</p>
+                            <p style="font-size: 24px; font-weight: 700; color: #009CDE;">
+                                51% <span style="font-size: 16px; color: #6b7280;">(940 alerts)</span>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="stat-label">After Hours (6pm-8am weekdays)</p>
+                            <p style="font-size: 24px; font-weight: 700; color: #702F8A;">
+                                41% <span style="font-size: 16px; color: #6b7280;">(756 alerts)</span>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="stat-label">Weekend Coverage</p>
+                            <p style="font-size: 24px; font-weight: 700; color: #EF3340;">
+                                8% <span style="font-size: 16px; color: #6b7280;">(147 alerts)</span>
+                            </p>
+                        </div>
+                        <p class="info-box" style="background-color: rgba(0, 156, 222, 0.15); font-size: 14px;">
+                            Our SOC handled 903 alerts outside business hours—protection working while your team isn't.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- After-Hours Customer Calls -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">After-Hours Customer Notifications</h2>
+            </div>
+            <div class="card-content">
+                <div class="highlight-box">
+                    <p style="font-size: 14px; color: #4b5563;">
+                        <strong>High and Critical severity alerts require direct customer notification.</strong> This shows how often your team was contacted outside business hours for urgent threats.
+                    </p>
+                </div>
+                
+                <div class="grid-3" style="margin-top: 16px;">
+                    <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
+                        <p style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">After Hours Calls</p>
+                        <p style="font-size: 32px; font-weight: 700; color: #702F8A; margin-bottom: 4px;">18%</p>
+                        <p style="font-size: 14px; color: #6b7280;">136 of 756 alerts</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">High/Critical requiring immediate attention</p>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
+                        <p style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Weekend Calls</p>
+                        <p style="font-size: 32px; font-weight: 700; color: #EF3340; margin-bottom: 4px;">15%</p>
+                        <p style="font-size: 14px; color: #6b7280;">22 of 147 alerts</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">High/Critical requiring immediate attention</p>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
+                        <p style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Total Off-Hours Calls</p>
+                        <p style="font-size: 32px; font-weight: 700; color: #009CDE; margin-bottom: 4px;">158</p>
+                        <p style="font-size: 14px; color: #6b7280;">17.5% of off-hours alerts</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Your team was notified 5.1 times per day off-hours</p>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1); margin-top: 16px;">
+                    <p style="font-size: 14px; color: #4b5563;">
+                        <strong>Context:</strong> 82.5% of after-hours alerts (745 alerts) were handled by CS SOC without requiring customer notification, allowing your team to rest while maintaining security coverage. Only high and critical severity incidents required immediate contact.
+                    </p>
+                </div>
+                
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 12px; font-style: italic;">
+                    Source: Vendor Severity (col 45), Current Priority (col 13), Escalated Timestamp (col 7)
+                </p>
+            </div>
+        </div>
+
+
+
+        <!-- TIER 4: Technical Detail Zone -->
+        <!-- Response Efficiency -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Response Efficiency</h2>
+            </div>
+            <div class="card-content">
+                <div class="grid-3">
+                    <div class="stat-card" style="background-color: rgba(0, 156, 222, 0.15);">
+                        <p class="stat-label">Containment Rate</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #004C97;">98%</p>
+                        <p class="stat-detail">262 of 267 contained</p>
+                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Response Action Status (col 36)</p>
+                    </div>
+                    <div class="stat-card" style="background-color: rgba(0, 156, 222, 0.15);">
+                        <p class="stat-label">Playbook Automation</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #004C97;">86%</p>
+                        <p class="stat-detail">Consistent, rule-based escalation</p>
+                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Initial Escalation Method (col 9)</p>
+                    </div>
+                    <div class="stat-card" style="background-color: rgba(255, 106, 20, 0.15);">
+                        <p class="stat-label">Analyst Escalation</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #FF6A14;">14%</p>
+                        <p class="stat-detail">Human judgment required</p>
+                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Initial Escalation Method (col 9)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Engagement -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Collaboration Quality</h2>
+            </div>
+            <div class="card-content">
+                <div class="grid-3">
+                    <div style="text-align: center;">
+                        <p class="stat-label">Average Touches per Incident</p>
+                        <p style="font-size: 32px; font-weight: 700; color: #009CDE;">2.3</p>
+                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Touched By (col 26)</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <p class="stat-label">Active Client Participation</p>
+                        <p style="font-size: 32px; font-weight: 700; color: #009CDE;">72%</p>
+                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Customer Last Comment (col 29)</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <p class="stat-label">Client-Led Closures</p>
+                        <p style="font-size: 32px; font-weight: 700; color: #009CDE;">21%</p>
+                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Closed By (col 27)</p>
+                    </div>
+                </div>
+                <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 16px; font-style: italic;">
+                    Strong two-way collaboration. High client participation indicates trust and engagement with the SOC process.
+                </p>
+            </div>
+        </div>
+
+        <!-- Detection Quality & Severity -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Detection Accuracy</h2>
+                </div>
+                <div class="card-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">True Positives (Threats)</span>
+                        <span style="font-weight: 700; color: #EF3340;">4.1%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">Benign True Positives</span>
+                        <span style="font-weight: 700; color: #009CDE;">86.9%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">False Positives</span>
+                        <span style="font-weight: 700; color: #FF6A14;">9.0%</span>
+                    </div>
+                    <p style="font-size: 12px; color: #9ca3af; margin-top: 12px; font-style: italic;">
+                        Source: CS SOC Verdict (col 12) — 11 TP, 232 BTP, 24 FP
+                    </p>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                        FP rate down from 12.1% in prior period—tuning efforts showing results.
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Severity Distribution</h2>
+                </div>
+                <div class="card-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">Critical/High</span>
+                        <span style="font-weight: 700;">8.6% <span style="font-size: 12px; color: #6b7280;">(23 incidents)</span></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">Medium</span>
+                        <span style="font-weight: 700;">45.3% <span style="font-size: 12px; color: #6b7280;">(121 incidents)</span></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">Low</span>
+                        <span style="font-weight: 700;">38.6% <span style="font-size: 12px; color: #6b7280;">(103 incidents)</span></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">Informational</span>
+                        <span style="font-weight: 700;">7.5% <span style="font-size: 12px; color: #6b7280;">(20 incidents)</span></span>
+                    </div>
+                    <p style="font-size: 12px; color: #9ca3af; margin-top: 12px; font-style: italic;">
+                        Source: Vendor Severity (col 45) and Current Priority (col 13)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Threat Landscape - STACKED BY SEVERITY -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Threat Landscape by Tactic & Severity</h2>
+            </div>
+            <div class="card-content">
+                <div class="chart-container" style="height: 280px;">
+                    <canvas id="mitreChart"></canvas>
+                </div>
+                <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1); margin-top: 16px;">
+                    <p style="font-size: 14px; color: #4b5563;">
+                        <strong>Key Insight:</strong> Persistence tactics show the highest concentration of high-severity incidents (12 of 77), suggesting adversaries are attempting to establish foothold. Defense Evasion follows closely. These patterns warrant enhanced detection rules and proactive hunting.
+                    </p>
+                </div>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 8px; font-style: italic;">
+                    Source: MITRE Tactic Name (col 42), MITRE Technique Name (col 44), Vendor Severity (col 45)
+                </p>
+            </div>
+        </div>
+
+        <!-- ENHANCED Improvement Opportunities -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Prioritized Improvement Plan</h2>
+            </div>
+            <div class="card-content">
+                <div class="highlight-box">
+                    <p style="font-size: 14px; color: #4b5563;">
+                        <strong>Action-Oriented Recommendations:</strong> These improvements are prioritized by impact and auto-generated from threshold analysis. Each includes ownership and target timelines.
+                    </p>
+                </div>
+                
+                <!-- Improvement 1: Detection Tuning -->
+                <div class="improvement-item" style="border-left: 4px solid #EF3340;">
+                    <div style="margin-bottom: 12px;">
+                        <span class="priority-badge priority-high">HIGH</span>
+                        <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Detection Tuning</span>
+                    </div>
+                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                        False positive rate at 9.0% exceeds our 10.0% threshold. Palo Alto Cortex XDR is the primary driver at 11.2%. Tuning these alerts will reduce client noise and improve SOC efficiency.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
+                        <div>
+                            <span style="color: #6b7280;">Owner:</span>
+                            <p style="font-weight: 600;">CS SOC + Lennar Security Team</p>
+                        </div>
+                        <div>
+                            <span style="color: #6b7280;">Target:</span>
+                            <p style="font-weight: 600;">Next 30 days</p>
+                        </div>
+                        <div>
+                            <span style="color: #6b7280;">Expected Impact:</span>
+                            <p style="font-weight: 600;">Reduce escalations by ~20%, improve analyst focus</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Improvement 2: Automation -->
+                <div class="improvement-item" style="border-left: 4px solid #FF6A14;">
+                    <div style="margin-bottom: 12px;">
+                        <span class="priority-badge priority-medium">MEDIUM</span>
+                        <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Automation Opportunity</span>
+                    </div>
+                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                        Manual escalations at 14% exceed our 15% target. 38 incidents required analyst judgment. Expanding playbook coverage will improve consistency.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
+                        <div>
+                            <span style="color: #6b7280;">Owner:</span>
+                            <p style="font-weight: 600;">CS SOC Engineering</p>
+                        </div>
+                        <div>
+                            <span style="color: #6b7280;">Target:</span>
+                            <p style="font-weight: 600;">Next 60 days</p>
+                        </div>
+                        <div>
+                            <span style="color: #6b7280;">Expected Impact:</span>
+                            <p style="font-weight: 600;">Reduce manual review burden, faster escalation times</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Improvement 3: Threat Focus -->
+                <div class="improvement-item" style="border-left: 4px solid #EF3340;">
+                    <div style="margin-bottom: 12px;">
+                        <span class="priority-badge priority-high">HIGH</span>
+                        <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Threat Focus</span>
+                    </div>
+                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                        Persistence and Defense Evasion tactics driving 20 high-severity incidents. These persistence and evasion techniques suggest sophisticated adversary activity requiring enhanced detection.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
+                        <div>
+                            <span style="color: #6b7280;">Owner:</span>
+                            <p style="font-weight: 600;">Joint - CS Threat Intel + Lennar</p>
+                        </div>
+                        <div>
+                            <span style="color: #6b7280;">Target:</span>
+                            <p style="font-weight: 600;">Ongoing</p>
+                        </div>
+                        <div>
+                            <span style="color: #6b7280;">Expected Impact:</span>
+                            <p style="font-weight: 600;">Improved detection of advanced threats, reduced dwell time</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box" style="background-color: #f9fafb;">
+                    <p style="font-size: 12px; color: #6b7280;">
+                        <strong>Recommendation Engine:</strong> These trigger automatically when metrics cross defined thresholds:
+                    </p>
+                    <ul style="list-style-type: disc; padding-left: 20px; margin-top: 8px; font-size: 12px; color: #6b7280;">
+                        <li>False positive rate threshold: 10.0%</li>
+                        <li>Manual escalation threshold: 15%</li>
+                        <li>Containment target: 95%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Value Delivered - Detailed Breakdown -->
+        <div class="card" style="background: linear-gradient(to bottom right, rgba(0, 156, 222, 0.15), rgba(0, 76, 151, 0.1));">
+            <div class="card-header">
+                <h2 class="card-title">Security Outcomes This Period</h2>
+            </div>
+            <div class="card-content">
+                <p style="font-weight: 600; color: #4b5563; margin-bottom: 12px;">Your MDR investment delivered measurable security outcomes:</p>
+                <div class="grid-2">
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">452 Hours of Expert Analysis</p>
+                            <p style="font-size: 12px; color: #6b7280;">Security operations work your team didn't have to staff</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">1,843 Alerts Resolved</p>
+                            <p style="font-size: 12px; color: #6b7280;">Noise reduction—87% handled without escalation</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">24/7 Coverage Maintained</p>
+                            <p style="font-size: 12px; color: #6b7280;">744 hours of continuous monitoring and response</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">11 Threats Contained</p>
+                            <p style="font-size: 12px; color: #6b7280;">True positive threats stopped before business impact</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">88% Target Compliance</p>
+                            <p style="font-size: 12px; color: #6b7280;">Response targets met across all incident severities</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">87-Minute P90 Response</p>
+                            <p style="font-size: 12px; color: #6b7280;">90th percentile incidents resolved under 90-minute target</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">Zero Breaches</p>
+                            <p style="font-size: 12px; color: #6b7280;">No ransomware, no data loss, no operational disruption</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="checkmark">✓</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 14px;">9.0% False Positive Rate</p>
+                            <p style="font-size: 12px; color: #6b7280;">High signal-to-noise ratio maintained through ongoing tuning</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; padding: 12px; background: white; border-radius: 6px;">
+                    <p style="font-size: 14px; color: #4b5563;">
+                        <strong>Looking Ahead:</strong> In the next period we're focused on reducing false positives another 20% through enhanced Palo Alto XDR tuning and expanding playbook automation to capture the remaining 14% of manual escalations.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="font-weight: 600; margin-bottom: 4px;">Report Generated: November 5, 2025</p>
+            <p style="margin-bottom: 4px;">Data Sources: Excel Escalation Export (45 columns) + CORR Platform (90-day trends and benchmarks)</p>
+            <p style="margin-bottom: 4px;">All metrics calculated from source data. Improvement recommendations auto-generated based on configured thresholds.</p>
+            <p>Questions? Your Customer Success Manager is here to help.</p>
+        </div>
+    </div>
+
+    <script>
+        // Operational Load Pie Chart
+        const opLoadCtx = document.getElementById('operationalLoadChart').getContext('2d');
+        new Chart(opLoadCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Business Hours', 'After Hours', 'Weekend'],
+                datasets: [{
+                    data: [51, 41, 8],
+                    backgroundColor: ['#009CDE', '#702F8A', '#EF3340'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                family: 'Roboto',
+                                size: 12
+                            },
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Performance Trend Line Chart - MORE REALISTIC DATA
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Period -2', 'Period -1', 'Current'],
+                datasets: [
+                    {
+                        label: 'MTTR',
+                        data: [2.8, 2.5, 2.1],
+                        borderColor: '#009CDE',
+                        backgroundColor: 'rgba(0, 156, 222, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'MTTD',
+                        data: [0.9, 0.8, 0.7],
+                        borderColor: '#004C97',
+                        backgroundColor: 'rgba(0, 76, 151, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'FP %',
+                        data: [12.1, 10.8, 9.2],
+                        borderColor: '#EF3340',
+                        backgroundColor: 'rgba(239, 51, 64, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [8, 4],
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                family: 'Roboto',
+                                size: 11
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                family: 'Roboto',
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // MITRE ATT&CK STACKED Bar Chart
+        const mitreCtx = document.getElementById('mitreChart').getContext('2d');
+        new Chart(mitreCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Persistence', 'Defense Evasion', 'Execution', 'Discovery', 'Initial Access'],
+                datasets: [
+                    {
+                        label: 'High',
+                        data: [12, 8, 5, 3, 2],
+                        backgroundColor: '#EF3340',
+                        borderRadius: 0
+                    },
+                    {
+                        label: 'Medium',
+                        data: [38, 31, 22, 18, 12],
+                        backgroundColor: '#FF6A14',
+                        borderRadius: 0
+                    },
+                    {
+                        label: 'Low',
+                        data: [22, 18, 15, 24, 16],
+                        backgroundColor: '#009CDE',
+                        borderRadius: 0
+                    },
+                    {
+                        label: 'Info',
+                        data: [5, 3, 2, 8, 3],
+                        backgroundColor: '#9CA3AF',
+                        borderRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                family: 'Roboto',
+                                size: 11
+                            },
+                            padding: 10
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            footer: function(tooltipItems) {
+                                let total = 0;
+                                tooltipItems.forEach(function(tooltipItem) {
+                                    total += tooltipItem.parsed.y;
+                                });
+                                return 'Total: ' + total;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            font: {
+                                family: 'Roboto',
+                                size: 10
+                            },
+                            maxRotation: 45,
+                            minRotation: 15
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                family: 'Roboto',
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
