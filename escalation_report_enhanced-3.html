@@ -607,7 +607,7 @@
                 </h1>
                 <p style="font-weight: 600; color: #343741; margin-bottom: 4px;">Lennar Corporation</p>
                 <p style="color: #6b7280; font-size: 14px;">Period: August 1-31, 2025 (31 days)</p>
-                <p style="color: #9ca3af; font-size: 12px;">Production incidents escalated to client. Rolling 90-day benchmarks from CORR.</p>
+                <p style="color: #9ca3af; font-size: 12px;">Production incidents escalated to client. Rolling 90-day benchmarks from the Cyber Operations Risk Response (CORR) platform.</p>
             </div>
             <div class="badge">Target Met</div>
         </div>
@@ -627,7 +627,7 @@
                 <div class="hero-metric">
                     <div class="hero-number">1,843</div>
                     <div class="hero-label">Alerts Resolved</div>
-                    <div class="hero-context">Handled by CS SOC without escalation—noise filtered so you could focus</div>
+                    <div class="hero-context">Handled by the Critical Start Security Operations Center (CS SOC) without escalation—noise filtered so you could focus</div>
                 </div>
                 
                 <div class="hero-metric">
@@ -643,7 +643,7 @@
                 </div>
             </div>
             <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-top: 32px; text-align: center; font-style: italic;">
-                Sources: CORR Platform — Analyst Utilization & Coverage metadata; Report Extract — Incident Id (col 1), Escalated Datetime (US/Central) (col 20), CS SOC TTR (hh:mm) (col 37).
+                Sources: Cyber Operations Risk Response (CORR) platform — Analyst Utilization & Coverage metadata; Report Extract — Incident Id (col 1), Escalated Datetime (US/Central) (col 20), CS SOC time to respond (TTR) (hh:mm) (col 37).
             </p>
         </div>
 
@@ -657,7 +657,7 @@
                     <p style="font-size: 32px; font-weight: 700; color: #343741;">267 Incidents Escalated</p>
                     <p style="color: #6b7280;">Average 8.9 per day requiring your team's attention</p>
                     <p style="font-size: 14px; color: #9ca3af; margin-top: 4px;">
-                        Additionally: 1,843 alerts resolved by CS SOC without escalation (59.5 per day)
+                        Additionally: 1,843 alerts resolved by the CS SOC without escalation (59.5 per day)
                     </p>
                 </div>
                 
@@ -701,11 +701,11 @@
                 <div class="chart-legend">
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #009CDE;"></div>
-                        <span>MTTR (min)</span>
+                        <span>Mean Time to Respond (MTTR)</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #004C97;"></div>
-                        <span>MTTD (min)</span>
+                        <span>Mean Time to Detect (MTTD)</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #EF3340; border: 2px dashed #EF3340; background: none;"></div>
@@ -714,11 +714,11 @@
                 </div>
                 <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1);">
                     <p style="font-size: 14px; color: #4b5563;">
-                        <strong>Trend Analysis:</strong> Continuous improvement across all metrics. MTTR decreased 25% to 126 minutes, MTTD improved 22% to 42 minutes, and false positive rate dropped 24% over three periods, demonstrating effective tuning and process maturation.
+                        <strong>Trend Analysis:</strong> Continuous improvement across all metrics. Mean Time to Respond (MTTR) decreased 25% to 126 minutes, Mean Time to Detect (MTTD) improved 22% to 42 minutes, and false positive rate dropped 24% over three periods, demonstrating effective tuning and process maturation.
                     </p>
                 </div>
-                <p style="font-size: 12px; color: #9ca3af; margin-top: 8px; font-style: italic;">Data source: CORR Platform rolling 90-day averages</p>
-                <p style="font-size: 12px; color: #9ca3af; margin-top: 4px; font-style: italic;">Visualization note: MTTR/MTTD render on the left axis in minutes; False Positive % renders on the right axis.</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 8px; font-style: italic;">Data source: CORR platform rolling 90-day averages</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 4px; font-style: italic;">Visualization note: Mean Time to Respond (MTTR) and Mean Time to Detect (MTTD) render on the left axis in minutes; False Positive % renders on the right axis.</p>
             </div>
         </div>
 
@@ -734,12 +734,12 @@
                     <p class="stat-value" style="color: #343741;">87m</p>
                     <p class="improvement-delta">↓ 25% vs 90-day avg</p>
                     <p class="stat-detail" style="margin-top: 8px;">Target &lt; 90m | 90th percentile</p>
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 4px; font-style: italic;">CS SOC TTR (col 37)</p>
+                <p style="font-size: 12px; color: #6b7280; margin-top: 4px; font-style: italic;">CS SOC time to respond (TTR) (col 37)</p>
                 </div>
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title" style="font-size: 14px;">Critical/High Priority MTTR</h3>
+                    <h3 class="card-title" style="font-size: 14px;">Critical/High Priority Mean Time to Respond (MTTR)</h3>
                 </div>
                 <div class="card-content">
                     <p class="stat-value" style="color: #343741;">67 min</p>
@@ -749,7 +749,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title" style="font-size: 14px;">Medium/Low MTTR</h3>
+                    <h3 class="card-title" style="font-size: 14px;">Medium/Low Mean Time to Respond (MTTR)</h3>
                 </div>
                 <div class="card-content">
                     <p class="stat-value" style="color: #343741;">52 min</p>
@@ -785,16 +785,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td style="font-weight: 500;">MTTR (minutes)</td>
+                          <tr>
+                              <td style="font-weight: 500;">Mean Time to Respond (MTTR)</td>
                             <td style="text-align: center; font-weight: 700;">126</td>
                             <td style="text-align: center;">192</td>
                             <td style="text-align: center;">
                                 <span class="status-badge status-better">34% Better</span>
                             </td>
                         </tr>
-                        <tr>
-                            <td style="font-weight: 500;">MTTD (minutes)</td>
+                          <tr>
+                              <td style="font-weight: 500;">Mean Time to Detect (MTTD)</td>
                             <td style="text-align: center; font-weight: 700;">42</td>
                             <td style="text-align: center;">66</td>
                             <td style="text-align: center;">
@@ -811,7 +811,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <p style="font-size: 12px; color: #9ca3af; margin-top: 12px;">Benchmarks: SANS 2024 SOC Survey (Construction & Real Estate cohort), published averages converted to minutes.</p>
+                  <p style="font-size: 12px; color: #9ca3af; margin-top: 12px;">Benchmarks: SANS 2024 Security Operations Center (SOC) Survey (Construction &amp; Real Estate cohort), published averages converted to minutes.</p>
             </div>
         </div>
 
@@ -958,7 +958,7 @@
                             </p>
                         </div>
                         <p class="info-box" style="background-color: rgba(0, 156, 222, 0.15); font-size: 14px;">
-                            Our SOC handled 903 alerts outside business hours—protection working while your team isn't.
+                            Our CS SOC handled 903 alerts outside business hours—protection working while your team isn't.
                         </p>
                     </div>
                 </div>
@@ -1081,16 +1081,16 @@
                   <div class="detection-quality-layout">
                       <div>
                           <div class="detection-metric-grid">
-                              <div class="detection-metric detection-metric-critical">
-                                  <p class="detection-metric-label">True Threat Precision</p>
-                                  <p class="detection-metric-value" style="color: #EF3340;">31.4%</p>
-                                  <p class="detection-metric-detail">11 TP ÷ (11 TP + 24 FP)</p>
-                                  <p class="detection-metric-trend">Focused adversary detections delivered this period</p>
-                              </div>
+                                <div class="detection-metric detection-metric-critical">
+                                    <p class="detection-metric-label">True Threat Precision</p>
+                                    <p class="detection-metric-value" style="color: #EF3340;">31.4%</p>
+                                    <p class="detection-metric-detail">11 true positives (TP) ÷ (11 TP + 24 false positives (FP))</p>
+                                    <p class="detection-metric-trend">Focused adversary detections delivered this period</p>
+                                </div>
                               <div class="detection-metric detection-metric-positive">
                                   <p class="detection-metric-label">Signal Fidelity</p>
                                   <p class="detection-metric-value" style="color: #004C97;">91%</p>
-                                  <p class="detection-metric-detail">243 actionable escalations (TP + BTP) of 267 total</p>
+                                    <p class="detection-metric-detail">243 actionable escalations (true positives (TP) + benign true positives (BTP)) of 267 total</p>
                                   <p class="detection-metric-trend">Aligned with 88% response target compliance</p>
                               </div>
                               <div class="detection-metric detection-metric-warning">
@@ -1103,12 +1103,12 @@
                                   <p class="detection-metric-label">Client-Validated Outcomes</p>
                                   <p class="detection-metric-value" style="color: #009CDE;">86.9%</p>
                                   <p class="detection-metric-detail">Share of escalations your team confirmed as accurate (benign true positives)</p>
-                                  <p class="detection-metric-trend">Backed by 4 min MTTD and rapid analyst follow-up</p>
+                                    <p class="detection-metric-trend">Backed by 4 min mean time to detect (MTTD) and rapid analyst follow-up</p>
                               </div>
                               <div class="detection-metric detection-metric-positive">
                                   <p class="detection-metric-label">Signal-to-Noise Ratio</p>
                                   <p class="detection-metric-value" style="color: #004C97;">10.1 : 1</p>
-                                  <p class="detection-metric-detail">Actionable outcomes (true + benign true positives) per false positive</p>
+                                    <p class="detection-metric-detail">Actionable outcomes (true + benign true positives) per false positive (FP)</p>
                                   <p class="detection-metric-trend">243 validated escalations vs 24 false positives this period</p>
                               </div>
                           </div>
@@ -1395,7 +1395,7 @@
                 labels: ['Period -2', 'Period -1', 'Current'],
                 datasets: [
                     {
-                        label: 'MTTR (min)',
+                        label: 'Mean Time to Respond (MTTR)',
                         data: [168, 150, 126],
                         borderColor: '#009CDE',
                         backgroundColor: 'rgba(0, 156, 222, 0.1)',
@@ -1405,7 +1405,7 @@
                         pointHoverRadius: 6
                     },
                     {
-                        label: 'MTTD (min)',
+                        label: 'Mean Time to Detect (MTTD)',
                         data: [54, 48, 42],
                         borderColor: '#004C97',
                         backgroundColor: 'rgba(0, 76, 151, 0.1)',
