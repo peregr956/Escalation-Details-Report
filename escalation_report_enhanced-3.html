@@ -320,6 +320,327 @@
             margin-bottom: 16px;
         }
 
+          .card-subtitle {
+              margin-top: 4px;
+              font-size: 14px;
+              color: #6b7280;
+          }
+
+          .detection-quality-card .card-content {
+              padding: 32px;
+          }
+
+          .detection-quality-layout {
+              display: grid;
+              grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+              gap: 28px;
+              align-items: start;
+          }
+
+          .detection-metric-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+              gap: 16px;
+          }
+
+          .detection-metric {
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              padding: 16px 18px;
+              background-color: #f9fafb;
+          }
+
+          .detection-metric-critical {
+              background-color: rgba(239, 51, 64, 0.08);
+              border-color: rgba(239, 51, 64, 0.25);
+          }
+
+          .detection-metric-warning {
+              background-color: rgba(255, 106, 20, 0.08);
+              border-color: rgba(255, 106, 20, 0.25);
+          }
+
+          .detection-metric-positive {
+              background-color: rgba(0, 156, 222, 0.08);
+              border-color: rgba(0, 156, 222, 0.25);
+          }
+
+          .detection-metric-label {
+              font-size: 12px;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+              color: #6b7280;
+              margin-bottom: 6px;
+          }
+
+          .detection-metric-value {
+              font-size: 28px;
+              font-weight: 700;
+              color: #343741;
+              margin-bottom: 6px;
+          }
+
+          .detection-metric-detail {
+              font-size: 12px;
+              color: #6b7280;
+          }
+
+          .detection-metric-trend {
+              font-size: 12px;
+              color: #004C97;
+              margin-top: 6px;
+              font-weight: 500;
+          }
+
+          .detection-insight-list {
+              display: grid;
+              gap: 16px;
+              margin-top: 24px;
+          }
+
+          .detection-insight {
+              display: grid;
+              grid-template-columns: 12px auto;
+              gap: 12px;
+              align-items: start;
+          }
+
+          .detection-insight-dot {
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              margin-top: 4px;
+          }
+
+          .detection-insight-title {
+              font-weight: 600;
+              color: #343741;
+              font-size: 14px;
+              margin-bottom: 4px;
+          }
+
+          .detection-insight-text {
+              font-size: 13px;
+              color: #6b7280;
+              line-height: 1.6;
+          }
+
+          .detection-chart-panel {
+              background: #f6f7fb;
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              padding: 20px;
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+          }
+
+          .detection-chart-title {
+              font-size: 14px;
+              font-weight: 600;
+              color: #004C97;
+              text-transform: uppercase;
+              letter-spacing: 0.04em;
+          }
+
+          .detection-chart {
+              position: relative;
+              height: 210px;
+          }
+
+          .detection-legend {
+              display: grid;
+              gap: 8px;
+              font-size: 13px;
+              color: #4b5563;
+          }
+
+          .legend-dot {
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              flex-shrink: 0;
+          }
+
+          .detection-callouts {
+              display: flex;
+              gap: 12px;
+              flex-wrap: wrap;
+          }
+
+          .detection-callout {
+              flex: 1 1 120px;
+              background: white;
+              border-radius: 10px;
+              padding: 12px;
+              border: 1px solid #e5e7eb;
+          }
+
+          .callout-label {
+              font-size: 12px;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+              color: #6b7280;
+          }
+
+          .callout-value {
+              font-size: 22px;
+              font-weight: 700;
+              color: #004C97;
+              display: block;
+              margin-top: 4px;
+          }
+
+          .callout-detail {
+              font-size: 12px;
+              color: #6b7280;
+              margin-top: 4px;
+          }
+
+          .detection-footnote {
+              font-size: 11px;
+              color: #9ca3af;
+              margin-top: 24px;
+              font-style: italic;
+          }
+
+          .severity-card .card-content {
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+          }
+
+          .severity-chart-container {
+              width: 100%;
+              height: 220px;
+          }
+
+          .severity-breakdown {
+              display: grid;
+              gap: 12px;
+          }
+
+          .severity-row {
+              display: grid;
+              gap: 6px;
+          }
+
+          .severity-row-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: baseline;
+          }
+
+          .severity-label {
+              font-size: 14px;
+              color: #343741;
+              font-weight: 600;
+          }
+
+          .severity-value {
+              font-size: 14px;
+              color: #4b5563;
+              font-weight: 500;
+          }
+
+          .severity-progress {
+              background: #e5e7eb;
+              border-radius: 999px;
+              height: 8px;
+              overflow: hidden;
+          }
+
+          .severity-progress-bar {
+              height: 100%;
+              border-radius: 999px;
+          }
+
+          .severity-insights {
+              display: grid;
+              gap: 8px;
+              font-size: 12px;
+              color: #6b7280;
+          }
+
+          .severity-insight {
+              line-height: 1.6;
+          }
+
+          .severity-insights strong {
+              color: #004C97;
+              font-weight: 600;
+          }
+
+          .severity-response-card .card-content {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+          }
+
+          .severity-response-grid {
+              display: grid;
+              gap: 16px;
+          }
+
+          .severity-response-item {
+              border-left: 4px solid #009CDE;
+              padding-left: 12px;
+          }
+
+          .severity-response-item.high {
+              border-color: #EF3340;
+          }
+
+          .severity-response-item.medium {
+              border-color: #FF6A14;
+          }
+
+          .severity-response-item.low {
+              border-color: #009CDE;
+          }
+
+          .severity-response-label {
+              font-size: 12px;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+              color: #6b7280;
+          }
+
+          .severity-response-metric {
+              font-size: 22px;
+              font-weight: 700;
+              color: #343741;
+              margin-top: 4px;
+          }
+
+          .severity-response-detail {
+              font-size: 12px;
+              color: #6b7280;
+              margin-top: 4px;
+              line-height: 1.6;
+          }
+
+          .severity-response-callout {
+              font-size: 12px;
+              color: #4b5563;
+              background: rgba(0, 156, 222, 0.1);
+              border: 1px solid rgba(0, 156, 222, 0.2);
+              border-radius: 8px;
+              padding: 12px;
+          }
+
+          @media (max-width: 1024px) {
+              .detection-quality-layout {
+                  grid-template-columns: 1fr;
+              }
+          }
+
+          @media (max-width: 768px) {
+              .severity-chart-container {
+                  height: 200px;
+              }
+          }
+
         /* Hero Impact Section */
         .hero-section {
             background: linear-gradient(135deg, #009CDE 0%, #004C97 100%);
@@ -874,69 +1195,184 @@
             </div>
         </div>
 
-        <!-- Detection Quality & Severity -->
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Detection Accuracy</h2>
-                </div>
-                <div class="card-content">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px;">
-                        <div style="background-color: rgba(239, 51, 64, 0.08); border-radius: 10px; padding: 12px;">
-                            <p style="font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">True Threat Precision</p>
-                            <p style="font-size: 24px; font-weight: 700; color: #EF3340; margin-bottom: 4px;">31.4%</p>
-                            <p style="font-size: 12px; color: #6b7280;">11 TP ÷ (11 TP + 24 FP)</p>
-                        </div>
-                        <div style="background-color: rgba(255, 106, 20, 0.08); border-radius: 10px; padding: 12px;">
-                            <p style="font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">False Positive Rate</p>
-                            <p style="font-size: 24px; font-weight: 700; color: #FF6A14; margin-bottom: 4px;">9.0%</p>
-                            <p style="font-size: 12px; color: #6b7280;">↓ 3.1 pts vs. prior period (target &lt; 10%)</p>
-                        </div>
-                        <div style="background-color: rgba(0, 156, 222, 0.08); border-radius: 10px; padding: 12px;">
-                            <p style="font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">Client-Validated Outcomes</p>
-                            <p style="font-size: 24px; font-weight: 700; color: #009CDE; margin-bottom: 4px;">86.9%</p>
-                            <p style="font-size: 12px; color: #6b7280;">Benign true positives resolved with context</p>
-                        </div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">Threat Containment</span>
-                        <span style="font-weight: 700; color: #004C97;">100% (11 of 11 threats contained)</span>
-                    </div>
-                    <p style="font-size: 12px; color: #9ca3af; margin-top: 12px; font-style: italic;">
-                        Source: CS SOC Verdict (col 12) — 11 TP, 232 BTP, 24 FP
-                    </p>
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
-                        Precision gains mirror the <span style="font-weight: 600;">Detection Tuning</span> recommendation below—target Palo Alto Cortex XDR rules to drive FP &lt; 8% next period.
-                    </p>
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
-                        Continued noise reduction (12.1% → 9.0%) keeps analysts focused on the highest-risk activity while maintaining full containment on true threats.
-                    </p>
-                </div>
+        <!-- Detection Quality -->
+        <div class="card detection-quality-card tier-2-spacing">
+            <div class="card-header">
+                <h2 class="card-title">Detection Quality</h2>
+                <p class="card-subtitle">Precision, signal fidelity, and client-validated outcomes across escalations</p>
             </div>
-            <div class="card">
+            <div class="card-content">
+                <div class="detection-quality-layout">
+                    <div>
+                        <div class="detection-metric-grid">
+                            <div class="detection-metric detection-metric-critical">
+                                <p class="detection-metric-label">True Threat Precision</p>
+                                <p class="detection-metric-value" style="color: #EF3340;">31.4%</p>
+                                <p class="detection-metric-detail">11 TP ÷ (11 TP + 24 FP)</p>
+                                <p class="detection-metric-trend">Focused adversary detections delivered this period</p>
+                            </div>
+                            <div class="detection-metric detection-metric-positive">
+                                <p class="detection-metric-label">Signal Fidelity</p>
+                                <p class="detection-metric-value" style="color: #004C97;">91%</p>
+                                <p class="detection-metric-detail">243 actionable escalations (TP + BTP) of 267 total</p>
+                                <p class="detection-metric-trend">Aligned with 88% response target compliance</p>
+                            </div>
+                            <div class="detection-metric detection-metric-warning">
+                                <p class="detection-metric-label">False Positive Rate</p>
+                                <p class="detection-metric-value" style="color: #FF6A14;">9.0%</p>
+                                <p class="detection-metric-detail">Target &lt; 10% | ↓ 3.1 pts vs prior period</p>
+                                <p class="detection-metric-trend">Only Cortex XDR remains above threshold (11.2%)</p>
+                            </div>
+                            <div class="detection-metric">
+                                <p class="detection-metric-label">Client-Validated Outcomes</p>
+                                <p class="detection-metric-value" style="color: #009CDE;">86.9%</p>
+                                <p class="detection-metric-detail">Benign true positives resolved with customer context</p>
+                                <p class="detection-metric-trend">Backed by 4 min MTTD and rapid analyst follow-up</p>
+                            </div>
+                        </div>
+                        <div class="detection-insight-list">
+                            <div class="detection-insight">
+                                <div class="detection-insight-dot" style="background-color: #004C97;"></div>
+                                <div>
+                                    <p class="detection-insight-title">Precision continues to improve.</p>
+                                    <p class="detection-insight-text">False positive rate dropped by 3.1 points versus last period, sustaining strong signal-to-noise for client teams.</p>
+                                </div>
+                            </div>
+                            <div class="detection-insight">
+                                <div class="detection-insight-dot" style="background-color: #FF6A14;"></div>
+                                <div>
+                                    <p class="detection-insight-title">Next tuning priority: Palo Alto Cortex XDR.</p>
+                                    <p class="detection-insight-text">At 11.2% FP it is the only source above the 10% threshold, aligning with the high-priority recommendation in the improvement plan.</p>
+                                </div>
+                            </div>
+                            <div class="detection-insight">
+                                <div class="detection-insight-dot" style="background-color: #EF3340;"></div>
+                                <div>
+                                    <p class="detection-insight-title">Fast detection sustains 100% containment.</p>
+                                    <p class="detection-insight-text">4 minute MTTD empowered analysts to neutralize all 11 true threats before business impact.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detection-chart-panel">
+                        <p class="detection-chart-title">Escalation Verdict Mix (n = 267)</p>
+                        <div class="detection-chart">
+                            <canvas id="detectionQualityChart"></canvas>
+                        </div>
+                        <div class="detection-legend">
+                            <div class="legend-item">
+                                <span class="legend-dot" style="background-color: #EF3340;"></span>
+                                <span>True Positive (11)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot" style="background-color: #009CDE;"></span>
+                                <span>Benign True Positive (232)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot" style="background-color: #9CA3AF;"></span>
+                                <span>False Positive (24)</span>
+                            </div>
+                        </div>
+                        <div class="detection-callouts">
+                            <div class="detection-callout">
+                                <span class="callout-label">Signal-to-Noise</span>
+                                <span class="callout-value">10.1 : 1</span>
+                                <p class="callout-detail">Actionable outcomes vs false positives</p>
+                            </div>
+                            <div class="detection-callout">
+                                <span class="callout-label">True Threats Contained</span>
+                                <span class="callout-value">11 / 11</span>
+                                <p class="callout-detail">100% containment maintained</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="detection-footnote">Source: CS SOC Verdict (col 12); Report Extract incident counts.</p>
+            </div>
+        </div>
+
+        <div class="grid-2 tier-2-spacing">
+            <div class="card severity-card">
                 <div class="card-header">
                     <h2 class="card-title">Severity Distribution</h2>
+                    <p class="card-subtitle">Volume mix helps target tuning and engagement effort</p>
                 </div>
                 <div class="card-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">Critical/High</span>
-                        <span style="font-weight: 700;">8.6% <span style="font-size: 12px; color: #6b7280;">(23 incidents)</span></span>
+                    <div class="severity-chart-container">
+                        <canvas id="severityChart"></canvas>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">Medium</span>
-                        <span style="font-weight: 700;">45.3% <span style="font-size: 12px; color: #6b7280;">(121 incidents)</span></span>
+                    <div class="severity-breakdown">
+                        <div class="severity-row">
+                            <div class="severity-row-header">
+                                <span class="severity-label" style="color: #EF3340;">Critical / High</span>
+                                <span class="severity-value">23 incidents • 8.6%</span>
+                            </div>
+                            <div class="severity-progress">
+                                <div class="severity-progress-bar" style="width: 9%; background-color: #EF3340;"></div>
+                            </div>
+                        </div>
+                        <div class="severity-row">
+                            <div class="severity-row-header">
+                                <span class="severity-label" style="color: #FF6A14;">Medium</span>
+                                <span class="severity-value">121 incidents • 45.3%</span>
+                            </div>
+                            <div class="severity-progress">
+                                <div class="severity-progress-bar" style="width: 45%; background-color: #FF6A14;"></div>
+                            </div>
+                        </div>
+                        <div class="severity-row">
+                            <div class="severity-row-header">
+                                <span class="severity-label" style="color: #009CDE;">Low</span>
+                                <span class="severity-value">103 incidents • 38.6%</span>
+                            </div>
+                            <div class="severity-progress">
+                                <div class="severity-progress-bar" style="width: 39%; background-color: #009CDE;"></div>
+                            </div>
+                        </div>
+                        <div class="severity-row">
+                            <div class="severity-row-header">
+                                <span class="severity-label" style="color: #6b7280;">Informational</span>
+                                <span class="severity-value">20 incidents • 7.5%</span>
+                            </div>
+                            <div class="severity-progress">
+                                <div class="severity-progress-bar" style="width: 8%; background-color: #9CA3AF;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">Low</span>
-                        <span style="font-weight: 700;">38.6% <span style="font-size: 12px; color: #6b7280;">(103 incidents)</span></span>
+                    <div class="severity-insights">
+                        <p class="severity-insight"><strong>High / Critical</strong> incidents are low volume but drive urgent engagement, aligning with the 18% after-hours call rate.</p>
+                        <p class="severity-insight"><strong>Medium</strong> severity remains the largest share (121 escalations) — a key candidate for additional automation.</p>
+                        <p class="severity-insight"><strong>Low & Informational</strong> account for 46.1% of escalations, reinforcing ongoing tuning cycles to reduce noise.</p>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">Informational</span>
-                        <span style="font-weight: 700;">7.5% <span style="font-size: 12px; color: #6b7280;">(20 incidents)</span></span>
+                    <p style="font-size: 11px; color: #9ca3af; font-style: italic;">Source: Vendor Severity (col 45) + Current Priority (col 13)</p>
+                </div>
+            </div>
+            <div class="card severity-response-card">
+                <div class="card-header">
+                    <h2 class="card-title">Severity Response Focus</h2>
+                    <p class="card-subtitle">Performance against targets by severity band</p>
+                </div>
+                <div class="card-content">
+                    <div class="severity-response-grid">
+                        <div class="severity-response-item high">
+                            <span class="severity-response-label">Critical / High</span>
+                            <span class="severity-response-metric">67 min MTTR</span>
+                            <p class="severity-response-detail">Target &lt; 90 min | 100% containment maintained for high-risk activity</p>
+                        </div>
+                        <div class="severity-response-item medium">
+                            <span class="severity-response-label">Medium</span>
+                            <span class="severity-response-metric">52 min MTTR</span>
+                            <p class="severity-response-detail">Target &lt; 90 min | Comfortable buffer supported by playbook coverage</p>
+                        </div>
+                        <div class="severity-response-item low">
+                            <span class="severity-response-label">Automation & Containment</span>
+                            <span class="severity-response-metric">86% automated</span>
+                            <p class="severity-response-detail">Playbooks resolve most low / informational escalations while analysts maintain 11/11 threat containment.</p>
+                        </div>
                     </div>
-                    <p style="font-size: 12px; color: #9ca3af; margin-top: 12px; font-style: italic;">
-                        Source: Vendor Severity (col 45) and Current Priority (col 13)
-                    </p>
+                    <div class="severity-response-callout">
+                        High and critical notifications after hours accounted for 158 contacts (17.5% of off-hours alerts), keeping stakeholder engagement focused on truly urgent events.
+                    </div>
                 </div>
             </div>
         </div>
@@ -1290,6 +1726,99 @@
                 }
             }
         });
+
+          // Detection Quality Horizontal Bar
+          const detectionQualityCtx = document.getElementById('detectionQualityChart').getContext('2d');
+          new Chart(detectionQualityCtx, {
+              type: 'bar',
+              data: {
+                  labels: ['True Positive', 'Benign True Positive', 'False Positive'],
+                  datasets: [{
+                      data: [11, 232, 24],
+                      backgroundColor: ['#EF3340', '#009CDE', '#9CA3AF'],
+                      borderRadius: 12,
+                      barThickness: 24,
+                      maxBarThickness: 28
+                  }]
+              },
+              options: {
+                  indexAxis: 'y',
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: {
+                          display: false
+                      },
+                      tooltip: {
+                          callbacks: {
+                              label: function(context) {
+                                  return context.label + ': ' + context.raw + ' incidents';
+                              }
+                          }
+                      }
+                  },
+                  scales: {
+                      x: {
+                          beginAtZero: true,
+                          suggestedMax: 260,
+                          grid: {
+                              drawBorder: false
+                          },
+                          ticks: {
+                              font: {
+                                  family: 'Roboto',
+                                  size: 11
+                              }
+                          }
+                      },
+                      y: {
+                          grid: {
+                              display: false
+                          },
+                          ticks: {
+                              font: {
+                                  family: 'Roboto',
+                                  size: 12
+                              }
+                          }
+                      }
+                  }
+              }
+          });
+
+          // Severity Mix Doughnut
+          const severityCtx = document.getElementById('severityChart').getContext('2d');
+          new Chart(severityCtx, {
+              type: 'doughnut',
+              data: {
+                  labels: ['Critical / High', 'Medium', 'Low', 'Informational'],
+                  datasets: [{
+                      data: [23, 121, 103, 20],
+                      backgroundColor: ['#EF3340', '#FF6A14', '#009CDE', '#9CA3AF'],
+                      borderWidth: 0
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  cutout: '65%',
+                  plugins: {
+                      legend: {
+                          display: false
+                      },
+                      tooltip: {
+                          callbacks: {
+                              label: function(context) {
+                                  const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                                  const value = context.raw;
+                                  const percentage = ((value / total) * 100).toFixed(1);
+                                  return context.label + ': ' + value + ' incidents (' + percentage + '%)';
+                              }
+                          }
+                      }
+                  }
+              }
+          });
 
         // MITRE ATT&CK STACKED Bar Chart
         const mitreCtx = document.getElementById('mitreChart').getContext('2d');
