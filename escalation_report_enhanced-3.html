@@ -13,11 +13,67 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --font-h1-size: clamp(48px, 10vw, 152px);
+            --font-h1-line: clamp(52px, 10.5vw, 152px);
+            --font-h2-size: clamp(32px, 6.5vw, 96px);
+            --font-h2-line: clamp(36px, 7vw, 104px);
+            --font-h3-size: clamp(28px, 5.5vw, 64px);
+            --font-h3-line: clamp(32px, 6vw, 72px);
+            --font-h4-size: clamp(22px, 4vw, 36px);
+            --font-h4-line: clamp(24px, 4.2vw, 38px);
+            --font-h5-size: clamp(18px, 3.2vw, 24px);
+            --font-h5-line: clamp(22px, 3.6vw, 32px);
+            --font-h6-size: 16px;
+            --font-h6-line: 24px;
+            --font-body-size: 16px;
+            --font-body-line: 24px;
+            --font-footer-size: 12px;
+            --font-footer-line: 16px;
+        }
+
         body {
             font-family: 'Roboto', system-ui, sans-serif;
             background-color: #f9fafb;
             color: #343741;
-            line-height: 1.6;
+            font-size: var(--font-body-size);
+            line-height: var(--font-body-line);
+        }
+
+        h1 {
+            font-size: var(--font-h1-size);
+            line-height: var(--font-h1-line);
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: var(--font-h2-size);
+            line-height: var(--font-h2-line);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: var(--font-h3-size);
+            line-height: var(--font-h3-line);
+            font-weight: 600;
+        }
+
+        h4 {
+            font-size: var(--font-h4-size);
+            line-height: var(--font-h4-line);
+            font-weight: 600;
+        }
+
+        h5 {
+            font-size: var(--font-h5-size);
+            line-height: var(--font-h5-line);
+            font-weight: 600;
+        }
+
+        h6 {
+            font-size: var(--font-h6-size);
+            line-height: var(--font-h6-line);
+            font-weight: 600;
         }
 
         .container {
@@ -44,9 +100,18 @@
         }
 
         .card-title {
-            font-size: 18px;
-            font-weight: 600;
             color: #004C97;
+            margin: 0;
+        }
+
+        .page-title {
+            color: #004C97;
+            margin-bottom: 8px;
+        }
+
+        .metric-title {
+            color: #343741;
+            margin-bottom: 8px;
         }
 
         .card-content {
@@ -69,7 +134,7 @@
             color: white;
             padding: 8px 16px;
             border-radius: 4px;
-            font-size: 18px;
+            font-size: var(--font-body-size);
             font-weight: 500;
         }
 
@@ -110,7 +175,7 @@
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 16px;
             color: #6b7280;
             margin-bottom: 8px;
         }
@@ -129,7 +194,7 @@
         .table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .table thead tr {
@@ -174,7 +239,7 @@
             justify-content: center;
             gap: 24px;
             margin-top: 16px;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .legend-item {
@@ -210,12 +275,12 @@
         .summary-title {
             font-weight: 600;
             color: #009CDE;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .summary-value {
             color: #6b7280;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .product-item, .method-item {
@@ -287,7 +352,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             flex-shrink: 0;
         }
 
@@ -295,7 +360,8 @@
             background: white;
             padding: 16px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: var(--font-footer-size);
+            line-height: var(--font-footer-line);
             color: #6b7280;
             margin-top: 24px;
         }
@@ -322,7 +388,7 @@
 
           .card-subtitle {
               margin-top: 4px;
-              font-size: 14px;
+              font-size: 16px;
               color: #6b7280;
           }
 
@@ -374,7 +440,7 @@
           }
 
           .detection-metric-value {
-              font-size: 28px;
+              font-size: 36px;
               font-weight: 700;
               color: #343741;
               margin-bottom: 6px;
@@ -415,14 +481,14 @@
           .detection-insight-title {
               font-weight: 600;
               color: #343741;
-              font-size: 14px;
+              font-size: 16px;
               margin-bottom: 4px;
           }
 
           .detection-insight-text {
-              font-size: 13px;
-              color: #6b7280;
-              line-height: 1.6;
+                font-size: var(--font-body-size);
+                line-height: var(--font-body-line);
+                color: #6b7280;
           }
 
           .legend-dot {
@@ -433,7 +499,7 @@
           }
 
           .detection-footnote {
-              font-size: 11px;
+              font-size: 12px;
               color: #9ca3af;
               margin-top: 24px;
               font-style: italic;
@@ -464,7 +530,7 @@
         }
 
         .severity-chart-total {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             line-height: 1;
         }
@@ -481,7 +547,7 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 16px;
-            font-size: 14px;
+            font-size: 16px;
             color: #4b5563;
         }
 
@@ -528,7 +594,6 @@
 
         .hero-title {
             color: white;
-            font-size: 28px;
             font-weight: 600;
             margin-bottom: 8px;
             text-align: center;
@@ -565,14 +630,14 @@
         }
 
         .hero-label {
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 500;
             color: white;
             margin-bottom: 8px;
         }
 
         .hero-context {
-            font-size: 14px;
+            font-size: 16px;
             color: rgba(255, 255, 255, 0.85);
             line-height: 1.5;
         }
@@ -602,11 +667,11 @@
         <div class="header">
             <div>
                 <img src="critical-start-logo.png" alt="Critical Start" style="height: 40px; margin-bottom: 16px;">
-                <h1 style="font-size: 24px; font-weight: 700; color: #004C97; margin-bottom: 8px;">
+                <h1 class="page-title">
                     Escalation to Client Details Report — Signature Tier
                 </h1>
                 <p style="font-weight: 600; color: #343741; margin-bottom: 4px;">Lennar Corporation</p>
-                <p style="color: #6b7280; font-size: 14px;">Period: August 1-31, 2025 (31 days)</p>
+                <p style="color: #6b7280; font-size: 16px;">Period: August 1-31, 2025 (31 days)</p>
                 <p style="color: #9ca3af; font-size: 12px;">Production incidents escalated to your team. Rolling 90-day benchmarks from the Cyber Operations Risk Response (CORR) platform.</p>
             </div>
             <div class="badge">Target Met</div>
@@ -654,16 +719,16 @@
             </div>
             <div class="card-content">
                 <div style="margin-bottom: 16px;">
-                    <p style="font-size: 32px; font-weight: 700; color: #343741;">267 Incidents Escalated</p>
+                    <p style="font-size: 36px; font-weight: 700; color: #343741;">267 Incidents Escalated</p>
                     <p style="color: #6b7280;">Average 8.9 per day requiring your team's attention</p>
-                    <p style="font-size: 14px; color: #9ca3af; margin-top: 4px;">
+                    <p style="font-size: 16px; color: #9ca3af; margin-top: 4px;">
                         Additionally: 1,843 alerts resolved by the CS SOC without escalation (59.5 per day)
                     </p>
                 </div>
                 
                 <div class="highlight-box">
                     <p style="font-weight: 600; color: #004C97; margin-bottom: 8px;">Period Highlights</p>
-                    <p style="font-size: 14px; color: #4b5563; line-height: 1.7;">
+                    <p style="font-size: 16px; color: #4b5563; line-height: 1.7;">
                         Your security posture remained strong this reporting period. We maintained 88% target compliance across all incident severities, with 90th percentile response time at 87 minutes. Of the 267 incidents escalated, we identified 11 true positive threats and contained them before business impact. False positive rate held at 9.0%, reflecting our ongoing commitment to signal over noise.
                     </p>
                 </div>
@@ -713,7 +778,7 @@
                     </div>
                 </div>
                 <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1);">
-                    <p style="font-size: 14px; color: #4b5563;">
+                    <p style="font-size: 16px; color: #4b5563;">
                         <strong>Trend Analysis:</strong> Continuous improvement across all metrics. Mean Time to Respond (MTTR) decreased 25% to 126 minutes, Mean Time to Detect (MTTD) improved 22% to 42 minutes, and false positive rate dropped 24% over three periods—proof that the tuning work is paying off and our processes keep getting sharper.
                     </p>
                 </div>
@@ -728,7 +793,7 @@
         <div class="grid-4">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title" style="font-size: 14px;">P90 Response Time</h3>
+                <h5 class="metric-title">P90 Response Time</h5>
                 </div>
                 <div class="card-content">
                     <p class="stat-value" style="color: #343741;">87m</p>
@@ -739,7 +804,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title" style="font-size: 14px;">Critical/High Priority Mean Time to Respond (MTTR)</h3>
+                <h5 class="metric-title">Critical/High Priority Mean Time to Respond (MTTR)</h5>
                 </div>
                 <div class="card-content">
                     <p class="stat-value" style="color: #343741;">67 min</p>
@@ -749,7 +814,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title" style="font-size: 14px;">Medium/Low Mean Time to Respond (MTTR)</h3>
+                <h5 class="metric-title">Medium/Low Mean Time to Respond (MTTR)</h5>
                 </div>
                 <div class="card-content">
                     <p class="stat-value" style="color: #343741;">52 min</p>
@@ -759,7 +824,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title" style="font-size: 14px;">Mean Time to Detect (MTTD)</h3>
+                <h5 class="metric-title">Mean Time to Detect (MTTD)</h5>
                 </div>
                 <div class="card-content">
                     <p class="stat-value" style="color: #343741;">4 min</p>
@@ -823,8 +888,8 @@
             </div>
             <div class="card-content">
                 <div style="text-align: center; margin-bottom: 24px;">
-                    <p style="font-size: 48px; font-weight: 700; color: #004C97;">$7.55M</p>
-                    <p style="font-size: 14px; color: #6b7280; margin-top: 8px;">Security operations and threat prevention value we delivered together</p>
+                    <p style="font-size: 64px; font-weight: 700; color: #004C97;">$7.55M</p>
+                    <p style="font-size: 16px; color: #6b7280; margin-top: 8px;">Security operations and threat prevention value we delivered together</p>
                 </div>
                 
                 <div class="grid-3">
@@ -867,31 +932,31 @@
                 <div class="product-item">
                     <div>
                         <p style="font-weight: 600; color: #343741;">Palo Alto Cortex XDR</p>
-                        <p style="font-size: 14px; color: #6b7280;">189 incidents (70.8% of total)</p>
+                        <p style="font-size: 16px; color: #6b7280;">189 incidents (70.8% of total)</p>
                     </div>
                     <div style="text-align: right;">
-                        <p style="font-size: 14px; color: #6b7280;">False Positive Rate</p>
-                        <p style="font-size: 20px; font-weight: 700; color: #FF6A14;">11.2%</p>
+                        <p style="font-size: 16px; color: #6b7280;">False Positive Rate</p>
+                        <p style="font-size: 24px; font-weight: 700; color: #FF6A14;">11.2%</p>
                     </div>
                 </div>
                 <div class="product-item">
                     <div>
                         <p style="font-weight: 600; color: #343741;">Microsoft Sentinel</p>
-                        <p style="font-size: 14px; color: #6b7280;">52 incidents (19.5% of total)</p>
+                        <p style="font-size: 16px; color: #6b7280;">52 incidents (19.5% of total)</p>
                     </div>
                     <div style="text-align: right;">
-                        <p style="font-size: 14px; color: #6b7280;">False Positive Rate</p>
-                        <p style="font-size: 20px; font-weight: 700; color: #009CDE;">5.8%</p>
+                        <p style="font-size: 16px; color: #6b7280;">False Positive Rate</p>
+                        <p style="font-size: 24px; font-weight: 700; color: #009CDE;">5.8%</p>
                     </div>
                 </div>
                 <div class="product-item">
                     <div>
                         <p style="font-weight: 600; color: #343741;">CrowdStrike Falcon</p>
-                        <p style="font-size: 14px; color: #6b7280;">26 incidents (9.7% of total)</p>
+                        <p style="font-size: 16px; color: #6b7280;">26 incidents (9.7% of total)</p>
                     </div>
                     <div style="text-align: right;">
-                        <p style="font-size: 14px; color: #6b7280;">False Positive Rate</p>
-                        <p style="font-size: 20px; font-weight: 700; color: #009CDE;">7.7%</p>
+                        <p style="font-size: 16px; color: #6b7280;">False Positive Rate</p>
+                        <p style="font-size: 24px; font-weight: 700; color: #009CDE;">7.7%</p>
                     </div>
                 </div>
                 <p style="font-size: 12px; color: #9ca3af; font-style: italic; margin-top: 12px;">Source: Excel Extract columns 7 (Product) and 12 (CS SOC Verdict)</p>
@@ -909,7 +974,7 @@
                         <div class="percentage-circle" style="background-color: #009CDE;">86%</div>
                         <div>
                             <p style="font-weight: 600; color: #343741;">Playbook (Automated)</p>
-                            <p style="font-size: 14px; color: #6b7280;">229 incidents</p>
+                            <p style="font-size: 16px; color: #6b7280;">229 incidents</p>
                             <p style="font-size: 12px; color: #9ca3af; font-style: italic;">Rule-based automated escalation</p>
                         </div>
                     </div>
@@ -919,7 +984,7 @@
                         <div class="percentage-circle" style="background-color: #FF6A14;">14%</div>
                         <div>
                             <p style="font-weight: 600; color: #343741;">CS SOC (Analyst Escalation)</p>
-                            <p style="font-size: 14px; color: #6b7280;">38 incidents</p>
+                            <p style="font-size: 16px; color: #6b7280;">38 incidents</p>
                             <p style="font-size: 12px; color: #9ca3af; font-style: italic;">Analyst-driven escalation requiring human judgment</p>
                         </div>
                     </div>
@@ -957,7 +1022,7 @@
                                 8% <span style="font-size: 16px; color: #6b7280;">(147 alerts)</span>
                             </p>
                         </div>
-                        <p class="info-box" style="background-color: rgba(0, 156, 222, 0.15); font-size: 14px;">
+                        <p class="info-box" style="background-color: rgba(0, 156, 222, 0.15); font-size: 16px;">
                             Our CS SOC handled 903 alerts outside business hours—protection working while your team isn't.
                         </p>
                     </div>
@@ -972,7 +1037,7 @@
             </div>
             <div class="card-content">
                     <div class="highlight-box">
-                        <p style="font-size: 14px; color: #4b5563;">
+                        <p style="font-size: 16px; color: #4b5563;">
                             <strong>High and critical severity alerts still trigger a direct call to you.</strong> This shows how often your team was contacted outside business hours for urgent threats.
                         </p>
                     </div>
@@ -980,26 +1045,26 @@
                 <div class="grid-3" style="margin-top: 16px;">
                     <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
                         <p style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">After Hours Calls</p>
-                        <p style="font-size: 32px; font-weight: 700; color: #702F8A; margin-bottom: 4px;">18%</p>
-                        <p style="font-size: 14px; color: #6b7280;">136 of 756 alerts</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #702F8A; margin-bottom: 4px;">18%</p>
+                        <p style="font-size: 16px; color: #6b7280;">136 of 756 alerts</p>
                         <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">High/Critical requiring immediate attention</p>
                     </div>
                     <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
                         <p style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Weekend Calls</p>
-                        <p style="font-size: 32px; font-weight: 700; color: #EF3340; margin-bottom: 4px;">15%</p>
-                        <p style="font-size: 14px; color: #6b7280;">22 of 147 alerts</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #EF3340; margin-bottom: 4px;">15%</p>
+                        <p style="font-size: 16px; color: #6b7280;">22 of 147 alerts</p>
                         <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">High/Critical requiring immediate attention</p>
                     </div>
                     <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
                         <p style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Total Off-Hours Calls</p>
-                        <p style="font-size: 32px; font-weight: 700; color: #009CDE; margin-bottom: 4px;">158</p>
-                        <p style="font-size: 14px; color: #6b7280;">17.5% of off-hours alerts</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #009CDE; margin-bottom: 4px;">158</p>
+                        <p style="font-size: 16px; color: #6b7280;">17.5% of off-hours alerts</p>
                         <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Your team was notified 5.1 times per day off-hours</p>
                     </div>
                 </div>
                 
                 <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1); margin-top: 16px;">
-                    <p style="font-size: 14px; color: #4b5563;">
+                    <p style="font-size: 16px; color: #4b5563;">
                         <strong>Context:</strong> 82.5% of after-hours alerts (745 alerts) were handled by CS SOC without requiring customer notification, allowing your team to rest while maintaining security coverage. Only high and critical severity incidents required immediate contact.
                     </p>
                 </div>
@@ -1024,19 +1089,19 @@
                         <p class="stat-label">Containment Rate</p>
                         <p style="font-size: 36px; font-weight: 700; color: #004C97;">98%</p>
                         <p class="stat-detail">262 of 267 contained</p>
-                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Response Action Status (col 36)</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Response Action Status (col 36)</p>
                     </div>
                     <div class="stat-card" style="background-color: rgba(0, 156, 222, 0.15);">
                         <p class="stat-label">Playbook Automation</p>
                         <p style="font-size: 36px; font-weight: 700; color: #004C97;">86%</p>
                         <p class="stat-detail">Consistent, rule-based escalation</p>
-                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Initial Escalation Method (col 9)</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Initial Escalation Method (col 9)</p>
                     </div>
                     <div class="stat-card" style="background-color: rgba(255, 106, 20, 0.15);">
                         <p class="stat-label">Analyst Escalation</p>
                         <p style="font-size: 36px; font-weight: 700; color: #FF6A14;">14%</p>
                         <p class="stat-detail">Human judgment required</p>
-                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Initial Escalation Method (col 9)</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Initial Escalation Method (col 9)</p>
                     </div>
                 </div>
             </div>
@@ -1051,21 +1116,21 @@
                 <div class="grid-3">
                     <div style="text-align: center;">
                         <p class="stat-label">Average Touches per Incident</p>
-                        <p style="font-size: 32px; font-weight: 700; color: #009CDE;">2.3</p>
-                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Touched By (col 26)</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #009CDE;">2.3</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Touched By (col 26)</p>
                     </div>
                     <div style="text-align: center;">
                         <p class="stat-label">Active Client Participation</p>
-                        <p style="font-size: 32px; font-weight: 700; color: #009CDE;">72%</p>
-                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Customer Last Comment (col 29)</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #009CDE;">72%</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Customer Last Comment (col 29)</p>
                     </div>
                     <div style="text-align: center;">
                         <p class="stat-label">Client-Led Closures</p>
-                        <p style="font-size: 32px; font-weight: 700; color: #009CDE;">21%</p>
-                        <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Closed By (col 27)</p>
+                        <p style="font-size: 36px; font-weight: 700; color: #009CDE;">21%</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Closed By (col 27)</p>
                     </div>
                 </div>
-                <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 16px; font-style: italic;">
+                <p style="font-size: 16px; color: #6b7280; text-align: center; margin-top: 16px; font-style: italic;">
                     Strong two-way collaboration. High client participation indicates trust and engagement with the SOC process.
                 </p>
             </div>
@@ -1113,7 +1178,7 @@
                               </div>
                           </div>
                           <div class="info-box" style="background-color: rgba(0, 156, 222, 0.08); border: 1px solid rgba(0, 156, 222, 0.2); margin-top: 20px;">
-                              <p style="font-size: 14px; color: #4b5563;">
+                              <p style="font-size: 16px; color: #4b5563;">
                                   <strong>Key Insights:</strong> Signal quality improved again this period. False positive rate dropped 3.1 points, enabling a 10:1 actionable-to-noise ratio and sustaining 100% containment across 11 true threats.
                               </p>
                           </div>
@@ -1142,7 +1207,7 @@
                     <p class="severity-insight"><strong>Medium</strong> severity remains the largest share (121 escalations) — a key candidate for additional automation.</p>
                     <p class="severity-insight"><strong>Low & Informational</strong> account for 46.1% of escalations, reinforcing ongoing tuning cycles to reduce noise.</p>
                 </div>
-                <p style="font-size: 11px; color: #9ca3af; font-style: italic;">Source: Vendor Severity (col 45) + Current Priority (col 13)</p>
+                <p style="font-size: 12px; color: #9ca3af; font-style: italic;">Source: Vendor Severity (col 45) + Current Priority (col 13)</p>
             </div>
         </div>
 
@@ -1156,7 +1221,7 @@
                     <canvas id="mitreChart"></canvas>
                 </div>
                 <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1); margin-top: 16px;">
-                    <p style="font-size: 14px; color: #4b5563;">
+                    <p style="font-size: 16px; color: #4b5563;">
                         <strong>Key Insight:</strong> Persistence tactics show the highest concentration of high-severity incidents (12 of 77), suggesting adversaries are attempting to establish foothold. Defense Evasion follows closely. These patterns warrant enhanced detection rules and proactive hunting.
                     </p>
                 </div>
@@ -1173,7 +1238,7 @@
             </div>
             <div class="card-content">
                     <div class="highlight-box">
-                        <p style="font-size: 14px; color: #4b5563;">
+                        <p style="font-size: 16px; color: #4b5563;">
                             <strong>Action-Oriented Recommendations:</strong> We sort these improvements by impact, and the system flags them automatically when thresholds trip. Each includes ownership and target timelines.
                         </p>
                     </div>
@@ -1182,9 +1247,9 @@
                 <div class="improvement-item" style="border-left: 4px solid #EF3340;">
                     <div style="margin-bottom: 12px;">
                         <span class="priority-badge priority-high">HIGH</span>
-                        <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Detection Tuning</span>
+                        <span style="font-weight: 600; font-size: 16px; color: #004C97; margin-left: 8px;">Detection Tuning</span>
                     </div>
-                        <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                        <p style="font-size: 16px; color: #4b5563; margin-bottom: 12px;">
                             Palo Alto Cortex XDR false positive rate is 11.2%, exceeding the 10.0% threshold and keeping the overall rate at 9.0%. Tuning these alerts will reduce client noise and improve SOC efficiency.
                         </p>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
@@ -1207,9 +1272,9 @@
                 <div class="improvement-item" style="border-left: 4px solid #FF6A14;">
                     <div style="margin-bottom: 12px;">
                         <span class="priority-badge priority-medium">MEDIUM</span>
-                        <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Automation Opportunity</span>
+                        <span style="font-weight: 600; font-size: 16px; color: #004C97; margin-left: 8px;">Automation Opportunity</span>
                     </div>
-                        <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                        <p style="font-size: 16px; color: #4b5563; margin-bottom: 12px;">
                             Manual escalations at 14% exceed our 12% target. 38 incidents required analyst judgment. Expanding playbook coverage will improve consistency.
                         </p>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
@@ -1232,9 +1297,9 @@
                 <div class="improvement-item" style="border-left: 4px solid #EF3340;">
                     <div style="margin-bottom: 12px;">
                         <span class="priority-badge priority-high">HIGH</span>
-                        <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Threat Focus</span>
+                        <span style="font-weight: 600; font-size: 16px; color: #004C97; margin-left: 8px;">Threat Focus</span>
                     </div>
-                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                    <p style="font-size: 16px; color: #4b5563; margin-bottom: 12px;">
                         Persistence and Defense Evasion tactics driving 20 high-severity incidents. These persistence and evasion techniques suggest sophisticated adversary activity requiring enhanced detection.
                     </p>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
@@ -1278,62 +1343,62 @@
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">452 Hours of Expert Analysis</p>
+                            <p style="font-weight: 600; font-size: 16px;">452 Hours of Expert Analysis</p>
                             <p style="font-size: 12px; color: #6b7280;">Security operations work your team didn't have to staff</p>
                         </div>
                     </div>
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">1,843 Alerts Resolved</p>
+                            <p style="font-weight: 600; font-size: 16px;">1,843 Alerts Resolved</p>
                             <p style="font-size: 12px; color: #6b7280;">Noise reduction—87% handled without escalation</p>
                         </div>
                     </div>
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">24/7 Coverage Maintained</p>
+                            <p style="font-weight: 600; font-size: 16px;">24/7 Coverage Maintained</p>
                             <p style="font-size: 12px; color: #6b7280;">744 hours of continuous monitoring and response</p>
                         </div>
                     </div>
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">11 Threats Contained</p>
+                            <p style="font-weight: 600; font-size: 16px;">11 Threats Contained</p>
                             <p style="font-size: 12px; color: #6b7280;">True positive threats stopped before business impact</p>
                         </div>
                     </div>
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">88% Target Compliance</p>
+                            <p style="font-weight: 600; font-size: 16px;">88% Target Compliance</p>
                             <p style="font-size: 12px; color: #6b7280;">Response targets met across all incident severities</p>
                         </div>
                     </div>
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">87-Minute P90 Response</p>
+                            <p style="font-weight: 600; font-size: 16px;">87-Minute P90 Response</p>
                             <p style="font-size: 12px; color: #6b7280;">90th percentile incidents resolved under 90-minute target</p>
                         </div>
                     </div>
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">Zero Breaches</p>
+                            <p style="font-weight: 600; font-size: 16px;">Zero Breaches</p>
                             <p style="font-size: 12px; color: #6b7280;">No ransomware, no data loss, no operational disruption</p>
                         </div>
                     </div>
                     <div class="value-item">
                         <div class="checkmark">✓</div>
                         <div>
-                            <p style="font-weight: 600; font-size: 14px;">9.0% False Positive Rate</p>
+                            <p style="font-weight: 600; font-size: 16px;">9.0% False Positive Rate</p>
                             <p style="font-size: 12px; color: #6b7280;">High signal-to-noise ratio maintained through ongoing tuning</p>
                         </div>
                     </div>
                 </div>
                 <div style="margin-top: 16px; padding: 12px; background: white; border-radius: 6px;">
-                    <p style="font-size: 14px; color: #4b5563;">
+                    <p style="font-size: 16px; color: #4b5563;">
                         <strong>Looking Ahead:</strong> In the next period we're focused on reducing false positives another 20% through enhanced Palo Alto XDR tuning and expanding playbook automation to push manual escalations down to the 12% target.
                     </p>
                 </div>
