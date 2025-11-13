@@ -571,64 +571,6 @@
               font-weight: 600;
           }
 
-          .severity-response-card .card-content {
-              display: flex;
-              flex-direction: column;
-              gap: 16px;
-          }
-
-          .severity-response-grid {
-              display: grid;
-              gap: 16px;
-          }
-
-          .severity-response-item {
-              border-left: 4px solid #009CDE;
-              padding-left: 12px;
-          }
-
-          .severity-response-item.high {
-              border-color: #EF3340;
-          }
-
-          .severity-response-item.medium {
-              border-color: #FF6A14;
-          }
-
-          .severity-response-item.low {
-              border-color: #009CDE;
-          }
-
-          .severity-response-label {
-              font-size: 12px;
-              text-transform: uppercase;
-              letter-spacing: 0.06em;
-              color: #6b7280;
-          }
-
-          .severity-response-metric {
-              font-size: 22px;
-              font-weight: 700;
-              color: #343741;
-              margin-top: 4px;
-          }
-
-          .severity-response-detail {
-              font-size: 12px;
-              color: #6b7280;
-              margin-top: 4px;
-              line-height: 1.6;
-          }
-
-          .severity-response-callout {
-              font-size: 12px;
-              color: #4b5563;
-              background: rgba(0, 156, 222, 0.1);
-              border: 1px solid rgba(0, 156, 222, 0.2);
-              border-radius: 8px;
-              padding: 12px;
-          }
-
           @media (max-width: 1024px) {
               .detection-quality-layout {
                   grid-template-columns: 1fr;
@@ -1345,34 +1287,6 @@
                         <p class="severity-insight"><strong>Low & Informational</strong> account for 46.1% of escalations, reinforcing ongoing tuning cycles to reduce noise.</p>
                     </div>
                     <p style="font-size: 11px; color: #9ca3af; font-style: italic;">Source: Vendor Severity (col 45) + Current Priority (col 13)</p>
-                </div>
-            </div>
-            <div class="card severity-response-card">
-                <div class="card-header">
-                    <h2 class="card-title">Severity Response Focus</h2>
-                    <p class="card-subtitle">Performance against targets by severity band</p>
-                </div>
-                <div class="card-content">
-                    <div class="severity-response-grid">
-                        <div class="severity-response-item high">
-                            <span class="severity-response-label">Critical / High</span>
-                            <span class="severity-response-metric">67 min MTTR</span>
-                            <p class="severity-response-detail">Target &lt; 90 min | 100% containment maintained for high-risk activity</p>
-                        </div>
-                        <div class="severity-response-item medium">
-                            <span class="severity-response-label">Medium</span>
-                            <span class="severity-response-metric">52 min MTTR</span>
-                            <p class="severity-response-detail">Target &lt; 90 min | Comfortable buffer supported by playbook coverage</p>
-                        </div>
-                        <div class="severity-response-item low">
-                            <span class="severity-response-label">Automation & Containment</span>
-                            <span class="severity-response-metric">86% automated</span>
-                            <p class="severity-response-detail">Playbooks resolve most low / informational escalations while analysts maintain 11/11 threat containment.</p>
-                        </div>
-                    </div>
-                    <div class="severity-response-callout">
-                        High and critical notifications after hours accounted for 158 contacts (17.5% of off-hours alerts), keeping stakeholder engagement focused on truly urgent events.
-                    </div>
                 </div>
             </div>
         </div>
