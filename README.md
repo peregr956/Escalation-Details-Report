@@ -129,7 +129,7 @@ Users (CSMs or clients) can:
 
 **File**: `escalation_report_enhanced-3.html`
 
-- **Client**: Lennar Corporation
+- **Client**: Example Corporation
 - **Tier**: Signature Tier MDR
 - **Period**: August 1-31, 2025 (31 days)
 - **Total Incidents Escalated**: 267
