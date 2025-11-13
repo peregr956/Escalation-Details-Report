@@ -1233,61 +1233,59 @@
             </div>
         </div>
 
-        <div class="grid-2 tier-2-spacing">
-            <div class="card severity-card">
-                <div class="card-header">
-                    <h2 class="card-title">Severity Distribution</h2>
-                    <p class="card-subtitle">Volume mix helps target tuning and engagement effort</p>
+        <div class="card severity-card tier-2-spacing">
+            <div class="card-header">
+                <h2 class="card-title">Severity Distribution</h2>
+                <p class="card-subtitle">Volume mix helps target tuning and engagement effort</p>
+            </div>
+            <div class="card-content">
+                <div class="severity-chart-container">
+                    <canvas id="severityChart"></canvas>
                 </div>
-                <div class="card-content">
-                    <div class="severity-chart-container">
-                        <canvas id="severityChart"></canvas>
-                    </div>
-                    <div class="severity-breakdown">
-                        <div class="severity-row">
-                            <div class="severity-row-header">
-                                <span class="severity-label" style="color: #EF3340;">Critical / High</span>
-                                <span class="severity-value">23 incidents • 8.6%</span>
-                            </div>
-                            <div class="severity-progress">
-                                <div class="severity-progress-bar" style="width: 9%; background-color: #EF3340;"></div>
-                            </div>
+                <div class="severity-breakdown">
+                    <div class="severity-row">
+                        <div class="severity-row-header">
+                            <span class="severity-label" style="color: #EF3340;">Critical / High</span>
+                            <span class="severity-value">23 incidents • 8.6%</span>
                         </div>
-                        <div class="severity-row">
-                            <div class="severity-row-header">
-                                <span class="severity-label" style="color: #FF6A14;">Medium</span>
-                                <span class="severity-value">121 incidents • 45.3%</span>
-                            </div>
-                            <div class="severity-progress">
-                                <div class="severity-progress-bar" style="width: 45%; background-color: #FF6A14;"></div>
-                            </div>
-                        </div>
-                        <div class="severity-row">
-                            <div class="severity-row-header">
-                                <span class="severity-label" style="color: #009CDE;">Low</span>
-                                <span class="severity-value">103 incidents • 38.6%</span>
-                            </div>
-                            <div class="severity-progress">
-                                <div class="severity-progress-bar" style="width: 39%; background-color: #009CDE;"></div>
-                            </div>
-                        </div>
-                        <div class="severity-row">
-                            <div class="severity-row-header">
-                                <span class="severity-label" style="color: #6b7280;">Informational</span>
-                                <span class="severity-value">20 incidents • 7.5%</span>
-                            </div>
-                            <div class="severity-progress">
-                                <div class="severity-progress-bar" style="width: 8%; background-color: #9CA3AF;"></div>
-                            </div>
+                        <div class="severity-progress">
+                            <div class="severity-progress-bar" style="width: 9%; background-color: #EF3340;"></div>
                         </div>
                     </div>
-                    <div class="severity-insights">
-                        <p class="severity-insight"><strong>High / Critical</strong> incidents are low volume but drive urgent engagement, aligning with the 18% after-hours call rate.</p>
-                        <p class="severity-insight"><strong>Medium</strong> severity remains the largest share (121 escalations) — a key candidate for additional automation.</p>
-                        <p class="severity-insight"><strong>Low & Informational</strong> account for 46.1% of escalations, reinforcing ongoing tuning cycles to reduce noise.</p>
+                    <div class="severity-row">
+                        <div class="severity-row-header">
+                            <span class="severity-label" style="color: #FF6A14;">Medium</span>
+                            <span class="severity-value">121 incidents • 45.3%</span>
+                        </div>
+                        <div class="severity-progress">
+                            <div class="severity-progress-bar" style="width: 45%; background-color: #FF6A14;"></div>
+                        </div>
                     </div>
-                    <p style="font-size: 11px; color: #9ca3af; font-style: italic;">Source: Vendor Severity (col 45) + Current Priority (col 13)</p>
+                    <div class="severity-row">
+                        <div class="severity-row-header">
+                            <span class="severity-label" style="color: #009CDE;">Low</span>
+                            <span class="severity-value">103 incidents • 38.6%</span>
+                        </div>
+                        <div class="severity-progress">
+                            <div class="severity-progress-bar" style="width: 39%; background-color: #009CDE;"></div>
+                        </div>
+                    </div>
+                    <div class="severity-row">
+                        <div class="severity-row-header">
+                            <span class="severity-label" style="color: #6b7280;">Informational</span>
+                            <span class="severity-value">20 incidents • 7.5%</span>
+                        </div>
+                        <div class="severity-progress">
+                            <div class="severity-progress-bar" style="width: 8%; background-color: #9CA3AF;"></div>
+                        </div>
+                    </div>
                 </div>
+                <div class="severity-insights">
+                    <p class="severity-insight"><strong>High / Critical</strong> incidents are low volume but drive urgent engagement, aligning with the 18% after-hours call rate.</p>
+                    <p class="severity-insight"><strong>Medium</strong> severity remains the largest share (121 escalations) — a key candidate for additional automation.</p>
+                    <p class="severity-insight"><strong>Low & Informational</strong> account for 46.1% of escalations, reinforcing ongoing tuning cycles to reduce noise.</p>
+                </div>
+                <p style="font-size: 11px; color: #9ca3af; font-style: italic;">Source: Vendor Severity (col 45) + Current Priority (col 13)</p>
             </div>
         </div>
 
