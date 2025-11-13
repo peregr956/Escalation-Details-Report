@@ -332,7 +332,7 @@
 
           .detection-quality-layout {
               display: grid;
-              grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+              grid-template-columns: minmax(0, 1fr);
               gap: 28px;
               align-items: start;
           }
@@ -425,76 +425,11 @@
               line-height: 1.6;
           }
 
-          .detection-chart-panel {
-              background: #f6f7fb;
-              border: 1px solid #e5e7eb;
-              border-radius: 12px;
-              padding: 20px;
-              display: flex;
-              flex-direction: column;
-              gap: 16px;
-          }
-
-          .detection-chart-title {
-              font-size: 14px;
-              font-weight: 600;
-              color: #004C97;
-              text-transform: uppercase;
-              letter-spacing: 0.04em;
-          }
-
-          .detection-chart {
-              position: relative;
-              height: 210px;
-          }
-
-          .detection-legend {
-              display: grid;
-              gap: 8px;
-              font-size: 13px;
-              color: #4b5563;
-          }
-
           .legend-dot {
               width: 12px;
               height: 12px;
               border-radius: 50%;
               flex-shrink: 0;
-          }
-
-          .detection-callouts {
-              display: flex;
-              gap: 12px;
-              flex-wrap: wrap;
-          }
-
-          .detection-callout {
-              flex: 1 1 120px;
-              background: white;
-              border-radius: 10px;
-              padding: 12px;
-              border: 1px solid #e5e7eb;
-          }
-
-          .callout-label {
-              font-size: 12px;
-              text-transform: uppercase;
-              letter-spacing: 0.06em;
-              color: #6b7280;
-          }
-
-          .callout-value {
-              font-size: 22px;
-              font-weight: 700;
-              color: #004C97;
-              display: block;
-              margin-top: 4px;
-          }
-
-          .callout-detail {
-              font-size: 12px;
-              color: #6b7280;
-              margin-top: 4px;
           }
 
           .detection-footnote {
@@ -1142,94 +1077,50 @@
                 <h2 class="card-title">Detection Quality</h2>
                 <p class="card-subtitle">Precision, signal fidelity, and client-validated outcomes across escalations</p>
             </div>
-            <div class="card-content">
-                <div class="detection-quality-layout">
-                    <div>
-                        <div class="detection-metric-grid">
-                            <div class="detection-metric detection-metric-critical">
-                                <p class="detection-metric-label">True Threat Precision</p>
-                                <p class="detection-metric-value" style="color: #EF3340;">31.4%</p>
-                                <p class="detection-metric-detail">11 TP ÷ (11 TP + 24 FP)</p>
-                                <p class="detection-metric-trend">Focused adversary detections delivered this period</p>
-                            </div>
-                            <div class="detection-metric detection-metric-positive">
-                                <p class="detection-metric-label">Signal Fidelity</p>
-                                <p class="detection-metric-value" style="color: #004C97;">91%</p>
-                                <p class="detection-metric-detail">243 actionable escalations (TP + BTP) of 267 total</p>
-                                <p class="detection-metric-trend">Aligned with 88% response target compliance</p>
-                            </div>
-                            <div class="detection-metric detection-metric-warning">
-                                <p class="detection-metric-label">False Positive Rate</p>
-                                <p class="detection-metric-value" style="color: #FF6A14;">9.0%</p>
-                                <p class="detection-metric-detail">Target &lt; 10% | ↓ 3.1 pts vs prior period</p>
-                                <p class="detection-metric-trend">Only Cortex XDR remains above threshold (11.2%)</p>
-                            </div>
-                            <div class="detection-metric">
-                                <p class="detection-metric-label">Client-Validated Outcomes</p>
-                                <p class="detection-metric-value" style="color: #009CDE;">86.9%</p>
-                                <p class="detection-metric-detail">Benign true positives resolved with customer context</p>
-                                <p class="detection-metric-trend">Backed by 4 min MTTD and rapid analyst follow-up</p>
-                            </div>
-                        </div>
-                        <div class="detection-insight-list">
-                            <div class="detection-insight">
-                                <div class="detection-insight-dot" style="background-color: #004C97;"></div>
-                                <div>
-                                    <p class="detection-insight-title">Precision continues to improve.</p>
-                                    <p class="detection-insight-text">False positive rate dropped by 3.1 points versus last period, sustaining strong signal-to-noise for client teams.</p>
-                                </div>
-                            </div>
-                            <div class="detection-insight">
-                                <div class="detection-insight-dot" style="background-color: #FF6A14;"></div>
-                                <div>
-                                    <p class="detection-insight-title">Next tuning priority: Palo Alto Cortex XDR.</p>
-                                    <p class="detection-insight-text">At 11.2% FP it is the only source above the 10% threshold, aligning with the high-priority recommendation in the improvement plan.</p>
-                                </div>
-                            </div>
-                            <div class="detection-insight">
-                                <div class="detection-insight-dot" style="background-color: #EF3340;"></div>
-                                <div>
-                                    <p class="detection-insight-title">Fast detection sustains 100% containment.</p>
-                                    <p class="detection-insight-text">4 minute MTTD empowered analysts to neutralize all 11 true threats before business impact.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="detection-chart-panel">
-                        <p class="detection-chart-title">Escalation Verdict Mix (n = 267)</p>
-                        <div class="detection-chart">
-                            <canvas id="detectionQualityChart"></canvas>
-                        </div>
-                        <div class="detection-legend">
-                            <div class="legend-item">
-                                <span class="legend-dot" style="background-color: #EF3340;"></span>
-                                <span>True Positive (11)</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot" style="background-color: #009CDE;"></span>
-                                <span>Benign True Positive (232)</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot" style="background-color: #9CA3AF;"></span>
-                                <span>False Positive (24)</span>
-                            </div>
-                        </div>
-                        <div class="detection-callouts">
-                            <div class="detection-callout">
-                                <span class="callout-label">Signal-to-Noise</span>
-                                <span class="callout-value">10.1 : 1</span>
-                                <p class="callout-detail">Actionable outcomes vs false positives</p>
-                            </div>
-                            <div class="detection-callout">
-                                <span class="callout-label">True Threats Contained</span>
-                                <span class="callout-value">11 / 11</span>
-                                <p class="callout-detail">100% containment maintained</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <p class="detection-footnote">Source: CS SOC Verdict (col 12); Report Extract incident counts.</p>
-            </div>
+              <div class="card-content">
+                  <div class="detection-quality-layout">
+                      <div>
+                          <div class="detection-metric-grid">
+                              <div class="detection-metric detection-metric-critical">
+                                  <p class="detection-metric-label">True Threat Precision</p>
+                                  <p class="detection-metric-value" style="color: #EF3340;">31.4%</p>
+                                  <p class="detection-metric-detail">11 TP ÷ (11 TP + 24 FP)</p>
+                                  <p class="detection-metric-trend">Focused adversary detections delivered this period</p>
+                              </div>
+                              <div class="detection-metric detection-metric-positive">
+                                  <p class="detection-metric-label">Signal Fidelity</p>
+                                  <p class="detection-metric-value" style="color: #004C97;">91%</p>
+                                  <p class="detection-metric-detail">243 actionable escalations (TP + BTP) of 267 total</p>
+                                  <p class="detection-metric-trend">Aligned with 88% response target compliance</p>
+                              </div>
+                              <div class="detection-metric detection-metric-warning">
+                                  <p class="detection-metric-label">False Positive Rate</p>
+                                  <p class="detection-metric-value" style="color: #FF6A14;">9.0%</p>
+                                  <p class="detection-metric-detail">Target &lt; 10% | ↓ 3.1 pts vs prior period</p>
+                                  <p class="detection-metric-trend">Only Cortex XDR remains above threshold (11.2%)</p>
+                              </div>
+                              <div class="detection-metric">
+                                  <p class="detection-metric-label">Client-Validated Outcomes</p>
+                                  <p class="detection-metric-value" style="color: #009CDE;">86.9%</p>
+                                  <p class="detection-metric-detail">Share of escalations your team confirmed as accurate (benign true positives)</p>
+                                  <p class="detection-metric-trend">Backed by 4 min MTTD and rapid analyst follow-up</p>
+                              </div>
+                              <div class="detection-metric detection-metric-positive">
+                                  <p class="detection-metric-label">Signal-to-Noise Ratio</p>
+                                  <p class="detection-metric-value" style="color: #004C97;">10.1 : 1</p>
+                                  <p class="detection-metric-detail">Actionable outcomes (true + benign true positives) per false positive</p>
+                                  <p class="detection-metric-trend">243 validated escalations vs 24 false positives this period</p>
+                              </div>
+                          </div>
+                          <div class="info-box" style="background-color: rgba(0, 156, 222, 0.08); border: 1px solid rgba(0, 156, 222, 0.2); margin-top: 20px;">
+                              <p style="font-size: 14px; color: #4b5563;">
+                                  <strong>Key Insights:</strong> Signal quality improved again this period. False positive rate dropped 3.1 points, enabling a 10:1 actionable-to-noise ratio and sustaining 100% containment across 11 true threats.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+                  <p class="detection-footnote">Source: CS SOC Verdict (col 12); Report Extract incident counts.</p>
+              </div>
         </div>
 
         <div class="card severity-card tier-2-spacing">
@@ -1604,65 +1495,6 @@
                 }
             }
         });
-
-          // Detection Quality Horizontal Bar
-          const detectionQualityCtx = document.getElementById('detectionQualityChart').getContext('2d');
-          new Chart(detectionQualityCtx, {
-              type: 'bar',
-              data: {
-                  labels: ['True Positive', 'Benign True Positive', 'False Positive'],
-                  datasets: [{
-                      data: [11, 232, 24],
-                      backgroundColor: ['#EF3340', '#009CDE', '#9CA3AF'],
-                      borderRadius: 12,
-                      barThickness: 24,
-                      maxBarThickness: 28
-                  }]
-              },
-              options: {
-                  indexAxis: 'y',
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                      legend: {
-                          display: false
-                      },
-                      tooltip: {
-                          callbacks: {
-                              label: function(context) {
-                                  return context.label + ': ' + context.raw + ' incidents';
-                              }
-                          }
-                      }
-                  },
-                  scales: {
-                      x: {
-                          beginAtZero: true,
-                          suggestedMax: 260,
-                          grid: {
-                              drawBorder: false
-                          },
-                          ticks: {
-                              font: {
-                                  family: 'Roboto',
-                                  size: 11
-                              }
-                          }
-                      },
-                      y: {
-                          grid: {
-                              display: false
-                          },
-                          ticks: {
-                              font: {
-                                  family: 'Roboto',
-                                  size: 12
-                              }
-                          }
-                      }
-                  }
-              }
-          });
 
           // Severity Mix Doughnut
           const severityMetrics = [
