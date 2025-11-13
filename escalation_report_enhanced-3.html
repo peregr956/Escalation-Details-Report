@@ -445,6 +445,9 @@
                     <div class="hero-context">Response targets met across all incident severities</div>
                 </div>
             </div>
+            <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-top: 32px; text-align: center; font-style: italic;">
+                Sources: Excel Extract — Analyst Labor Hours (col 31), Alerts Resolved (col 22), Service Coverage Metadata (col 4), Target Compliance (col 37).
+            </p>
         </div>
 
         <!-- Executive Summary - ENHANCED -->
@@ -482,6 +485,9 @@
                         <p class="summary-value">9.0% false positive rate</p>
                     </div>
                 </div>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 16px; font-style: italic;">
+                    Sources: Excel Extract — Escalated Incidents (col 5), Non-Escalated Alerts (col 22), True Positive Verdict (col 12), After-Hours Indicator (col 8).
+                </p>
             </div>
         </div>
 
@@ -498,11 +504,11 @@
                 <div class="chart-legend">
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #009CDE;"></div>
-                        <span>MTTR</span>
+                        <span>MTTR (min)</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #004C97;"></div>
-                        <span>MTTD</span>
+                        <span>MTTD (min)</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #EF3340; border: 2px dashed #EF3340; background: none;"></div>
@@ -511,10 +517,11 @@
                 </div>
                 <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1);">
                     <p style="font-size: 14px; color: #4b5563;">
-                        <strong>Trend Analysis:</strong> Continuous improvement across all metrics. MTTR decreased 25%, MTTD improved 22%, and false positive rate dropped 24% over three periods, demonstrating effective tuning and process maturation.
+                        <strong>Trend Analysis:</strong> Continuous improvement across all metrics. MTTR decreased 25% to 126 minutes, MTTD improved 22% to 42 minutes, and false positive rate dropped 24% over three periods, demonstrating effective tuning and process maturation.
                     </p>
                 </div>
                 <p style="font-size: 12px; color: #9ca3af; margin-top: 8px; font-style: italic;">Data source: CORR Platform rolling 90-day averages</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 4px; font-style: italic;">Visualization note: MTTR/MTTD render on the left axis in minutes; False Positive % renders on the right axis.</p>
             </div>
         </div>
 
@@ -548,7 +555,7 @@
                     <h3 class="card-title" style="font-size: 14px;">Medium/Low MTTR</h3>
                 </div>
                 <div class="card-content">
-                    <p class="stat-value" style="color: #343741;">0:52:00</p>
+                    <p class="stat-value" style="color: #343741;">52 min</p>
                     <p class="improvement-delta">↓ 18% improvement</p>
                     <p class="stat-detail" style="margin-top: 8px;">Target &lt; 90m | n=135</p>
                 </div>
@@ -558,7 +565,7 @@
                     <h3 class="card-title" style="font-size: 14px;">Mean Time to Detect</h3>
                 </div>
                 <div class="card-content">
-                    <p class="stat-value" style="color: #343741;">0:04:00</p>
+                    <p class="stat-value" style="color: #343741;">4 min</p>
                     <p class="improvement-delta">↓ 12% improvement</p>
                     <p class="stat-detail" style="margin-top: 8px;">Target &lt; 15m | n=267</p>
                 </div>
@@ -582,17 +589,17 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="font-weight: 500;">MTTR (hrs)</td>
-                            <td style="text-align: center; font-weight: 700;">2.1</td>
-                            <td style="text-align: center;">3.2</td>
+                            <td style="font-weight: 500;">MTTR (minutes)</td>
+                            <td style="text-align: center; font-weight: 700;">126</td>
+                            <td style="text-align: center;">192</td>
                             <td style="text-align: center;">
                                 <span class="status-badge status-better">34% Better</span>
                             </td>
                         </tr>
                         <tr>
-                            <td style="font-weight: 500;">MTTD (hrs)</td>
-                            <td style="text-align: center; font-weight: 700;">0.7</td>
-                            <td style="text-align: center;">1.1</td>
+                            <td style="font-weight: 500;">MTTD (minutes)</td>
+                            <td style="text-align: center; font-weight: 700;">42</td>
+                            <td style="text-align: center;">66</td>
                             <td style="text-align: center;">
                                 <span class="status-badge status-better">36% Better</span>
                             </td>
@@ -607,7 +614,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <p style="font-size: 12px; color: #9ca3af; margin-top: 12px;">Benchmarks from CORR Platform: Signature Tier MDR clients in similar industries (mid-market construction/real estate)</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 12px;">Benchmarks: SANS 2024 SOC Survey (Construction & Real Estate cohort), published averages converted to minutes.</p>
             </div>
         </div>
 
@@ -960,9 +967,9 @@
                         <span class="priority-badge priority-high">HIGH</span>
                         <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Detection Tuning</span>
                     </div>
-                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
-                        False positive rate at 9.0% exceeds our 10.0% threshold. Palo Alto Cortex XDR is the primary driver at 11.2%. Tuning these alerts will reduce client noise and improve SOC efficiency.
-                    </p>
+                        <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                            Palo Alto Cortex XDR false positive rate is 11.2%, exceeding the 10.0% threshold and keeping the overall rate at 9.0%. Tuning these alerts will reduce client noise and improve SOC efficiency.
+                        </p>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
                         <div>
                             <span style="color: #6b7280;">Owner:</span>
@@ -985,9 +992,9 @@
                         <span class="priority-badge priority-medium">MEDIUM</span>
                         <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Automation Opportunity</span>
                     </div>
-                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
-                        Manual escalations at 14% exceed our 15% target. 38 incidents required analyst judgment. Expanding playbook coverage will improve consistency.
-                    </p>
+                        <p style="font-size: 14px; color: #4b5563; margin-bottom: 12px;">
+                            Manual escalations at 14% exceed our 12% target. 38 incidents required analyst judgment. Expanding playbook coverage will improve consistency.
+                        </p>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
                         <div>
                             <span style="color: #6b7280;">Owner:</span>
@@ -1034,8 +1041,8 @@
                         <strong>Recommendation Engine:</strong> These trigger automatically when metrics cross defined thresholds:
                     </p>
                     <ul style="list-style-type: disc; padding-left: 20px; margin-top: 8px; font-size: 12px; color: #6b7280;">
-                        <li>False positive rate threshold: 10.0%</li>
-                        <li>Manual escalation threshold: 15%</li>
+                        <li>Source-level false positive rate threshold: 10.0%</li>
+                        <li>Manual escalation threshold: 12%</li>
                         <li>Containment target: 95%</li>
                     </ul>
                 </div>
@@ -1110,7 +1117,7 @@
                 </div>
                 <div style="margin-top: 16px; padding: 12px; background: white; border-radius: 6px;">
                     <p style="font-size: 14px; color: #4b5563;">
-                        <strong>Looking Ahead:</strong> In the next period we're focused on reducing false positives another 20% through enhanced Palo Alto XDR tuning and expanding playbook automation to capture the remaining 14% of manual escalations.
+                        <strong>Looking Ahead:</strong> In the next period we're focused on reducing false positives another 20% through enhanced Palo Alto XDR tuning and expanding playbook automation to push manual escalations down to the 12% target.
                     </p>
                 </div>
             </div>
@@ -1171,8 +1178,8 @@
                 labels: ['Period -2', 'Period -1', 'Current'],
                 datasets: [
                     {
-                        label: 'MTTR',
-                        data: [2.8, 2.5, 2.1],
+                        label: 'MTTR (min)',
+                        data: [168, 150, 126],
                         borderColor: '#009CDE',
                         backgroundColor: 'rgba(0, 156, 222, 0.1)',
                         borderWidth: 3,
@@ -1181,8 +1188,8 @@
                         pointHoverRadius: 6
                     },
                     {
-                        label: 'MTTD',
-                        data: [0.9, 0.8, 0.7],
+                        label: 'MTTD (min)',
+                        data: [54, 48, 42],
                         borderColor: '#004C97',
                         backgroundColor: 'rgba(0, 76, 151, 0.1)',
                         borderWidth: 3,
@@ -1199,7 +1206,8 @@
                         borderDash: [8, 4],
                         tension: 0.4,
                         pointRadius: 4,
-                        pointHoverRadius: 6
+                        pointHoverRadius: 6,
+                        yAxisID: 'y1'
                     }
                 ]
             },
@@ -1212,16 +1220,50 @@
                     },
                     tooltip: {
                         mode: 'index',
-                        intersect: false
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                const datasetLabel = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                if (datasetLabel.includes('FP')) {
+                                    return datasetLabel + ': ' + value.toFixed(1) + '%';
+                                }
+                                return datasetLabel + ': ' + Math.round(value) + ' min';
+                            }
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Minutes'
+                        },
                         ticks: {
                             font: {
                                 family: 'Roboto',
                                 size: 11
+                            }
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'False Positive %'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Roboto',
+                                size: 11
+                            },
+                            callback: function(value) {
+                                return value + '%';
                             }
                         }
                     },
