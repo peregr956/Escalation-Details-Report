@@ -1756,138 +1756,150 @@
               });
           }
 
-          const severitySankeyCanvas = document.getElementById('severitySankeyChart');
-          if (severitySankeyCanvas) {
-              const severitySankeyCtx = severitySankeyCanvas.getContext('2d');
-              new Chart(severitySankeyCtx, {
-                  type: 'sankey',
-                  data: {
-                      datasets: [{
-                          label: 'Severity alignment',
-                          data: severityFlows,
-                          colorFrom: (ctx) => {
-                              const link = ctx.dataset.data[ctx.dataIndex];
-                              return nodeColorMap[link.from] || '#009CDE';
-                          },
-                          colorTo: (ctx) => {
-                              const link = ctx.dataset.data[ctx.dataIndex];
-                              return nodeColorMap[link.to] || '#004C97';
-                          },
-                          colorMode: 'gradient',
-                          nodeWidth: 18,
-                          nodePadding: 18,
-                          borderColor: 'rgba(255, 255, 255, 0.9)',
-                          borderWidth: 1
-                      }]
-                  },
-                  options: {
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: {
-                          legend: {
-                              display: false
-                          },
-                          tooltip: {
-                              callbacks: {
-                                  title: () => '',
-                                  label: (context) => {
-                                      const link = context.raw || context.dataset.data[context.dataIndex];
-                                      return `${link.from} → ${link.to}: ${formatNumber(link.flow)} alerts (${formatPercentValue(link.flow)})`;
+          // Severity Sankey Chart - with error handling
+          try {
+              const severitySankeyCanvas = document.getElementById('severitySankeyChart');
+              if (severitySankeyCanvas) {
+                  const severitySankeyCtx = severitySankeyCanvas.getContext('2d');
+                  new Chart(severitySankeyCtx, {
+                      type: 'sankey',
+                      data: {
+                          datasets: [{
+                              label: 'Severity alignment',
+                              data: severityFlows,
+                              colorFrom: (ctx) => {
+                                  const link = ctx.dataset.data[ctx.dataIndex];
+                                  return nodeColorMap[link.from] || '#009CDE';
+                              },
+                              colorTo: (ctx) => {
+                                  const link = ctx.dataset.data[ctx.dataIndex];
+                                  return nodeColorMap[link.to] || '#004C97';
+                              },
+                              colorMode: 'gradient',
+                              nodeWidth: 18,
+                              nodePadding: 18,
+                              borderColor: 'rgba(255, 255, 255, 0.9)',
+                              borderWidth: 1
+                          }]
+                      },
+                      options: {
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                              legend: {
+                                  display: false
+                              },
+                              tooltip: {
+                                  callbacks: {
+                                      title: () => '',
+                                      label: (context) => {
+                                          const link = context.raw || context.dataset.data[context.dataIndex];
+                                          return `${link.from} → ${link.to}: ${formatNumber(link.flow)} alerts (${formatPercentValue(link.flow)})`;
+                                      }
                                   }
                               }
-                          }
-                      },
-                      parsing: false
-                  }
-              });
+                          },
+                          parsing: false
+                      }
+                  });
+              }
+          } catch (error) {
+              console.error('Error initializing Severity Sankey chart:', error);
           }
 
-        // MITRE ATT&CK STACKED Bar Chart
-        const mitreCtx = document.getElementById('mitreChart').getContext('2d');
-        new Chart(mitreCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Persistence', 'Defense Evasion', 'Execution', 'Discovery', 'Initial Access'],
-                datasets: [
-                    {
-                        label: 'High',
-                        data: [12, 8, 5, 3, 2],
-                        backgroundColor: '#EF3340',
-                        borderRadius: 0
-                    },
-                    {
-                        label: 'Medium',
-                        data: [38, 31, 22, 18, 12],
-                        backgroundColor: '#FF6A14',
-                        borderRadius: 0
-                    },
-                    {
-                        label: 'Low',
-                        data: [22, 18, 15, 24, 16],
-                        backgroundColor: '#009CDE',
-                        borderRadius: 0
-                    },
-                    {
-                        label: 'Info',
-                        data: [5, 3, 2, 8, 3],
-                        backgroundColor: '#9CA3AF',
-                        borderRadius: 0
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: {
-                                family: 'Roboto',
-                                size: 11
+        // MITRE ATT&CK STACKED Bar Chart - with error handling
+        try {
+            const mitreCanvas = document.getElementById('mitreChart');
+            if (mitreCanvas) {
+                const mitreCtx = mitreCanvas.getContext('2d');
+                new Chart(mitreCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Persistence', 'Defense Evasion', 'Execution', 'Discovery', 'Initial Access'],
+                        datasets: [
+                            {
+                                label: 'High',
+                                data: [12, 8, 5, 3, 2],
+                                backgroundColor: '#EF3340',
+                                borderRadius: 0
                             },
-                            padding: 10
-                        }
+                            {
+                                label: 'Medium',
+                                data: [38, 31, 22, 18, 12],
+                                backgroundColor: '#FF6A14',
+                                borderRadius: 0
+                            },
+                            {
+                                label: 'Low',
+                                data: [22, 18, 15, 24, 16],
+                                backgroundColor: '#009CDE',
+                                borderRadius: 0
+                            },
+                            {
+                                label: 'Info',
+                                data: [5, 3, 2, 8, 3],
+                                backgroundColor: '#9CA3AF',
+                                borderRadius: 0
+                            }
+                        ]
                     },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            footer: function(tooltipItems) {
-                                let total = 0;
-                                tooltipItems.forEach(function(tooltipItem) {
-                                    total += tooltipItem.parsed.y;
-                                });
-                                return 'Total: ' + total;
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        family: 'Roboto',
+                                        size: 11
+                                    },
+                                    padding: 10
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    footer: function(tooltipItems) {
+                                        let total = 0;
+                                        tooltipItems.forEach(function(tooltipItem) {
+                                            total += tooltipItem.parsed.y;
+                                        });
+                                        return 'Total: ' + total;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: {
+                                    font: {
+                                        family: 'Roboto',
+                                        size: 10
+                                    },
+                                    maxRotation: 45,
+                                    minRotation: 15
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        family: 'Roboto',
+                                        size: 11
+                                    }
+                                }
                             }
                         }
                     }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        ticks: {
-                            font: {
-                                family: 'Roboto',
-                                size: 10
-                            },
-                            maxRotation: 45,
-                            minRotation: 15
-                        }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        ticks: {
-                            font: {
-                                family: 'Roboto',
-                                size: 11
-                            }
-                        }
-                    }
-                }
+                });
             }
-        });
+        } catch (error) {
+            console.error('Error initializing MITRE ATT&CK chart:', error);
+        }
     </script>
 </body>
 </html>
