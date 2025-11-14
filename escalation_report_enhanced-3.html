@@ -7,6 +7,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-pbQg0fJQ/3jz6oaUuuv8gYmEWBrco7N3O5iDutZSaPfndl53Q7g7uT+nx9wYxAiM4UirU8bAztJQpyXgq5XegQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@4.3.0/dist/chartjs-chart-sankey.min.js"></script>
     <style>
         :root {
             --cs-blue: #009CDE;
@@ -456,83 +457,160 @@
               font-style: italic;
           }
 
-        .severity-card .card-content {
+        .severity-card .card-header {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
         }
 
-        .severity-chart-container {
-            width: 100%;
-            height: 220px;
+        .severity-card .card-content {
+            padding: 28px;
+        }
+
+        .severity-card-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+            align-items: stretch;
+        }
+
+        .severity-chip {
+            background-color: rgba(0, 156, 222, 0.12);
+            color: #004C97;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 76, 151, 0.15);
+        }
+
+        .severity-flow-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .severity-flow-panel p {
+            font-size: 14px;
+            color: rgba(52, 55, 65, 0.8);
+            line-height: 1.6;
+        }
+
+        .severity-flow-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .flow-stat {
+            border: 1px solid rgba(0, 76, 151, 0.12);
+            border-radius: 10px;
+            padding: 12px 14px;
+            background-color: rgba(0, 156, 222, 0.05);
+        }
+
+        .flow-stat[data-accent="critical"] {
+            background-color: rgba(239, 51, 64, 0.08);
+            border-color: rgba(239, 51, 64, 0.25);
+        }
+
+        .flow-stat[data-accent="warning"] {
+            background-color: rgba(255, 106, 20, 0.08);
+            border-color: rgba(255, 106, 20, 0.25);
+        }
+
+        .flow-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #343741;
+            line-height: 1.1;
+        }
+
+        .flow-stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(52, 55, 65, 0.75);
+        }
+
+        .severity-flow-insights {
+            display: grid;
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .severity-flow-insights li {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 10px auto;
+            gap: 10px;
+            color: rgba(52, 55, 65, 0.85);
+            font-size: 13px;
+        }
+
+        .severity-flow-insights li::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 6px;
+            background-color: #009CDE;
+        }
+
+        .severity-flow-insights li[data-accent="lift"]::before {
+            background-color: #EF3340;
+        }
+
+        .severity-flow-insights li[data-accent="lower"]::before {
+            background-color: #9CA3AF;
+        }
+
+        .sankey-chart-wrapper {
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sankey-chart-container {
+            flex: 1;
             position: relative;
         }
 
-        .severity-chart-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            color: #343741;
+        .sankey-chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        .severity-chart-total {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .severity-chart-text {
-            font-size: 12px;
-            color: rgba(52, 55, 65, 0.75);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .severity-legend {
+        .sankey-legend {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
             gap: 16px;
-            font-size: 14px;
-            color: rgba(52, 55, 65, 0.8);
+            font-size: 13px;
+            color: rgba(52, 55, 65, 0.85);
         }
 
-        .severity-legend .legend-item span:last-child {
-            display: inline-block;
+        .sankey-legend .legend-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
-          .severity-insights {
-              display: grid;
-              gap: 8px;
-              font-size: 12px;
-              color: rgba(52, 55, 65, 0.75);
-          }
+        .card-footnote {
+            font-size: 11px;
+            color: rgba(52, 55, 65, 0.6);
+            font-style: italic;
+            margin-top: 12px;
+        }
 
-          .severity-insight {
-              line-height: 1.6;
-          }
-
-          .severity-insights strong {
-              color: #004C97;
-              font-weight: 600;
-          }
-
-          @media (max-width: 1024px) {
-              .detection-quality-layout {
-                  grid-template-columns: 1fr;
-              }
-          }
-
-          @media (max-width: 768px) {
-              .severity-chart-container {
-                  height: 200px;
-              }
-          }
+        @media (max-width: 1024px) {
+            .detection-quality-layout {
+                grid-template-columns: 1fr;
+            }
+        }
 
         /* Hero Impact Section */
         .hero-section {
@@ -1135,24 +1213,46 @@
 
         <div class="card severity-card tier-2-spacing">
             <div class="card-header">
-                <h2 class="card-title">Severity Distribution</h2>
-                <p class="card-subtitle">Volume mix helps target tuning and engagement effort</p>
+                <div>
+                    <h2 class="card-title">Severity Alignment Flow</h2>
+                    <p class="card-subtitle">Vendor-reported criticality vs. Critical Start adjudication</p>
+                </div>
+                <span class="severity-chip" data-total-escalations>267 escalations</span>
             </div>
             <div class="card-content">
-                <div class="severity-chart-container">
-                    <canvas id="severityChart"></canvas>
-                    <div class="severity-chart-label">
-                        <span class="severity-chart-total" data-severity-value>0</span>
-                        <span class="severity-chart-text" data-severity-label>Total incidents</span>
+                <div class="severity-card-body">
+                    <div class="severity-flow-panel">
+                        <p>
+                            Our SOC analysts re-evaluate every vendor alert before escalating. The Sankey view highlights how often Critical Start raises or lowers the raw severity to reflect the real business impact you need to act on.
+                        </p>
+                        <div class="severity-flow-stats">
+                            <div class="flow-stat" data-accent="critical">
+                                <div class="flow-stat-value" data-flow-upgraded>0</div>
+                                <div class="flow-stat-label">Alerts upgraded</div>
+                            </div>
+                            <div class="flow-stat" data-accent="warning">
+                                <div class="flow-stat-value" data-flow-downgraded>0</div>
+                                <div class="flow-stat-label">Alerts de-escalated</div>
+                            </div>
+                            <div class="flow-stat">
+                                <div class="flow-stat-value" data-flow-aligned>0</div>
+                                <div class="flow-stat-label">Remained aligned</div>
+                            </div>
+                        </div>
+                        <ul class="severity-flow-insights">
+                            <li data-accent="lift"><span data-flow-upgrade-copy>Upgraded alerts ensure true critical issues trigger engagement.</span></li>
+                            <li data-accent="lower"><span data-flow-downgrade-copy>De-escalations remove vendor noise before it hits your team.</span></li>
+                            <li><span data-flow-dominant-copy>The largest path shows where automation investments will deliver the fastest relief.</span></li>
+                        </ul>
+                    </div>
+                    <div class="sankey-chart-wrapper">
+                        <div class="sankey-chart-container">
+                            <canvas id="severitySankeyChart"></canvas>
+                        </div>
+                        <div class="sankey-legend" id="sankeyLegend"></div>
                     </div>
                 </div>
-                <div class="severity-legend" id="severityLegend"></div>
-                <div class="severity-insights">
-                    <p class="severity-insight"><strong>High / Critical</strong> incidents are low volume but drive urgent engagement, aligning with the 18% after-hours call rate.</p>
-                    <p class="severity-insight"><strong>Medium</strong> severity remains the largest share (121 escalations) — a key candidate for additional automation.</p>
-                    <p class="severity-insight"><strong>Low & Informational</strong> account for 46.1% of escalations, reinforcing ongoing tuning cycles to reduce noise.</p>
-                </div>
-                <p style="font-size: 11px; color: rgba(52, 55, 65, 0.6); font-style: italic;">Source: Vendor Severity (col 45) + Current Priority (col 13)</p>
+                <p class="card-footnote">Source: Vendor Severity (col 45) vs. Critical Start Determination (Current Priority, col 13)</p>
             </div>
         </div>
 
@@ -1506,95 +1606,200 @@
             }
         });
 
-          // Severity Mix Doughnut
-          const severityMetrics = [
-              { label: 'Critical / High', count: 23, color: '#EF3340' },
-              { label: 'Medium', count: 121, color: '#FF6A14' },
-              { label: 'Low', count: 103, color: '#009CDE' },
-              { label: 'Informational', count: 20, color: '#9CA3AF' }
+          // Severity Alignment Sankey
+          const severityFlows = [
+              { from: 'Vendor Critical', to: 'CS Critical', flow: 7 },
+              { from: 'Vendor Critical', to: 'CS High', flow: 1 },
+              { from: 'Vendor High', to: 'CS Critical', flow: 2 },
+              { from: 'Vendor High', to: 'CS High', flow: 7 },
+              { from: 'Vendor High', to: 'CS Medium', flow: 4 },
+              { from: 'Vendor High', to: 'CS Low', flow: 2 },
+              { from: 'Vendor Medium', to: 'CS High', flow: 9 },
+              { from: 'Vendor Medium', to: 'CS Medium', flow: 72 },
+              { from: 'Vendor Medium', to: 'CS Low', flow: 32 },
+              { from: 'Vendor Medium', to: 'CS Informational', flow: 8 },
+              { from: 'Vendor Low', to: 'CS Medium', flow: 18 },
+              { from: 'Vendor Low', to: 'CS Low', flow: 67 },
+              { from: 'Vendor Low', to: 'CS Informational', flow: 18 },
+              { from: 'Vendor Informational', to: 'CS Low', flow: 5 },
+              { from: 'Vendor Informational', to: 'CS Informational', flow: 15 }
           ];
-          const severityTotal = severityMetrics.reduce((sum, entry) => sum + entry.count, 0);
-          const severityValueEl = document.querySelector('[data-severity-value]');
-          const severityLabelEl = document.querySelector('[data-severity-label]');
-          const severityLegendEl = document.getElementById('severityLegend');
-          const getDisplayPercentage = (count) => {
-              const fixed = ((count / severityTotal) * 100).toFixed(1);
-              return fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed;
+
+          const severityBaseColors = {
+              Critical: '#EF3340',
+              High: '#FF6A14',
+              Medium: '#FDBA4D',
+              Low: '#009CDE',
+              Informational: '#9CA3AF'
           };
 
-          if (severityLegendEl) {
-              severityLegendEl.innerHTML = '';
-              severityMetrics.forEach((entry) => {
+          const nodeColorMap = {};
+          Object.keys(severityBaseColors).forEach((severity) => {
+              nodeColorMap[`Vendor ${severity}`] = severityBaseColors[severity];
+              nodeColorMap[`CS ${severity}`] = severityBaseColors[severity];
+          });
+
+          const severityOrder = ['Informational', 'Low', 'Medium', 'High', 'Critical'];
+          const totalSeverityFlows = severityFlows.reduce((sum, link) => sum + link.flow, 0);
+
+          const getSeverityDetails = (label) => {
+              const parts = label.split(' ');
+              const severityLabel = parts[parts.length - 1];
+              return {
+                  name: severityLabel,
+                  index: severityOrder.indexOf(severityLabel)
+              };
+          };
+
+          const aggregateShifts = severityFlows.reduce((acc, link) => {
+              const source = getSeverityDetails(link.from);
+              const target = getSeverityDetails(link.to);
+
+              if (target.index > source.index) {
+                  acc.upgraded += link.flow;
+                  if (link.flow > acc.topUpgrade.flow) {
+                      acc.topUpgrade = { ...link, severity: `${source.name} → ${target.name}` };
+                  }
+              } else if (target.index < source.index) {
+                  acc.downgraded += link.flow;
+                  if (link.flow > acc.topDowngrade.flow) {
+                      acc.topDowngrade = { ...link, severity: `${source.name} → ${target.name}` };
+                  }
+              } else {
+                  acc.aligned += link.flow;
+              }
+
+              if (link.flow > acc.topFlow.flow) {
+                  acc.topFlow = { ...link, severity: `${source.name} → ${target.name}` };
+              }
+
+              return acc;
+          }, {
+              upgraded: 0,
+              downgraded: 0,
+              aligned: 0,
+              topUpgrade: { flow: 0, severity: '' },
+              topDowngrade: { flow: 0, severity: '' },
+              topFlow: { flow: 0, severity: '' }
+          });
+
+          const formatNumber = (value) => value.toLocaleString('en-US');
+          const formatPercentValue = (value) => {
+              if (!totalSeverityFlows) {
+                  return '0%';
+              }
+              const pct = ((value / totalSeverityFlows) * 100).toFixed(1);
+              return pct.endsWith('.0') ? pct.slice(0, -2) + '%' : pct + '%';
+          };
+
+          const totalChipEl = document.querySelector('[data-total-escalations]');
+          if (totalChipEl) {
+              totalChipEl.textContent = `${formatNumber(totalSeverityFlows)} escalations`;
+          }
+
+          const flowUpgradedEl = document.querySelector('[data-flow-upgraded]');
+          const flowDowngradedEl = document.querySelector('[data-flow-downgraded]');
+          const flowAlignedEl = document.querySelector('[data-flow-aligned]');
+
+          if (flowUpgradedEl) {
+              flowUpgradedEl.textContent = formatNumber(aggregateShifts.upgraded);
+          }
+          if (flowDowngradedEl) {
+              flowDowngradedEl.textContent = formatNumber(aggregateShifts.downgraded);
+          }
+          if (flowAlignedEl) {
+              flowAlignedEl.textContent = formatNumber(aggregateShifts.aligned);
+          }
+
+          const upgradeCopyEl = document.querySelector('[data-flow-upgrade-copy]');
+          if (upgradeCopyEl) {
+              if (aggregateShifts.upgraded) {
+                  upgradeCopyEl.textContent = `${formatNumber(aggregateShifts.upgraded)} alerts (${formatPercentValue(aggregateShifts.upgraded)}) were upgraded — primarily ${aggregateShifts.topUpgrade.severity} (${aggregateShifts.topUpgrade.flow}) when vendor context understated the risk.`;
+              } else {
+                  upgradeCopyEl.textContent = 'No vendor alerts required an upward severity adjustment this period.';
+              }
+          }
+
+          const downgradeCopyEl = document.querySelector('[data-flow-downgrade-copy]');
+          if (downgradeCopyEl) {
+              if (aggregateShifts.downgraded) {
+                  const downgradeHighlight = aggregateShifts.topDowngrade.flow
+                      ? `${aggregateShifts.topDowngrade.severity} (${aggregateShifts.topDowngrade.flow})`
+                      : 'de-escalated flows';
+                  downgradeCopyEl.textContent = `${formatNumber(aggregateShifts.downgraded)} alerts (${formatPercentValue(aggregateShifts.downgraded)}) were de-escalated — ${downgradeHighlight} kept noise away from your on-call team.`;
+              } else {
+                  downgradeCopyEl.textContent = 'All vendor alerts held their original severity, no de-escalations required.';
+              }
+          }
+
+          const dominantCopyEl = document.querySelector('[data-flow-dominant-copy]');
+          if (dominantCopyEl) {
+              if (aggregateShifts.topFlow.flow) {
+                  dominantCopyEl.textContent = `Largest stream: ${aggregateShifts.topFlow.severity} (${aggregateShifts.topFlow.flow} alerts). Targeting automation/tuning here will yield the most impact.`;
+              } else {
+                  dominantCopyEl.textContent = 'Severity paths evenly distributed this period.';
+              }
+          }
+
+          const sankeyLegendEl = document.getElementById('sankeyLegend');
+          if (sankeyLegendEl) {
+              sankeyLegendEl.innerHTML = '';
+              severityOrder.slice().reverse().forEach((severity) => {
                   const legendItem = document.createElement('div');
                   legendItem.className = 'legend-item';
                   legendItem.innerHTML = `
-                      <span class="legend-dot" style="background-color: ${entry.color};"></span>
-                      <span>${entry.label} · ${entry.count} incidents (${getDisplayPercentage(entry.count)}%)</span>
+                      <span class="legend-dot" style="background-color: ${severityBaseColors[severity]};"></span>
+                      <span>${severity}</span>
                   `;
-                  severityLegendEl.appendChild(legendItem);
+                  sankeyLegendEl.appendChild(legendItem);
               });
           }
 
-          const resetSeverityCenter = () => {
-              if (!severityValueEl || !severityLabelEl) {
-                  return;
-              }
-              severityValueEl.textContent = severityTotal;
-              severityLabelEl.textContent = 'Total incidents';
-          };
-
-          const severityCanvas = document.getElementById('severityChart');
-          let severityChart;
-
-          if (severityCanvas) {
-              const severityCtx = severityCanvas.getContext('2d');
-              severityChart = new Chart(severityCtx, {
-                  type: 'doughnut',
+          const severitySankeyCanvas = document.getElementById('severitySankeyChart');
+          if (severitySankeyCanvas) {
+              const severitySankeyCtx = severitySankeyCanvas.getContext('2d');
+              new Chart(severitySankeyCtx, {
+                  type: 'sankey',
                   data: {
-                      labels: severityMetrics.map((entry) => entry.label),
                       datasets: [{
-                          data: severityMetrics.map((entry) => entry.count),
-                          backgroundColor: severityMetrics.map((entry) => entry.color),
-                          borderWidth: 0
+                          label: 'Severity alignment',
+                          data: severityFlows,
+                          colorFrom: (ctx) => {
+                              const link = ctx.dataset.data[ctx.dataIndex];
+                              return nodeColorMap[link.from] || '#009CDE';
+                          },
+                          colorTo: (ctx) => {
+                              const link = ctx.dataset.data[ctx.dataIndex];
+                              return nodeColorMap[link.to] || '#004C97';
+                          },
+                          colorMode: 'gradient',
+                          nodeWidth: 18,
+                          nodePadding: 18,
+                          borderColor: 'rgba(255, 255, 255, 0.9)',
+                          borderWidth: 1
                       }]
                   },
                   options: {
                       responsive: true,
                       maintainAspectRatio: false,
-                      cutout: '65%',
                       plugins: {
                           legend: {
                               display: false
                           },
                           tooltip: {
                               callbacks: {
-                                  label: function(context) {
-                                      const value = context.raw;
-                                      const percentage = getDisplayPercentage(value);
-                                      return context.label + ': ' + value + ' incidents (' + percentage + '%)';
+                                  title: () => '',
+                                  label: (context) => {
+                                      const link = context.raw || context.dataset.data[context.dataIndex];
+                                      return `${link.from} → ${link.to}: ${formatNumber(link.flow)} alerts (${formatPercentValue(link.flow)})`;
                                   }
                               }
                           }
-                      }
+                      },
+                      parsing: false
                   }
               });
-
-              severityCanvas.addEventListener('mousemove', (event) => {
-                  const elements = severityChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
-                  if (elements.length && severityValueEl && severityLabelEl) {
-                      const index = elements[0].index;
-                      const entry = severityMetrics[index];
-                      severityValueEl.textContent = getDisplayPercentage(entry.count) + '%';
-                      severityLabelEl.textContent = entry.label + ' (' + entry.count + ')';
-                  } else {
-                      resetSeverityCenter();
-                  }
-              });
-
-              severityCanvas.addEventListener('mouseleave', resetSeverityCenter);
           }
-
-          resetSeverityCenter();
 
         // MITRE ATT&CK STACKED Bar Chart
         const mitreCtx = document.getElementById('mitreChart').getContext('2d');
