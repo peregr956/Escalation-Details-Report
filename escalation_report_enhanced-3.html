@@ -1634,11 +1634,18 @@
               Informational: '#9CA3AF'
           };
 
-          const nodeColorMap = {};
-          Object.keys(severityBaseColors).forEach((severity) => {
-              nodeColorMap[`Vendor ${severity}`] = severityBaseColors[severity];
-              nodeColorMap[`CS ${severity}`] = severityBaseColors[severity];
-          });
+            const nodeColorMap = {};
+            Object.keys(severityBaseColors).forEach((severity) => {
+                nodeColorMap[`Vendor ${severity}`] = severityBaseColors[severity];
+                nodeColorMap[`CS ${severity}`] = severityBaseColors[severity];
+            });
+
+            const sankeyPriorityOrder = ['Critical', 'High', 'Medium', 'Low', 'Informational'];
+            const nodePriorityMap = sankeyPriorityOrder.reduce((acc, severity, index) => {
+                acc[`Vendor ${severity}`] = index;
+                acc[`CS ${severity}`] = index;
+                return acc;
+            }, {});
 
           const severityOrder = ['Informational', 'Low', 'Medium', 'High', 'Critical'];
           const totalSeverityFlows = severityFlows.reduce((sum, link) => sum + link.flow, 0);
@@ -1775,6 +1782,7 @@
                                   const link = ctx.dataset.data[ctx.dataIndex];
                                   return nodeColorMap[link.to] || '#004C97';
                               },
+                                priority: nodePriorityMap,
                               colorMode: 'gradient',
                               nodeWidth: 18,
                               nodePadding: 18,
