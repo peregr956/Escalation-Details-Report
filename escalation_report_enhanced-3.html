@@ -9,6 +9,21 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.14.0/dist/chartjs-chart-sankey.min.js" integrity="sha512-p9MnIc0Xzj4QcoFGM2vuBWpT+8mDtCgpLju/3i1F7w3LVRTIWEpXgEmVH1SUMulnO5A55oHdku3IjS7BwYFm0w==" crossorigin="anonymous"></script>
     <style>
+        /* ============================================================================
+           CSS VARIABLES - CRITICAL START BRAND COLOR SYSTEM
+           ============================================================================
+           BUSINESS CONTEXT: Brand colors defined per Critical Start brand guidelines.
+           These colors carry semantic meaning throughout the report:
+           - Blue (#009CDE): Primary brand color, positive metrics, trust indicators
+           - Navy (#004C97): Headers, emphasis, professional tone
+           - Slate (#343741): Body text, neutral information
+           - Purple (#702F8A): After-hours metrics, off-hours indicators
+           - Red (#EF3340): Critical alerts, high-priority items, negative trends
+           - Orange (#FF6A14): Warnings, medium-priority, attention items
+           
+           TRANSPARENCY VARIANTS: Used for backgrounds, overlays, and subtle emphasis.
+           Opacity values (05, 10, 12, 15, 25, 60, 75, 80) create visual hierarchy.
+           ============================================================================ */
         :root {
             --cs-blue: #009CDE;
             --cs-navy: #004C97;
@@ -607,6 +622,17 @@
             margin-top: 12px;
         }
 
+        /* ============================================================================
+           RESPONSIVE BREAKPOINTS
+           ============================================================================
+           BUSINESS CONTEXT: Report must be readable on tablets and desktop screens.
+           Mobile view is not a primary use case (reports are typically viewed in
+           business review meetings on larger screens).
+           
+           BREAKPOINT: 1024px - Tablet/Desktop boundary
+           - Below 1024px: Detection quality section stacks vertically for readability
+           - Above 1024px: Side-by-side layout for executive dashboard view
+           ============================================================================ */
         @media (max-width: 1024px) {
             .detection-quality-layout {
                 grid-template-columns: 1fr;
@@ -682,6 +708,12 @@
             margin-bottom: 32px;
         }
 
+        /* ============================================================================
+           PRINT STYLING
+           ============================================================================
+           BUSINESS CONTEXT: Reports may be printed for executive handouts or archival.
+           Print styles ensure cards don't break across pages awkwardly.
+           ============================================================================ */
         @media print {
             .container {
                 max-width: 100%;
@@ -693,44 +725,108 @@
     </style>
 </head>
 <body>
+    <!-- ============================================================================
+         REPORT STRUCTURE OVERVIEW
+         ============================================================================
+         BUSINESS CONTEXT: This report follows a 4-tier hierarchy designed for
+         executive consumption, with the most important client-facing value at the top.
+         
+         TIER 1: Hero Impact Section
+         - Purpose: Immediate value demonstration for executives
+         - Audience: C-suite, CISOs, Security Leadership
+         - Content: Hours delivered, alerts resolved, coverage, compliance
+         
+         TIER 2: Performance & Trust Zone
+         - Purpose: Build trust through trend analysis and benchmarking
+         - Audience: Security Leadership, SOC Managers
+         - Content: 3-month trends, target metrics, industry comparison
+         
+         TIER 3: Coverage & Capability Zone
+         - Purpose: Demonstrate operational value and detection quality
+         - Audience: SOC Managers, Security Leadership
+         - Content: Value delivered, detection sources, escalation methods, after-hours coverage
+         
+         TIER 4: Technical Detail Zone
+         - Purpose: Deep-dive metrics for operational improvement
+         - Audience: SOC Managers, Analysts
+         - Content: Response efficiency, collaboration quality, detection quality, threat landscape
+         ============================================================================ -->
     <div class="container">
-        <!-- Header -->
+        <!-- ========================================================================
+             REPORT HEADER
+             ========================================================================
+             BUSINESS CONTEXT: Header establishes report identity, client context,
+             and reporting period. Critical for multi-client report generation.
+             
+             [DYNAMIC] Client name, period dates, and tier level must be populated
+             from CORR platform or configuration.
+             
+             DATA SOURCES:
+             - Client name: CORR platform client configuration
+             - Period dates: User-selected date range or default period
+             - Tier level: Client subscription tier (Signature, etc.)
+             ======================================================================== -->
         <div class="header">
                 <div>
                     <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjUyIiB2aWV3Qm94PSIwIDAgMjQwIDUyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHJvbGU9ImltZyIgYXJpYS1sYWJlbGxlZGJ5PSJjc0xvZ29UaXRsZSBjc0xvZ29EZXNjIj4KICA8dGl0bGUgaWQ9ImNzTG9nb1RpdGxlIj5Dcml0aWNhbCBTdGFydCBQcmltYXJ5IExvZ288L3RpdGxlPgogIDxkZXNjIGlkPSJjc0xvZ29EZXNjIj5Xb3JkbWFyayBzaG93aW5nIENyaXRpY2FsIFN0YXJ0IHdpdGggdGhlIENyaXRpY2FsIHBvcnRpb24gaW4gbmF2eSBhbmQgU3RhcnQgaW4gcmVkIG92ZXIgYSBibHVlIGdyYWRpZW50IGJhc2VsaW5lLjwvZGVzYz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3NHcmFkaWVudCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDA5Q0RFIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDRDOTciIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSIwIiB5PSI0NCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI0IiBmaWxsPSJ1cmwoI2NzR3JhZGllbnQpIiByeD0iMiIgLz4KICA8dGV4dCB4PSIwIiB5PSIzNCIgZm9udC1mYW1pbHk9IidSb2JvdG8nLCAnQXJpYWwgQmxhY2snLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIiBmb250LXNpemU9IjM0IiBmaWxsPSIjMDA0Qzk3IiBsZXR0ZXItc3BhY2luZz0iMiI+CiAgICBDUklUSUNBTAogIDwvdGV4dD4KICA8dGV4dCB4PSIxNTIiIHk9IjM0IiBmb250LWZhbWlseT0iJ1JvYm90bycsICdBcmlhbCBCbGFjaycsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMzQiIGZpbGw9IiNFRjMzNDAiIGxldHRlci1zcGFjaW5nPSIyIj4KICAgIFNUQVJUCiAgPC90ZXh0PgogIDx0ZXh0IHg9IjIyNiIgeT0iMTgiIGZvbnQtZmFtaWx5PSInUm9ib3RvJywgJ0FyaWFsJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0VGMzM0MCI+CiAgICDCrgogIDwvdGV4dD4KPC9zdmc+Cg==" alt="Critical Start logo" style="width: 160px; height: auto; margin-bottom: 16px;">
                 <h1 style="font-size: 24px; font-weight: 700; color: #004C97; margin-bottom: 8px;">
                     Escalation to Client Details Report — Signature Tier
                 </h1>
+                <!-- [EXAMPLE DATA] Client name - Replace with dynamic client from CORR -->
                 <p style="font-weight: 600; color: #343741; margin-bottom: 4px;">Lennar Corporation</p>
+                <!-- [DYNAMIC] Period dates - Must be calculated from selected date range -->
                 <p style="color: rgba(52, 55, 65, 0.75); font-size: 14px;">Period: August 1-31, 2025 (31 days)</p>
                 <p style="color: rgba(52, 55, 65, 0.6); font-size: 12px;">Production incidents escalated to client. Rolling 90-day benchmarks from the Cyber Operations Risk & Response&trade; (CORR) platform.</p>
             </div>
         </div>
 
-        <!-- TIER 1: Hero Impact Section -->
+        <!-- ========================================================================
+             TIER 1: HERO IMPACT SECTION
+             ========================================================================
+             BUSINESS CONTEXT: This is the most important section for executive
+             consumption. It immediately demonstrates value delivered and sets the
+             narrative for the entire report. Designed to answer "What did we get
+             for our investment?" at a glance.
+             
+             AUDIENCE: Primary - C-suite executives, CISOs
+             PURPOSE: Drive renewals by quantifying operational value
+             
+             METRICS DISPLAYED:
+             1. Hours of Expert Analysis - Labor hours saved (value calculation)
+             2. Alerts Resolved - Noise reduction (operational efficiency)
+             3. Coverage Provided - 24/7 protection demonstration
+             4. Target Compliance - Service level achievement
+             
+             [DYNAMIC] All values must be calculated from CORR platform data
+             [EXAMPLE] Current values are wireframe/example data
+             ======================================================================== -->
         <div class="hero-section tier-1-spacing">
             <h2 class="hero-title">What We Delivered This Period</h2>
             <p class="hero-subtitle">Real protection, measurable outcomes.</p>
             
             <div class="hero-grid">
+                <!-- [EXAMPLE DATA] Hours of Expert Analysis - Calculate from CORR analyst utilization -->
                 <div class="hero-metric">
                     <div class="hero-number">452</div>
                     <div class="hero-label">Hours of Expert Analysis</div>
                     <div class="hero-context">Security operations your team didn't have to staff</div>
                 </div>
                 
+                <!-- [EXAMPLE DATA] Alerts Resolved - Sum of non-escalated alerts from CORR -->
                 <div class="hero-metric">
                     <div class="hero-number">1,843</div>
                     <div class="hero-label">Alerts Resolved</div>
                     <div class="hero-context">Handled by the Critical Start Security Operations Center (CS SOC) without escalation—noise filtered so you could focus</div>
                 </div>
                 
+                <!-- [DYNAMIC] Coverage Provided - Calculate from period duration -->
                 <div class="hero-metric">
                     <div class="hero-number">24/7</div>
                     <div class="hero-label">Coverage Provided</div>
                     <div class="hero-context">744 hours of continuous monitoring and response</div>
                 </div>
                 
+                <!-- [DYNAMIC] Target Compliance - Calculate from response time targets vs. actuals -->
                 <div class="hero-metric">
                     <div class="hero-number">88%</div>
                     <div class="hero-label">Target Compliance</div>
@@ -742,15 +838,38 @@
             </p>
         </div>
 
-        <!-- Executive Summary - ENHANCED -->
+        <!-- ========================================================================
+             EXECUTIVE SUMMARY
+             ========================================================================
+             BUSINESS CONTEXT: Provides high-level narrative summary of the reporting
+             period. Balances positive outcomes (threats contained) with transparency
+             (false positive rate, incident volume). Designed for executive scanning.
+             
+             AUDIENCE: Primary - C-suite, CISOs; Secondary - Security Leadership
+             PURPOSE: Set context and key takeaways before detailed metrics
+             
+             KEY METRICS:
+             - Total incidents escalated (primary operational load indicator)
+             - Daily average (helps executives understand frequency)
+             - Non-escalated alerts (demonstrates noise reduction)
+             - Period highlights (narrative summary)
+             
+             DATA SOURCES:
+             - Incident count: Report Extract - Incident Id (col 1)
+             - CS SOC Verdict: Report Extract (col 12) for true positive identification
+             - Escalated Datetime: Report Extract (col 20) for period calculations
+             ======================================================================== -->
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">Executive Summary</h2>
             </div>
             <div class="card-content">
                 <div style="margin-bottom: 16px;">
+                    <!-- [EXAMPLE DATA] Total incidents - Count from Report Extract col 1 -->
                     <p style="font-size: 32px; font-weight: 700; color: #343741;">267 Incidents Escalated</p>
+                    <!-- [DYNAMIC] Daily average - Calculate: total incidents / period days -->
                     <p style="color: rgba(52, 55, 65, 0.75);">Average 8.9 per day requiring your team's attention</p>
+                    <!-- [EXAMPLE DATA] Non-escalated alerts - From CORR platform metadata -->
                     <p style="font-size: 14px; color: rgba(52, 55, 65, 0.6); margin-top: 4px;">
                         Additionally: 1,843 alerts resolved by CS SOC without escalation (59.5 per day)
                     </p>
@@ -783,13 +902,38 @@
             </div>
         </div>
 
-        <!-- TIER 2: Performance & Trust Zone -->
-        <!-- 3-Month Performance Trend -->
+        <!-- ========================================================================
+             TIER 2: PERFORMANCE & TRUST ZONE
+             ========================================================================
+             BUSINESS CONTEXT: Builds trust through trend analysis and external
+             benchmarking. Demonstrates continuous improvement and competitive
+             positioning. Critical for renewal conversations.
+             
+             AUDIENCE: Security Leadership, SOC Managers, Executives
+             PURPOSE: Demonstrate improvement trajectory and industry competitiveness
+             ======================================================================== -->
+        
+        <!-- ========================================================================
+             3-MONTH PERFORMANCE TREND CHART
+             ========================================================================
+             BUSINESS CONTEXT: Shows improvement trajectory across three key metrics
+             over three reporting periods. Demonstrates maturation and tuning effectiveness.
+             
+             METRICS DISPLAYED:
+             - Mean Time to Respond (MTTR): Left axis, minutes
+             - Mean Time to Detect (MTTD): Left axis, minutes  
+             - False Positive %: Right axis, percentage
+             
+             DATA SOURCE: CORR platform rolling 90-day averages
+             [DYNAMIC] Period labels and data points must be calculated from CORR
+             [EXAMPLE] Current data is wireframe example
+             ======================================================================== -->
         <div class="card tier-2-spacing">
             <div class="card-header">
                 <h2 class="card-title">Getting Better Every Period</h2>
             </div>
             <div class="card-content">
+                <!-- [TODO] Chart initialization handled in JavaScript section -->
                 <div class="chart-container">
                     <canvas id="trendChart"></canvas>
                 </div>
@@ -819,14 +963,37 @@
 
         <!-- INCIDENT SPOTLIGHT - NEW -->
 
-        <!-- Target Metrics - NOW WITH 4 CARDS INCLUDING P90 -->
+        <!-- ========================================================================
+             TARGET METRICS CARDS
+             ========================================================================
+             BUSINESS CONTEXT: Displays key performance indicators against defined
+             targets. P90 (90th percentile) is the primary SLA metric for response time.
+             
+             METRICS:
+             1. P90 Response Time - Primary SLA metric (target < 90 minutes)
+             2. Critical/High Priority MTTR - High-severity incidents
+             3. Medium/Low MTTR - Lower-severity incidents
+             4. Mean Time to Detect (MTTD) - Detection speed
+             
+             BUSINESS RULES:
+             - P90 target: < 90 minutes (90th percentile of all response times)
+             - MTTR targets: < 90 minutes for all priority levels
+             - MTTD target: < 15 minutes
+             
+             DATA SOURCES:
+             - Response times: Report Extract - CS SOC Time to Respond (TTR) (col 37)
+             - Priority levels: Report Extract - Current Priority (col 13)
+             ======================================================================== -->
         <div class="grid-4">
+            <!-- [DYNAMIC] P90 Response Time - Calculate 90th percentile from col 37 -->
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title" style="font-size: 14px;">90th Percentile (P90) Response Time</h3>
                 </div>
                 <div class="card-content">
+                    <!-- [EXAMPLE DATA] P90 value - Calculate from actual response times -->
                     <p class="stat-value" style="color: #343741;">87m</p>
+                    <!-- [DYNAMIC] Improvement delta - Compare to 90-day rolling average -->
                     <p class="improvement-delta">↓ 25% vs 90-day avg</p>
                     <p class="stat-detail" style="margin-top: 8px;">Target &lt; 90m | 90th percentile</p>
                     <p style="font-size: 12px; color: rgba(52, 55, 65, 0.75); margin-top: 4px; font-style: italic;">CS SOC Time to Respond (TTR) (col 37)</p>
@@ -910,14 +1077,43 @@
             </div>
         </div>
 
-        <!-- TIER 3: Coverage & Capability Zone -->
-        <!-- Value Delivered -->
+        <!-- ========================================================================
+             TIER 3: COVERAGE & CAPABILITY ZONE
+             ========================================================================
+             BUSINESS CONTEXT: Demonstrates operational value and detection capabilities.
+             Focuses on "what we delivered" from a capability and cost-avoidance perspective.
+             
+             AUDIENCE: Security Leadership, SOC Managers, Executives
+             PURPOSE: Quantify value delivered and demonstrate detection quality
+             ======================================================================== -->
+        
+        <!-- ========================================================================
+             VALUE DELIVERED - COST AVOIDANCE CALCULATION
+             ========================================================================
+             BUSINESS CONTEXT: Quantifies the financial value of MDR services through
+             three components: operations labor, 24/7 coverage, and threat prevention.
+             Critical for renewal conversations and ROI demonstration.
+             
+             CALCULATION METHODOLOGY:
+             1. Security Operations: Analyst hours × loaded hourly rate
+             2. 24/7 Coverage: Full-time SOC analyst cost × coverage ratio
+             3. Threat Prevention: Contained threats × breach cost × probability factor
+             
+             BUSINESS RULES:
+             - Operations: 452 hours × $85/hr loaded cost = $38K
+             - Coverage: $110K annual analyst cost × coverage ratio = $163K
+             - Threat Prevention: 11 threats × $4.45M breach cost × 15% = $7.34M
+             
+             [DYNAMIC] All values must be calculated from actual data
+             [EXAMPLE] Current values use example data and configurable rates
+             ======================================================================== -->
         <div class="card cost-avoidance-card">
             <div class="card-header">
                 <h2 class="card-title">Value Delivered This Period</h2>
             </div>
             <div class="card-content">
                 <div style="text-align: center; margin-bottom: 24px;">
+                    <!-- [EXAMPLE DATA] Total value - Sum of three components -->
                     <p style="font-size: 48px; font-weight: 700; color: #004C97;">$7.55M</p>
                     <p style="font-size: 14px; color: rgba(52, 55, 65, 0.75); margin-top: 8px;">Combined security operations and threat prevention value</p>
                 </div>
@@ -953,19 +1149,44 @@
             </div>
         </div>
 
-        <!-- Product Breakdown -->
+        <!-- ========================================================================
+             DETECTION SOURCES & QUALITY
+             ========================================================================
+             BUSINESS CONTEXT: Shows which security products are generating escalations
+             and their false positive rates. Helps identify tuning opportunities and
+             demonstrates detection source diversity.
+             
+             METRICS:
+             - Product name and incident count
+             - Percentage of total incidents
+             - False positive rate per product
+             
+             BUSINESS RULE: False positive rate threshold is 10.0% per product
+             Products exceeding threshold trigger improvement recommendations
+             
+             DATA SOURCES:
+             - Product: Report Extract - Product (col 7)
+             - Verdict: Report Extract - CS SOC Verdict (col 12) for FP calculation
+             
+             [DYNAMIC] Product list and counts must be aggregated from Report Extract
+             [EXAMPLE] Current products and rates are example data
+             ======================================================================== -->
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">Detection Sources & Quality</h2>
             </div>
             <div class="card-content">
+                    <!-- [EXAMPLE DATA] Product breakdown - Aggregate from col 7, calculate FP rate from col 12 -->
                     <div class="product-item">
                         <div>
                             <p style="font-weight: 600; color: #343741;">Palo Alto Cortex XDR (Extended Detection and Response)</p>
+                        <!-- [DYNAMIC] Incident count and percentage - Calculate from Report Extract -->
                         <p style="font-size: 14px; color: rgba(52, 55, 65, 0.75);">189 incidents (70.8% of total)</p>
                     </div>
                     <div style="text-align: right;">
                         <p style="font-size: 14px; color: rgba(52, 55, 65, 0.75);">False Positive Rate</p>
+                        <!-- [DYNAMIC] FP rate - Calculate: (FP count / total incidents for product) × 100 -->
+                        <!-- [TODO] Color coding: Orange if > 10% threshold, Blue if <= 10% -->
                         <p style="font-size: 20px; font-weight: 700; color: #FF6A14;">11.2%</p>
                     </div>
                 </div>
@@ -993,27 +1214,49 @@
             </div>
         </div>
 
-        <!-- Escalation Methods - UPDATED -->
+        <!-- ========================================================================
+             ESCALATION METHODS
+             ========================================================================
+             BUSINESS CONTEXT: Shows how incidents reach the client - automated
+             playbook vs. analyst-driven. Demonstrates automation maturity and
+             identifies opportunities for playbook expansion.
+             
+             METRICS:
+             - Playbook (Automated): Rule-based automated escalations
+             - CS SOC (Analyst Escalation): Human judgment required
+             
+             BUSINESS RULE: Target is 12% or less for manual escalations
+             Exceeding 12% triggers automation opportunity recommendation
+             
+             DATA SOURCE: Report Extract - Initial Escalation Method (col 9)
+             
+             [DYNAMIC] Percentages and counts must be calculated from col 9
+             [EXAMPLE] Current values are wireframe data
+             ======================================================================== -->
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">How Incidents Reach You</h2>
             </div>
             <div class="card-content">
+                <!-- [DYNAMIC] Playbook percentage - Count "Playbook" in col 9, calculate percentage -->
                 <div class="method-item">
                     <div style="display: flex; align-items: center; gap: 16px;">
                         <div class="percentage-circle" style="background-color: #009CDE;">86%</div>
                         <div>
                             <p style="font-weight: 600; color: #343741;">Playbook (Automated)</p>
+                            <!-- [EXAMPLE DATA] Incident count - Count from col 9 -->
                             <p style="font-size: 14px; color: rgba(52, 55, 65, 0.75);">229 incidents</p>
                             <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); font-style: italic;">Rule-based automated escalation</p>
                         </div>
                     </div>
                 </div>
+                <!-- [DYNAMIC] Analyst escalation percentage - Count "CS SOC" in col 9, calculate percentage -->
                 <div class="method-item">
                     <div style="display: flex; align-items: center; gap: 16px;">
                         <div class="percentage-circle" style="background-color: #FF6A14;">14%</div>
                         <div>
                             <p style="font-weight: 600; color: #343741;">CS SOC (Analyst Escalation)</p>
+                            <!-- [EXAMPLE DATA] Incident count - Count from col 9 -->
                             <p style="font-size: 14px; color: rgba(52, 55, 65, 0.75);">38 incidents</p>
                             <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); font-style: italic;">Analyst-driven escalation requiring human judgment</p>
                         </div>
@@ -1107,17 +1350,46 @@
 
 
 
-        <!-- TIER 4: Technical Detail Zone -->
-        <!-- Response Efficiency -->
+        <!-- ========================================================================
+             TIER 4: TECHNICAL DETAIL ZONE
+             ========================================================================
+             BUSINESS CONTEXT: Deep-dive metrics for operational improvement and
+             technical analysis. Used by SOC managers and analysts to identify
+             optimization opportunities.
+             
+             AUDIENCE: SOC Managers, Analysts, Security Leadership
+             PURPOSE: Operational metrics for continuous improvement
+             ======================================================================== -->
+        
+        <!-- ========================================================================
+             RESPONSE EFFICIENCY
+             ========================================================================
+             BUSINESS CONTEXT: Measures how effectively incidents are handled.
+             Containment rate and automation percentage indicate operational maturity.
+             
+             METRICS:
+             - Containment Rate: Percentage of incidents successfully contained
+             - Playbook Automation: Percentage of automated escalations
+             - Analyst Escalation: Percentage requiring human judgment
+             
+             BUSINESS RULE: Containment target is 95%
+             
+             DATA SOURCES:
+             - Containment: Report Extract - Response Action Status (col 36)
+             - Automation: Report Extract - Initial Escalation Method (col 9)
+             ======================================================================== -->
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">Response Efficiency</h2>
             </div>
             <div class="card-content">
                 <div class="grid-3">
+                    <!-- [DYNAMIC] Containment rate - Count "Contained" in col 36, calculate percentage -->
                     <div class="stat-card" style="background-color: rgba(0, 156, 222, 0.15);">
                         <p class="stat-label">Containment Rate</p>
+                        <!-- [EXAMPLE DATA] Containment percentage - Calculate from col 36 -->
                         <p style="font-size: 36px; font-weight: 700; color: #004C97;">98%</p>
+                        <!-- [DYNAMIC] Contained count - Count from col 36 -->
                         <p class="stat-detail">262 of 267 contained</p>
                         <p style="font-size: 11px; color: rgba(52, 55, 65, 0.6); margin-top: 4px;">Response Action Status (col 36)</p>
                     </div>
@@ -1166,7 +1438,27 @@
             </div>
         </div>
 
-        <!-- Detection Quality -->
+        <!-- ========================================================================
+             DETECTION QUALITY
+             ========================================================================
+             BUSINESS CONTEXT: Comprehensive view of detection accuracy and signal
+             quality. Demonstrates tuning effectiveness and client validation of
+             escalations. Critical for building trust in detection capabilities.
+             
+             METRICS:
+             - True Threat Precision: TP / (TP + FP) - Focused adversary detection
+             - Signal Fidelity: (TP + BTP) / Total - Actionable escalations
+             - False Positive Rate: FP / Total - Target < 10%
+             - Client-Validated Outcomes: TBR validations / Total
+             
+             BUSINESS RULES:
+             - False Positive Rate target: < 10%
+             - Signal Fidelity indicates alignment with response targets
+             
+             DATA SOURCES:
+             - CS SOC Verdict (col 12): TP, FP, BTP classifications
+             - Trusted Behavior Registry (TBR): Client validations
+             ======================================================================== -->
         <div class="card detection-quality-card tier-2-spacing">
             <div class="card-header">
                 <h2 class="card-title">Detection Quality</h2>
@@ -1212,12 +1504,34 @@
               </div>
         </div>
 
+        <!-- ========================================================================
+             SEVERITY ALIGNMENT FLOW (Sankey Diagram)
+             ========================================================================
+             BUSINESS CONTEXT: Visualizes how Critical Start analysts re-evaluate
+             vendor severity ratings. Shows upgrades (raising severity) and
+             downgrades (reducing noise). Demonstrates analyst value-add.
+             
+             VISUALIZATION: Sankey flow diagram showing vendor severity → CS severity
+             
+             METRICS:
+             - Upgraded alerts: Vendor severity raised by CS analysts
+             - Downgraded alerts: Vendor severity lowered (noise reduction)
+             - Aligned alerts: Severity remained the same
+             
+             DATA SOURCES:
+             - Vendor Severity: Report Extract (col 45)
+             - Critical Start Determination: Report Extract - Current Priority (col 13)
+             
+             [DYNAMIC] Flow data must be calculated by comparing col 45 vs col 13
+             [EXAMPLE] Current flow data is wireframe example
+             ======================================================================== -->
         <div class="card severity-card tier-2-spacing">
             <div class="card-header">
                 <div>
                     <h2 class="card-title">Severity Alignment Flow</h2>
                     <p class="card-subtitle">Vendor-reported criticality vs. Critical Start adjudication</p>
                 </div>
+                <!-- [DYNAMIC] Total escalations - Count from Report Extract -->
                 <span class="severity-chip" data-total-escalations>267 escalations</span>
             </div>
             <div class="card-content">
@@ -1257,12 +1571,36 @@
             </div>
         </div>
 
-        <!-- Threat Landscape - STACKED BY SEVERITY -->
+        <!-- ========================================================================
+             THREAT LANDSCAPE BY MITRE ATT&CK TACTIC & SEVERITY
+             ========================================================================
+             BUSINESS CONTEXT: Shows which adversary tactics are most prevalent and
+             their severity distribution. Helps prioritize detection tuning and
+             proactive hunting efforts.
+             
+             VISUALIZATION: Stacked bar chart - Tactics on X-axis, severity on Y-axis
+             
+             METRICS:
+             - MITRE ATT&CK tactic name
+             - Severity distribution (High, Medium, Low, Info) per tactic
+             
+             BUSINESS INSIGHT: Persistence and Defense Evasion tactics with high
+             severity suggest sophisticated adversary activity requiring enhanced detection.
+             
+             DATA SOURCES:
+             - MITRE ATT&CK tactic name: Report Extract (col 42)
+             - MITRE ATT&CK technique name: Report Extract (col 44)
+             - Vendor Severity: Report Extract (col 45)
+             
+             [DYNAMIC] Data must be aggregated by tactic and severity from Report Extract
+             [EXAMPLE] Current chart data is wireframe example
+             ======================================================================== -->
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">Threat Landscape by Tactic & Severity</h2>
             </div>
             <div class="card-content">
+                <!-- [TODO] Chart initialization handled in JavaScript section -->
                 <div class="chart-container" style="height: 280px;">
                     <canvas id="mitreChart"></canvas>
                 </div>
@@ -1277,7 +1615,31 @@
             </div>
         </div>
 
-        <!-- ENHANCED Improvement Opportunities -->
+        <!-- ========================================================================
+             PRIORITIZED IMPROVEMENT PLAN
+             ========================================================================
+             BUSINESS CONTEXT: Auto-generated recommendations based on threshold
+             analysis. Demonstrates proactive improvement and provides actionable
+             next steps. Critical for continuous improvement narrative.
+             
+             AUTOMATION: Recommendations are automatically generated when metrics
+             cross defined thresholds. No manual curation required.
+             
+             BUSINESS RULES (Thresholds):
+             - Source-level false positive rate: 10.0%
+             - Manual escalation threshold: 12%
+             - Containment target: 95%
+             
+             RECOMMENDATION STRUCTURE:
+             - Priority level (High, Medium, Low)
+             - Description with business context
+             - Owner assignment
+             - Target timeline
+             - Expected impact
+             
+             [DYNAMIC] Recommendations must be auto-generated from threshold analysis
+             [EXAMPLE] Current recommendations are wireframe examples
+             ======================================================================== -->
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">Prioritized Improvement Plan</h2>
@@ -1461,13 +1823,304 @@
     </div>
 
     <script>
-        // Operational Load Pie Chart
+        /* ============================================================================
+           DEVELOPER NOTES - ARCHITECTURE & DATA FLOW
+           ============================================================================
+           
+           REPORT ARCHITECTURE:
+           This is a single-page HTML report with embedded CSS and JavaScript.
+           Designed for auto-generation from CORR platform data with minimal
+           human intervention.
+           
+           DATA FLOW:
+           1. CORR Platform → Excel Export (Report Extract) → 45 columns of incident data
+           2. CORR Platform → Metadata (analyst utilization, coverage, trends)
+           3. Report Extract + Metadata → JavaScript calculations → Chart data
+           4. Chart data → Chart.js visualizations → Interactive charts
+           
+           INTEGRATION POINTS:
+           - [TODO] Date range picker: User selects period, triggers data fetch
+           - [TODO] PDF generation: Export report as PDF for archival/handouts
+           - [TODO] CORR API integration: Replace example data with live API calls
+           - [TODO] Excel parsing: Parse Report Extract Excel file programmatically
+           
+           CHART LIBRARIES:
+           - Chart.js v4.4.0: Line charts, pie charts, bar charts
+           - chartjs-chart-sankey v0.14.0: Sankey flow diagrams
+           
+           DATA PROCESSING:
+           - All calculations performed client-side in JavaScript
+           - Example data currently hardcoded (see EXAMPLE DATA CONFIGURATION below)
+           - Production implementation must replace with dynamic data loading
+           
+           EXCEL COLUMN MAPPING:
+           See comprehensive mapping documentation in comments throughout HTML.
+           Key columns referenced:
+           - col 1: Incident Id
+           - col 7: Product
+           - col 9: Initial Escalation Method
+           - col 12: CS SOC Verdict
+           - col 13: Current Priority
+           - col 20: Escalated Datetime (US/Central)
+           - col 26: Touched By
+           - col 27: Closed By
+           - col 29: Customer Last Comment
+           - col 36: Response Action Status
+           - col 37: CS SOC Time to Respond (TTR) (hh:mm)
+           - col 42: MITRE ATT&CK tactic name
+           - col 44: MITRE ATT&CK technique name
+           - col 45: Vendor Severity
+           
+           ============================================================================ */
+        
+        /* ============================================================================
+           EXCEL COLUMN MAPPING REFERENCE
+           ============================================================================
+           COMPREHENSIVE MAPPING OF REPORT EXTRACT COLUMNS TO REPORT SECTIONS
+           
+           The Report Extract Excel file contains 45 columns of incident data.
+           This section documents which columns are used where in the report.
+           
+           COLUMN REFERENCE:
+           - col 1: Incident Id
+             USAGE: Primary key for counting incidents, aggregations
+             SECTIONS: All sections requiring incident counts
+           
+           - col 7: Product
+             USAGE: Detection source identification, product-level FP rate calculation
+             SECTIONS: Detection Sources & Quality section
+             CALCULATION: Group by product, count incidents, calculate FP rate per product
+           
+           - col 9: Initial Escalation Method
+             USAGE: Distinguish automated (Playbook) vs manual (CS SOC) escalations
+             SECTIONS: Escalation Methods, Response Efficiency
+             VALUES: "Playbook" (automated), "CS SOC" (analyst-driven)
+             BUSINESS RULE: Target < 12% for manual escalations
+           
+           - col 12: CS SOC Verdict
+             USAGE: Classification of incident outcome (TP, FP, BTP, etc.)
+             SECTIONS: Executive Summary, Detection Quality, Detection Sources
+             CALCULATIONS: False Positive Rate = (FP count / Total) × 100
+             VALUES: True Positive (TP), False Positive (FP), Benign True Positive (BTP)
+           
+           - col 13: Current Priority
+             USAGE: Critical Start's severity determination after analyst review
+             SECTIONS: Severity Alignment Flow, Target Metrics (priority-based MTTR)
+             COMPARISON: Compared against col 45 (Vendor Severity) for Sankey diagram
+             VALUES: Critical, High, Medium, Low, Informational
+           
+           - col 20: Escalated Datetime (US/Central)
+             USAGE: Timestamp for time-based analysis (business hours, after-hours, weekends)
+             SECTIONS: Hero Impact, Executive Summary, CS SOC Alert Resolution, After-Hours Notifications
+             CALCULATIONS: 
+               - Business Hours: 8am-6pm Mon-Fri
+               - After Hours: 6pm-8am weekdays
+               - Weekend: Saturday-Sunday
+           
+           - col 26: Touched By
+             USAGE: Track collaboration touches per incident
+             SECTIONS: Collaboration Quality
+             CALCULATION: Average touches per incident = Total touches / Total incidents
+           
+           - col 27: Closed By
+             USAGE: Identify client-led vs CS SOC-led closures
+             SECTIONS: Collaboration Quality
+             CALCULATION: Client-Led Closures % = (Client closures / Total) × 100
+           
+           - col 29: Customer Last Comment
+             USAGE: Indicate active client participation
+             SECTIONS: Collaboration Quality
+             CALCULATION: Active Participation % = (Incidents with comments / Total) × 100
+           
+           - col 36: Response Action Status
+             USAGE: Containment status of incidents
+             SECTIONS: Response Efficiency
+             CALCULATION: Containment Rate = (Contained count / Total) × 100
+             VALUES: "Contained", "Not Contained", etc.
+             BUSINESS RULE: Target 95% containment rate
+           
+           - col 37: CS SOC Time to Respond (TTR) (hh:mm)
+             USAGE: Response time metric for SLA calculations
+             SECTIONS: Hero Impact, Executive Summary, Target Metrics, Performance Trend
+             CALCULATIONS:
+               - P90 Response Time: 90th percentile of all response times
+               - MTTR: Mean Time to Respond = Average of all response times
+               - Priority-based MTTR: Filter by col 13, then calculate mean
+             BUSINESS RULE: P90 target < 90 minutes
+             FORMAT: "hh:mm" (e.g., "01:23" = 83 minutes)
+           
+           - col 42: MITRE ATT&CK tactic name
+             USAGE: Adversary tactic classification
+             SECTIONS: Threat Landscape by Tactic & Severity
+             CALCULATION: Group by tactic, count incidents, segment by severity (col 45)
+           
+           - col 44: MITRE ATT&CK technique name
+             USAGE: Specific technique identification (referenced but not primary)
+             SECTIONS: Threat Landscape (data source citation)
+           
+           - col 45: Vendor Severity
+             USAGE: Original vendor-reported severity before CS analyst review
+             SECTIONS: Severity Alignment Flow, Threat Landscape, After-Hours Notifications
+             COMPARISON: Compared against col 13 (Current Priority) for Sankey diagram
+             VALUES: Critical, High, Medium, Low, Informational
+           
+           ADDITIONAL DATA SOURCES (Not in Excel):
+           - CORR Platform Metadata:
+             * Analyst Utilization & Coverage: Hours of expert analysis
+             * Non-escalated alert volume: Alerts resolved without escalation
+             * Rolling 90-day averages: MTTR, MTTD, FP % trends
+             * Detection timestamps: For MTTD calculation
+           
+           - Trusted Behavior Registry (TBR):
+             * Client-validated outcomes: Client confirmation of escalations
+           
+           - Industry Benchmarks:
+             * SANS Institute 2024 SOC Survey: Industry average comparisons
+             * Breach cost models: Threat prevention value calculations
+           ============================================================================ */
+        
+        /* ============================================================================
+           EXAMPLE DATA CONFIGURATION
+           ============================================================================
+           [EXAMPLE DATA] All values below are wireframe/example data for demonstration.
+           In production, these must be replaced with dynamic data from:
+           - CORR platform API
+           - Report Extract Excel file parsing
+           - Calculated metrics from incident data
+           
+           CONFIGURATION STRUCTURE:
+           This object should be populated from production data sources.
+           All calculations should reference this configuration for consistency.
+           ============================================================================ */
+        const EXAMPLE_DATA_CONFIG = {
+            // Report metadata
+            clientName: 'Lennar Corporation', // [DYNAMIC] From CORR platform
+            tier: 'Signature Tier', // [DYNAMIC] From CORR platform
+            periodStart: 'August 1, 2025', // [DYNAMIC] From date range picker
+            periodEnd: 'August 31, 2025', // [DYNAMIC] From date range picker
+            periodDays: 31, // [DYNAMIC] Calculate from dates
+            
+            // Hero Impact metrics
+            hoursOfExpertAnalysis: 452, // [DYNAMIC] From CORR analyst utilization
+            alertsResolved: 1843, // [DYNAMIC] From CORR non-escalated alert volume
+            coverageHours: 744, // [DYNAMIC] Calculate: periodDays × 24
+            targetCompliance: 88, // [DYNAMIC] Calculate from response time targets vs actuals
+            
+            // Executive Summary
+            totalIncidentsEscalated: 267, // [DYNAMIC] Count from Report Extract col 1
+            dailyAverageIncidents: 8.9, // [DYNAMIC] Calculate: totalIncidentsEscalated / periodDays
+            truePositiveThreats: 11, // [DYNAMIC] Count "TP" in Report Extract col 12
+            falsePositiveRate: 9.0, // [DYNAMIC] Calculate: (FP count / Total) × 100 from col 12
+            
+            // Performance metrics
+            p90ResponseTime: 87, // [DYNAMIC] Calculate 90th percentile from col 37
+            criticalHighMTTR: 67, // [DYNAMIC] Filter col 13 for Critical/High, calculate mean from col 37
+            mediumLowMTTR: 52, // [DYNAMIC] Filter col 13 for Medium/Low, calculate mean from col 37
+            mttd: 4, // [DYNAMIC] Calculate from CORR detection timestamps
+            
+            // Trend data (3 periods)
+            trendPeriods: ['Period -2', 'Period -1', 'Current'], // [DYNAMIC] Generate from date ranges
+            trendMTTR: [168, 150, 126], // [DYNAMIC] Calculate mean from col 37 per period
+            trendMTTD: [54, 48, 42], // [DYNAMIC] Calculate from CORR metadata per period
+            trendFP: [12.1, 10.8, 9.2], // [DYNAMIC] Calculate from col 12 per period
+            
+            // Value delivered calculations
+            analystHourlyRate: 85, // [CONFIGURABLE] Loaded cost per hour
+            fullTimeAnalystCost: 110000, // [CONFIGURABLE] Annual analyst cost
+            breachCostAverage: 4450000, // [CONFIGURABLE] Industry average breach cost
+            threatPreventionProbability: 0.15, // [CONFIGURABLE] Conservative probability factor (15%)
+            
+            // Detection sources
+            products: [
+                { name: 'Palo Alto Cortex XDR (Extended Detection and Response)', incidents: 189, fpRate: 11.2 },
+                { name: 'Microsoft Sentinel', incidents: 52, fpRate: 5.8 },
+                { name: 'CrowdStrike Falcon', incidents: 26, fpRate: 7.7 }
+            ], // [DYNAMIC] Aggregate from Report Extract col 7, calculate FP rates from col 12
+            
+            // Escalation methods
+            playbookEscalations: 229, // [DYNAMIC] Count "Playbook" in col 9
+            analystEscalations: 38, // [DYNAMIC] Count "CS SOC" in col 9
+            
+            // Operational load (time buckets)
+            businessHoursPercent: 51, // [DYNAMIC] Calculate from col 20: 8am-6pm Mon-Fri
+            afterHoursPercent: 41, // [DYNAMIC] Calculate from col 20: 6pm-8am weekdays
+            weekendPercent: 8, // [DYNAMIC] Calculate from col 20: Saturday-Sunday
+            
+            // Response efficiency
+            containmentRate: 98, // [DYNAMIC] Count "Contained" in col 36, calculate percentage
+            containedCount: 262, // [DYNAMIC] Count from col 36
+            
+            // Collaboration quality
+            avgTouchesPerIncident: 2.3, // [DYNAMIC] Calculate from col 26
+            activeClientParticipation: 72, // [DYNAMIC] Calculate from col 29
+            clientLedClosures: 21, // [DYNAMIC] Calculate from col 27
+            
+            // Severity flow data (for Sankey diagram)
+            severityFlows: [
+                { from: 'Vendor Critical', to: 'CS Critical', flow: 7 },
+                { from: 'Vendor Critical', to: 'CS High', flow: 1 },
+                { from: 'Vendor High', to: 'CS Critical', flow: 2 },
+                { from: 'Vendor High', to: 'CS High', flow: 7 },
+                { from: 'Vendor High', to: 'CS Medium', flow: 4 },
+                { from: 'Vendor High', to: 'CS Low', flow: 2 },
+                { from: 'Vendor Medium', to: 'CS High', flow: 9 },
+                { from: 'Vendor Medium', to: 'CS Medium', flow: 72 },
+                { from: 'Vendor Medium', to: 'CS Low', flow: 32 },
+                { from: 'Vendor Medium', to: 'CS Informational', flow: 8 },
+                { from: 'Vendor Low', to: 'CS Medium', flow: 18 },
+                { from: 'Vendor Low', to: 'CS Low', flow: 67 },
+                { from: 'Vendor Low', to: 'CS Informational', flow: 18 },
+                { from: 'Vendor Informational', to: 'CS Low', flow: 5 },
+                { from: 'Vendor Informational', to: 'CS Informational', flow: 15 }
+            ], // [DYNAMIC] Calculate by comparing col 45 vs col 13
+            
+            // MITRE ATT&CK threat landscape
+            mitreTactics: [
+                { tactic: 'Persistence', high: 12, medium: 38, low: 22, info: 5 },
+                { tactic: 'Defense Evasion', high: 8, medium: 31, low: 18, info: 3 },
+                { tactic: 'Execution', high: 5, medium: 22, low: 15, info: 2 },
+                { tactic: 'Discovery', high: 3, medium: 18, low: 24, info: 8 },
+                { tactic: 'Initial Access', high: 2, medium: 12, low: 16, info: 3 }
+            ] // [DYNAMIC] Aggregate from col 42, segment by col 45
+        };
+        
+        /* ============================================================================
+           BUSINESS RULES & THRESHOLDS
+           ============================================================================
+           These thresholds trigger automated improvement recommendations when exceeded.
+           ============================================================================ */
+        const BUSINESS_RULES = {
+            falsePositiveRateThreshold: 10.0, // Per product - triggers detection tuning recommendation
+            manualEscalationThreshold: 12, // Percentage - triggers automation opportunity
+            containmentTarget: 95, // Percentage - triggers containment improvement
+            p90ResponseTimeTarget: 90, // Minutes - primary SLA metric
+            mttrTarget: 90, // Minutes - for all priority levels
+            mttdTarget: 15 // Minutes - detection speed target
+        };
+        
+        /* ============================================================================
+           OPERATIONAL LOAD PIE CHART
+           ============================================================================
+           BUSINESS CONTEXT: Shows distribution of CS SOC alert resolution across
+           business hours, after-hours, and weekends. Demonstrates 24/7 coverage value.
+           
+           DATA PROCESSING:
+           - [DYNAMIC] Calculate time buckets from Escalated Datetime (col 20)
+           - Business Hours: 8am-6pm Mon-Fri
+           - After Hours: 6pm-8am weekdays
+           - Weekend: Saturday-Sunday
+           
+           DATA SOURCE: Report Extract - Escalated Datetime (US/Central) (col 20)
+           [EXAMPLE] Current percentages are wireframe data
+           ============================================================================ */
         const opLoadCtx = document.getElementById('operationalLoadChart').getContext('2d');
         new Chart(opLoadCtx, {
             type: 'pie',
             data: {
                 labels: ['Business Hours', 'After Hours', 'Weekend'],
                 datasets: [{
+                    // [EXAMPLE DATA] Percentages - Calculate from col 20 datetime analysis
+                    // [TODO] Replace with: [EXAMPLE_DATA_CONFIG.businessHoursPercent, EXAMPLE_DATA_CONFIG.afterHoursPercent, EXAMPLE_DATA_CONFIG.weekendPercent]
                     data: [51, 41, 8],
                     backgroundColor: ['#009CDE', '#702F8A', '#EF3340'],
                     borderWidth: 0
@@ -1498,15 +2151,43 @@
             }
         });
 
-        // Performance Trend Line Chart - MORE REALISTIC DATA
+        /* ============================================================================
+           PERFORMANCE TREND LINE CHART
+           ============================================================================
+           BUSINESS CONTEXT: Shows improvement trajectory across three periods for
+           MTTR, MTTD, and False Positive rate. Demonstrates continuous improvement
+           and tuning effectiveness.
+           
+           DATA PROCESSING:
+           - [DYNAMIC] Period labels: Generate from date range (e.g., "Aug 2025", "Sep 2025")
+           - [DYNAMIC] MTTR: Calculate mean from CS SOC Time to Respond (col 37) per period
+           - [DYNAMIC] MTTD: Calculate from detection timestamps (CORR metadata)
+           - [DYNAMIC] FP %: Calculate from CS SOC Verdict (col 12) per period
+           
+           CHART CONFIGURATION:
+           - Left Y-axis: Minutes (MTTR, MTTD)
+           - Right Y-axis: Percentage (False Positive %)
+           - Dashed line for FP % to distinguish from time-based metrics
+           
+           DATA SOURCES:
+           - MTTR: Report Extract - CS SOC Time to Respond (TTR) (col 37)
+           - MTTD: CORR platform metadata
+           - FP %: Report Extract - CS SOC Verdict (col 12)
+           
+           [EXAMPLE] Current data points are wireframe examples
+           ============================================================================ */
         const trendCtx = document.getElementById('trendChart').getContext('2d');
         new Chart(trendCtx, {
             type: 'line',
             data: {
+                // [DYNAMIC] Period labels - Generate from date ranges
+                // [TODO] Replace with: EXAMPLE_DATA_CONFIG.trendPeriods
                 labels: ['Period -2', 'Period -1', 'Current'],
                 datasets: [
                     {
                         label: 'MTTR (min)',
+                        // [EXAMPLE DATA] MTTR values - Calculate from col 37 per period
+                        // [TODO] Replace with: EXAMPLE_DATA_CONFIG.trendMTTR
                         data: [168, 150, 126],
                         borderColor: '#009CDE',
                         backgroundColor: 'rgba(0, 156, 222, 0.1)',
@@ -1517,6 +2198,8 @@
                     },
                     {
                         label: 'MTTD (min)',
+                        // [EXAMPLE DATA] MTTD values - Calculate from CORR metadata per period
+                        // [TODO] Replace with: EXAMPLE_DATA_CONFIG.trendMTTD
                         data: [54, 48, 42],
                         borderColor: '#004C97',
                         backgroundColor: 'rgba(0, 76, 151, 0.1)',
@@ -1527,6 +2210,8 @@
                     },
                     {
                         label: 'FP %',
+                        // [EXAMPLE DATA] False Positive % - Calculate from col 12 per period
+                        // [TODO] Replace with: EXAMPLE_DATA_CONFIG.trendFP
                         data: [12.1, 10.8, 9.2],
                         borderColor: '#EF3340',
                         backgroundColor: 'rgba(239, 51, 64, 0.1)',
@@ -1607,7 +2292,33 @@
             }
         });
 
-          // Severity Alignment Sankey
+          /* ============================================================================
+             SEVERITY ALIGNMENT SANKEY CHART DATA PROCESSING
+             ============================================================================
+             BUSINESS CONTEXT: Calculates flow data showing how vendor severity
+             ratings are adjusted by CS analysts. Demonstrates analyst value-add
+             through severity adjudication.
+             
+             DATA PROCESSING:
+             - [DYNAMIC] Compare Vendor Severity (col 45) vs Current Priority (col 13)
+             - Count occurrences of each severity transition
+             - Aggregate into flow objects: { from: 'Vendor X', to: 'CS Y', flow: count }
+             
+             CALCULATION LOGIC:
+             1. Group incidents by vendor severity (col 45)
+             2. For each vendor severity, count CS severity assignments (col 13)
+             3. Create flow objects for each transition
+             4. Calculate aggregate statistics (upgraded, downgraded, aligned)
+             
+             DATA SOURCES:
+             - Vendor Severity: Report Extract (col 45)
+             - Critical Start Determination: Report Extract - Current Priority (col 13)
+             
+             [EXAMPLE] Current flow data is wireframe example
+             ============================================================================ */
+          // [EXAMPLE DATA] Severity flow data - Calculate by comparing col 45 vs col 13
+          // [TODO] Replace with: EXAMPLE_DATA_CONFIG.severityFlows
+          // [DYNAMIC] This should be calculated programmatically from Report Extract data
           const severityFlows = [
               { from: 'Vendor Critical', to: 'CS Critical', flow: 7 },
               { from: 'Vendor Critical', to: 'CS High', flow: 1 },
@@ -1626,6 +2337,19 @@
               { from: 'Vendor Informational', to: 'CS Informational', flow: 15 }
           ];
 
+          /* ============================================================================
+             SEVERITY COLOR MAPPING
+             ============================================================================
+             BUSINESS CONTEXT: Color coding for severity levels follows Critical Start
+             brand guidelines and provides visual hierarchy in the Sankey diagram.
+             
+             COLOR SEMANTICS:
+             - Critical (Red): Highest priority, immediate action required
+             - High (Orange): High priority, urgent attention needed
+             - Medium (Yellow): Moderate priority, standard handling
+             - Low (Blue): Lower priority, routine handling
+             - Informational (Gray): Lowest priority, informational only
+             ============================================================================ */
           const severityBaseColors = {
               Critical: '#EF3340',
               High: '#FF6A14',
@@ -1659,6 +2383,20 @@
               };
           };
 
+          /* ============================================================================
+             SEVERITY SHIFT AGGREGATION CALCULATION
+             ============================================================================
+             BUSINESS CONTEXT: Calculates aggregate statistics from severity flow data
+             to populate summary metrics and insights in the UI.
+             
+             CALCULATION LOGIC:
+             - Upgraded: CS severity > Vendor severity (analyst raised priority)
+             - Downgraded: CS severity < Vendor severity (analyst reduced noise)
+             - Aligned: CS severity = Vendor severity (no change)
+             - Top flows: Identifies largest severity transitions for insights
+             
+             USAGE: Results populate summary stats and dynamic insight text
+             ============================================================================ */
           const aggregateShifts = severityFlows.reduce((acc, link) => {
               const source = getSeverityDetails(link.from);
               const target = getSeverityDetails(link.to);
@@ -1814,7 +2552,30 @@
               console.error('Error initializing Severity Sankey chart:', error);
           }
 
-        // MITRE ATT&CK STACKED Bar Chart - with error handling
+        /* ============================================================================
+           MITRE ATT&CK STACKED BAR CHART
+           ============================================================================
+           BUSINESS CONTEXT: Visualizes threat landscape by adversary tactic and
+           severity distribution. Helps prioritize detection tuning and proactive
+           hunting efforts.
+           
+           DATA PROCESSING:
+           - [DYNAMIC] Group incidents by MITRE ATT&CK tactic (col 42)
+           - [DYNAMIC] Count incidents per tactic, segmented by Vendor Severity (col 45)
+           - [DYNAMIC] Sort tactics by total incident count (descending)
+           - [DYNAMIC] Limit to top 5-10 tactics for readability
+           
+           CHART CONFIGURATION:
+           - Stacked bar chart: Tactics on X-axis, severity counts stacked on Y-axis
+           - Color coding matches severity color system
+           - Severity order: High (red), Medium (orange), Low (blue), Info (gray)
+           
+           DATA SOURCES:
+           - MITRE ATT&CK tactic name: Report Extract (col 42)
+           - Vendor Severity: Report Extract (col 45)
+           
+           [EXAMPLE] Current chart data is wireframe example
+           ============================================================================ */
         try {
             const mitreCanvas = document.getElementById('mitreChart');
             if (mitreCanvas) {
@@ -1822,28 +2583,38 @@
                 new Chart(mitreCtx, {
                     type: 'bar',
                     data: {
+                        // [DYNAMIC] Tactic labels - Aggregate from col 42, sort by total count
+                        // [TODO] Replace with: EXAMPLE_DATA_CONFIG.mitreTactics.map(t => t.tactic)
                         labels: ['Persistence', 'Defense Evasion', 'Execution', 'Discovery', 'Initial Access'],
                         datasets: [
                             {
                                 label: 'High',
+                                // [EXAMPLE DATA] High severity counts per tactic - Calculate from col 42 + col 45
+                                // [TODO] Replace with: EXAMPLE_DATA_CONFIG.mitreTactics.map(t => t.high)
                                 data: [12, 8, 5, 3, 2],
                                 backgroundColor: '#EF3340',
                                 borderRadius: 0
                             },
                             {
                                 label: 'Medium',
+                                // [EXAMPLE DATA] Medium severity counts per tactic
+                                // [TODO] Replace with: EXAMPLE_DATA_CONFIG.mitreTactics.map(t => t.medium)
                                 data: [38, 31, 22, 18, 12],
                                 backgroundColor: '#FF6A14',
                                 borderRadius: 0
                             },
                             {
                                 label: 'Low',
+                                // [EXAMPLE DATA] Low severity counts per tactic
+                                // [TODO] Replace with: EXAMPLE_DATA_CONFIG.mitreTactics.map(t => t.low)
                                 data: [22, 18, 15, 24, 16],
                                 backgroundColor: '#009CDE',
                                 borderRadius: 0
                             },
                             {
                                 label: 'Info',
+                                // [EXAMPLE DATA] Informational severity counts per tactic
+                                // [TODO] Replace with: EXAMPLE_DATA_CONFIG.mitreTactics.map(t => t.info)
                                 data: [5, 3, 2, 8, 3],
                                 backgroundColor: '#9CA3AF',
                                 borderRadius: 0
