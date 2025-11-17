@@ -734,7 +734,7 @@
                 <div class="hero-metric">
                     <div class="hero-number">158</div>
                     <div class="hero-label">After-Hours Escalations Absorbed</div>
-                    <div class="hero-context">744 hours of nonstop coverage · 86% auto-routed via playbooks</div>
+                    <div class="hero-context">744 hours of nonstop coverage · 86% auto-routed via playbooks (see “After-Hours Notifications”)</div>
                 </div>
             </div>
             <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-top: 32px; text-align: center; font-style: italic;">
@@ -756,12 +756,12 @@
                     </p>
                 </div>
                 
-                <div class="highlight-box">
-                    <p style="font-weight: 600; color: #004C97; margin-bottom: 8px;">Period Highlights</p>
-                    <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8); line-height: 1.7;">
-                        Your security posture remained strong this reporting period. We maintained 88% target compliance across all incident severities, with 90th percentile response time at 87 minutes. Of the 267 incidents escalated, we identified 11 true positive threats and contained them before business impact. False positive rate held at 9.0%, reflecting our ongoing commitment to signal over noise.
-                    </p>
-                </div>
+                    <div class="highlight-box">
+                        <p style="font-weight: 600; color: #004C97; margin-bottom: 8px;">Period Highlights</p>
+                        <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8); line-height: 1.7;">
+                            Your security posture remained strong this reporting period. CS SOC triaged 2,110 alerts, partnering with your team on 1,690 decisions and closing 420 end-to-end. Response speed landed 34% faster than sector medians (126-minute MTTR, 87-minute P90), while 158 escalations were absorbed after hours without gaps in coverage. Of the 267 incidents escalated, we identified 11 true positive threats and contained each before business impact, keeping false positives at 9.0%.
+                        </p>
+                    </div>
 
                 <div class="summary-grid">
                     <div class="summary-item">
@@ -769,8 +769,12 @@
                         <p class="summary-value">11 threats contained, zero breaches</p>
                     </div>
                     <div class="summary-item">
+                        <p class="summary-title">Response Advantage</p>
+                        <p class="summary-value">34% faster MTTR vs peers (126m vs 192m)</p>
+                    </div>
+                    <div class="summary-item">
                         <p class="summary-title">24/7 Protection</p>
-                        <p class="summary-value">49% handled after-hours</p>
+                        <p class="summary-value">49% of escalations handled after-hours</p>
                     </div>
                     <div class="summary-item">
                         <p class="summary-title">Detection Quality</p>
@@ -790,6 +794,7 @@
                 <h2 class="card-title">Getting Better Every Period</h2>
             </div>
             <div class="card-content">
+                <p style="font-size: 13px; color: rgba(52, 55, 65, 0.75); margin-bottom: 12px;">These charts unpack the 34% faster response advantage highlighted in the hero by showing how MTTR, MTTD, and false positives trended across the last three periods.</p>
                 <div class="chart-container">
                     <canvas id="trendChart"></canvas>
                 </div>
@@ -1297,7 +1302,7 @@
                         <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Detection Tuning</span>
                     </div>
                         <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8); margin-bottom: 12px;">
-                            Palo Alto Cortex XDR false positive rate is 11.2%, exceeding the 10.0% threshold and keeping the overall rate at 9.0%. Tuning these alerts will reduce client noise and improve SOC efficiency.
+                            Palo Alto Cortex XDR false positive rate is 11.2%, exceeding the 10.0% threshold and keeping the overall rate at 9.0%. Tuning these alerts will reduce client noise and improve SOC efficiency, directly lowering the 1,690 client-touch decisions surfaced in the hero.
                         </p>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
                         <div>
