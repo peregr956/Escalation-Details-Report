@@ -56,7 +56,7 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
 - **Value Delivered & Security Outcomes:** Refresh hours saved, CS SOC touches, target compliance, and forward-looking commitments so the hero, outcomes grid, and improvement plan tell the same story.
 
 ## Sample configuration (`escalation_report_enhanced-3.html`)
-- Client: **Lennar Corporation**
+- Client: **Example Corporation**
 - Tier: **Signature Tier MDR**
 - Period: **Aug 1–31, 2025** (31 days / 744 hours of coverage)
 - Incidents escalated: **267** (8.9 per day); alerts resolved without escalation: **1,843** (59.5 per day)
