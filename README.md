@@ -86,5 +86,10 @@ Markdown files under `brand/` are now the authoritative branding system:
 - Prioritize reusable snippets and automation-friendly approaches when contributing code or copy.
 - Avoid new data sources unless explicitly cleared as industry benchmarks.
 
+## TODO (AI Opportunities)
+- TODO (AI): Auto-generate the "Key Insights" and "Looking Ahead" narratives directly from the trend arrays in `escalation_report_enhanced-3.html` so every refresh stays template-driven.
+- TODO (AI): Layer anomaly detection over `severityFlows` and `mitreChart` datasets to surface net-new recommendations beyond the current static thresholds.
+- TODO (AI): Build a question-answering helper over `Report Extract.xlsx` so stakeholders can request bespoke insights without manual filtering.
+
 ## License & Confidentiality
 This project is proprietary to Critical Start. All datasets, code, and visualizations remain confidential and should only be used by authorized internal teams and approved clients. No public redistribution.

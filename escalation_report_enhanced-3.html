@@ -812,9 +812,9 @@
                         <span>False Positive %</span>
                     </div>
                 </div>
-                <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1);">
-                    <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
-                        <strong>Trend Analysis:</strong> Continuous improvement across all metrics. Mean Time to Respond (MTTR) decreased 25% to 126 minutes, while Mean Time to Detect (MTTD) improved 22% to 42 minutes, and false positive rate dropped 24% over three periods, demonstrating effective tuning and process maturation.
+                    <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1);">
+                        <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
+                            <strong>Trend Analysis:</strong> Continuous improvement across all metrics. Mean Time to Respond (MTTR) decreased 25% to 126 minutes, while Mean Time to Detect (MTTD) improved 22% to 42 minutes, and false positive rate dropped 25% over three periods, demonstrating effective tuning and process maturation.
                     </p>
                 </div>
                 <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); margin-top: 8px; font-style: italic;">Data source: Cyber Operations Risk & Response&trade; (CORR) platform rolling 90-day averages</p>
@@ -1197,7 +1197,7 @@
                                 <div class="detection-metric detection-metric-warning">
                                     <p class="detection-metric-label">False Positive Rate</p>
                                     <p class="detection-metric-value" style="color: #FF6A14;">9.0%</p>
-                                    <p class="detection-metric-detail">Target &lt; 10% | ↓ 3.1 pts vs prior period</p>
+                                     <p class="detection-metric-detail">Target &lt; 10% | ↓ 1.8 pts vs prior period (10.8% to 9.0%)</p>
                                     <p class="detection-metric-trend">Only Cortex XDR remains above threshold (11.2%)</p>
                                 </div>
                                 <div class="detection-metric">
@@ -1208,8 +1208,8 @@
                                 </div>
                           </div>
                           <div class="info-box" style="background-color: rgba(0, 156, 222, 0.08); border: 1px solid rgba(0, 156, 222, 0.2); margin-top: 20px;">
-                              <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
-                                    <strong>Key Insights:</strong> Signal quality improved again this period. False positive rate dropped 3.1 points, sustaining 100% containment across 11 true threats.
+                               <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
+                                     <strong>Key Insights:</strong> Signal quality improved this period: false positives fell from 10.8% to 9.0% (1.8-pt drop) while all 11 escalated true threats were contained.
                               </p>
                           </div>
                       </div>
@@ -1273,8 +1273,8 @@
                     <canvas id="mitreChart"></canvas>
                 </div>
                 <div class="info-box" style="background-color: rgba(0, 156, 222, 0.1); margin-top: 16px;">
-                    <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
-                        <strong>Key Insight:</strong> Persistence tactics show the highest concentration of high-severity incidents (12 of 77), suggesting adversaries are attempting to establish foothold. Defense Evasion follows closely. These patterns warrant enhanced detection rules and proactive hunting.
+                     <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
+                         <strong>Key Insight:</strong> Persistence tactics generated 77 escalations with 12 high-severity cases (15.6%), the highest share, while Defense Evasion contributed 60 incidents with 8 high-severity cases. The MITRE ATT&amp;CK&reg; (cols 42 &amp; 45) mix directs automation toward those foothold attempts.
                     </p>
                 </div>
                 <p style="font-size: 12px; color: rgba(52, 55, 65, 0.6); margin-top: 8px; font-style: italic;">
@@ -1351,8 +1351,8 @@
                         <span class="priority-badge priority-high">HIGH</span>
                         <span style="font-weight: 600; font-size: 14px; color: #004C97; margin-left: 8px;">Threat Focus</span>
                     </div>
-                    <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8); margin-bottom: 12px;">
-                        Persistence and Defense Evasion tactics driving 20 high-severity incidents. These persistence and evasion techniques suggest sophisticated adversary activity requiring enhanced detection.
+                      <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8); margin-bottom: 12px;">
+                          Persistence plus Defense Evasion account for 20 of the 30 high-severity incidents (67%) in the MITRE dataset, signaling concentrated foothold attempts that should drive proactive hunts and new detections.
                     </p>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
                         <div>
@@ -1450,8 +1450,8 @@
                       </div>
                   </div>
                 <div style="margin-top: 16px; padding: 12px; background: white; border-radius: 6px;">
-                    <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
-                        <strong>Looking Ahead:</strong> In the next period we're focused on reducing false positives another 20% through enhanced Palo Alto XDR tuning and expanding playbook automation to push manual escalations down to the 12% target.
+                     <p style="font-size: 14px; color: rgba(52, 55, 65, 0.8);">
+                         <strong>Looking Ahead:</strong> Next period automation targets trimming Palo Alto XDR false positives from 11.2% on 189 incidents down to the 10% threshold (~4 fewer escalations) and reducing manual escalations from 38 incidents (14%) to 32 or fewer (12% target) through additional playbooks.
                     </p>
                 </div>
             </div>
@@ -1505,6 +1505,7 @@
         });
 
         // Performance Trend Line Chart - MORE REALISTIC DATA
+        // TODO (AI): Auto-generate the Trend Analysis copy directly from these arrays to eliminate manual narrative updates.
         const trendCtx = document.getElementById('trendChart').getContext('2d');
         new Chart(trendCtx, {
             type: 'line',
@@ -1532,8 +1533,8 @@
                         pointHoverRadius: 6
                     },
                     {
-                        label: 'FP %',
-                        data: [12.1, 10.8, 9.2],
+                         label: 'FP %',
+                         data: [12.1, 10.8, 9.0],
                         borderColor: '#EF3340',
                         backgroundColor: 'rgba(239, 51, 64, 0.1)',
                         borderWidth: 3,
@@ -1613,8 +1614,9 @@
             }
         });
 
-          // Severity Alignment Sankey
-          const severityFlows = [
+        // Severity Alignment Sankey
+        // TODO (AI): Replace the static severityFlows seed with AI-assisted anomaly detection so insights adapt to new client exports.
+        const severityFlows = [
               { from: 'Vendor Critical', to: 'CS Critical', flow: 7 },
               { from: 'Vendor Critical', to: 'CS High', flow: 1 },
               { from: 'Vendor High', to: 'CS Critical', flow: 2 },
