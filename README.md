@@ -1,154 +1,89 @@
 # Escalation to Client Details Report
 
+Interactive, single-page business review experience that quantifies the work Critical Start’s Managed Detection & Response (MDR) team delivers for executive stakeholders. This repo stores the production-ready HTML artifact, sample data, and the Markdown-based brand system that replaced the legacy DOCX package.
+
 ## Overview
 
-The **Escalation to Client Details Report** is an interactive dashboard developed by Critical Start to deliver comprehensive visibility into Managed Detection and Response (MDR) performance for enterprise clients. Unlike the ROI Dashboard, which focuses on continuous value demonstration, this report provides a semi-annual or annual deep-dive into operational outcomes, risk posture, and measurable protection results.
+The Escalation to Client Details Report complements the always-on ROI dashboard by providing a deeper, semi-annual/annual walkthrough of operational outcomes, risk posture, and measurable protection. It is usually narrated by the Customer Success Manager (CSM) with C-suite, CISO, and SOC leaders but can also be generated on demand for custom date ranges.
 
-The report is designed to be guided by the Customer Success Manager (CSM) during business reviews with client security leadership and executives. Clients may also self-generate reports on demand using a custom date range picker to review specific time periods.
-
-## Purpose
-
-The Escalation to Client Details Report serves two main objectives:
-
-1. **Drive Renewals** – By quantifying the operational value and threat mitigation achieved through Critical Start's MDR service.
-2. **Inform Operational Improvements** – By providing data-driven insight into alert handling, detection accuracy, and response efficiency.
+## Objectives
+- **Drive renewals:** Quantify escalations handled, threats contained, efficiency gains, and compliance against contracted SLOs.
+- **Improve operations:** Feed clients actionable insights on alert quality, automation gaps, and tuning opportunities—directly mapped to CORR-derived metrics.
 
 ## Audience
+- **Primary:** Client executives, CISOs, and security leadership.
+- **Secondary:** SOC managers/analysts who action the recommendations.
 
-- **Primary**: Client C-suite executives, CISOs, and Security Leadership
-- **Secondary**: Security Operations Center (SOC) Managers and Analysts
+## Repository Map
 
-## Key Sections
+| Path | Description |
+| --- | --- |
+| `escalation_report_enhanced-3.html` | Signature Tier sample of the interactive report. Pure HTML+CSS+JS with Chart.js 4.4.0 and Font Awesome 6.5.1. |
+| `Report Extract.xlsx` | Sanitized slice of the Escalation to Client Details export used to validate numbers/columns. Keep aligned with CORR. |
+| `brand/brand-guidelines.md` | Master narrative, voice, governance prompts, and revision log. |
+| `brand/visual-identity.md` | Logo usage, palette (#009CDE, #004C97, #EF3340, #FF6A14), typography, accessibility, and asset inventory. |
+| `brand/README.md` | How-to for maintaining the Markdown guidelines. |
+| `assets/critical-start-logo.svg` | Approved vector lockup embedded directly in the HTML header. |
 
-### 1. Hero (Executive Summary Header)
+## Tech Stack
+- Static HTML5 document with inline CSS for easier PDF exports.
+- Vanilla JavaScript + Chart.js (line, pie, stacked bar, and Sankey via `chartjs-chart-sankey`).
+- Google Fonts (Roboto) and Font Awesome icons.
+- Fully responsive layout with print styles tuned for “Save as PDF”.
 
-**Title**: "What We Delivered This Period — Real Protection, Measurable Outcomes"
+## Quick Start
 
-**Highlights:**
-- Total hours of expert analysis provided
-- Number of alerts resolved without escalation
-- Coverage level (e.g., 24×7)
-- Target compliance across incident severities
+### Preview the dashboard locally
+1. `cd /workspace`
+2. `python3 -m http.server 4173`
+3. Navigate to `http://localhost:4173/escalation_report_enhanced-3.html`
+4. Stop the server with `Ctrl+C` when finished. (You can also open the file directly in a browser, but a local server keeps font/CDN calls consistent.)
 
-### 2. Executive Summary
+### Export or share
+- Use the browser’s `Print → Save as PDF` workflow with “Background graphics” enabled.
+- For executive walkthroughs, keep the tab in full-screen (1920×1080) or export to PDF before sending.
 
-Sample highlights include:
-> "Your security posture remains strong. We maintained 88% target compliance across all incident severities, with a 90th percentile response time of 87 minutes."
+## Updating Data & Narrative
+- **Source data & QA:** 95% of the metrics come from the Escalation to Client Details Excel Export in CORR. Use `Report Extract.xlsx` as the working copy and keep column references intact (e.g., Incident Id col 1, CS SOC Verdict col 12, Escalated Datetime col 20, CS SOC Time to Respond col 37, MITRE Tactic col 42, Vendor Severity col 45, Current Priority col 13).
+- **Hero + Executive Summary:** Update the `.hero-section` blocks and the first card (`Executive Summary`) together. Values (hours, alerts resolved, coverage, compliance, incidents escalated, true positives) should match the same date range and appear again in “Security Outcomes This Period”.
+- **Charts & automation:** Near the bottom of the HTML you’ll find the Chart.js configs. Update the numerical arrays only—styling is shared.
+  - `operationalLoadChart`: After-hours vs business-hours distribution (pie).
+  - `trendChart`: MTTR, MTTD, FP% line graph (labels `['Period -2', 'Period -1', 'Current']`).
+  - `severityFlows`: Array of `{ from, to, flow }` objects powering the Sankey chart and all severity insight copy.
+  - `mitreChart`: Provides the stacked bar by tactic & severity.
+- **Severity alignment flow:** When regenerating `severityFlows`, keep `Vendor`/`CS` prefixes and ensure totals reconcile to the escalated incident count. The script auto-computes upgraded/downgraded copies.
+- **Prioritized improvement plan:** Thresholds appear in the “Recommendation Engine” list (false positive 10%, manual escalation 12%, containment 95%). Adjust copy, owners, and targets as the automation rules or client remediation plans evolve.
+- **Value Delivered & Security Outcomes:** Refresh hours saved, CS SOC touches, target compliance, and forward-looking commitments so the hero, outcomes grid, and improvement plan tell the same story.
 
-- Number of incidents escalated, true positives identified, and false positive rate
-- P90 response times (Critical/High vs. Medium/Low), Mean Time to Detect (MTTD)
-- **Industry Comparison**: Benchmarked against external standards rather than internal data to ensure meaningful context
+## Sample configuration (`escalation_report_enhanced-3.html`)
+- Client: **Lennar Corporation**
+- Tier: **Signature Tier MDR**
+- Period: **Aug 1–31, 2025** (31 days / 744 hours of coverage)
+- Incidents escalated: **267** (8.9 per day); alerts resolved without escalation: **1,843** (59.5 per day)
+- True positives contained: **11**; zero breaches reported
+- Target compliance achieved: **88%** with **87‑minute** P90 response; MTTR trending down to 126 minutes
+- False positive rate: **9.0%** (Palo Alto Cortex XDR at 11.2% noted in tuning plan)
+- Manual escalations: **14%** vs 12% target—driving the automation recommendation
+- Report generated: **5 Nov 2025**; data sources: CORR + Escalation export (45 columns)
 
-### 3. Value Delivered
+## Brand Workspace
+Markdown files under `brand/` are now the authoritative branding system:
+- Keep `brand-guidelines.md` and `visual-identity.md` up to date, including revision histories and asset tables.
+- Link any binary asset in `assets/` (e.g., `assets/critical-start-logo.svg`) or an approved CDN, and document usage constraints.
+- Follow `brand/README.md` for editing etiquette (tables aligned, assets referenced, change log updated).
 
-- Labor hours saved and their equivalent dollar value (loaded/unloaded cost)
-- Threat prevention modeled via conservative breach cost estimates
-- Visualized cost avoidance and productivity gain metrics
+## Design, Automation & UX Guardrails
+- Embrace Human-Centered Design: high contrast, responsive breakpoints, legible typography.
+- Every number must trace back to CORR or the sanctioned Excel export; note the column reference where space allows.
+- Recommendations must come from rule-driven thresholds so reports stay auto-generatable with minimal manual touch.
+- Print/PDF parity is required—avoid browser-only interactions that break when exported.
 
-### 4. Operational Metrics
+## Working with ChatGPT (or other copilots)
+- Recognize this repo as part of Critical Start’s client-facing analytics suite before suggesting changes.
+- Preserve HCD alignment and Critical Start voice; never introduce off-brand colors, fonts, or assets.
+- Maintain data lineage—if a figure cannot be derived from CORR or the approved export, don’t surface it.
+- Prioritize reusable snippets and automation-friendly approaches when contributing code or copy.
+- Avoid new data sources unless explicitly cleared as industry benchmarks.
 
-- **After-Hours Notifications**: Volume of off-hours alerts, weekend calls, and customer notifications
-- **Response Efficiency**: Average touches per incident, client participation rate, and collaboration indicators
-- **Detection Accuracy**: False positive rate, severity distribution, and source quality
-
-### 5. Threat Landscape
-
-- Summary of incidents by MITRE ATT&CK tactic and severity
-- Prioritized improvement plan auto-generated from threshold analysis
-
-**Example:**
-- **Detection Tuning**: False positive rate (9%) exceeds threshold; Palo Alto Cortex XDR identified as primary driver.
-- **Automation Opportunity**: Manual escalations (14%) exceed target; recommend expanding playbook coverage.
-
-### 6. Security Outcomes
-
-- Clear linkage between MDR investment and quantifiable security outcomes
-- Demonstrated reduction in potential business impact from detected threats
-
-## Data Source
-
-The report is built on data from **CORR** (Cyber Operations Risk Response Platform) and draws 95% of its metrics from the **Escalation to Client Details Excel Export**.
-
-An extract of the Escalation to Client Details Excel Export is provided in the Github Repo as "Report Extract"
-
-Each section references its corresponding Excel column to ensure transparency and traceability.
-
-## Design and Automation Requirements
-
-- Must comply with **Human-Centered Design (HCD)** principles for clarity, accessibility, and usability.
-- Fully auto-generatable from CORR data with minimal human intervention.
-- Recommendations and improvement plans are automated based on rule-driven threshold logic.
-- Designed for seamless integration into quarterly or semi-annual business review workflows.
-
-## Current Focus (Development Phase)
-
-- **Refactoring & Documentation**: Streamlining structure and layout for readability and HCD alignment.
-- **Automation Validation**: Ensuring all metrics map directly to CORR-based data sources.
-- **UX Review**: Optimizing data hierarchy and executive storytelling to meet client expectations and renewal goals.
-
-## For ChatGPT Assistance
-
-When connected to this repository, ChatGPT should:
-
-- Recognize this project as part of Critical Start's client-facing analytics suite.
-- Preserve HCD alignment in all UI/UX or structural recommendations.
-- Ensure data lineage integrity — every figure should trace back to the CORR export.
-- Prioritize automation, scalability, and consistency across reporting periods.
-- Provide concise, explainable, and reusable code for metrics generation, visualization, or layout refactoring.
-- Avoid introducing any data source outside CORR or approved industry benchmark datasets.
-
-## Example Usage
-
-Users (CSMs or clients) can:
-
-- Select a custom date range via the dashboard interface.
-- Generate a complete, auto-formatted PDF or web-based report.
-- Walk through results with the CSM for contextual interpretation.
-
-## Technical Details
-
-### Technologies Used
-- Pure HTML5 with embedded CSS and JavaScript
-- Chart.js (v4.4.0) for interactive visualizations
-- Responsive design with print-friendly layouts
-- Google Fonts (Roboto) for typography
-- Critical Start brand colors (#009CDE, #004C97, #EF3340, #FF6A14)
-
-### Report Structure
-1. **Tier 1**: Hero impact metrics (most important client-facing value)
-2. **Tier 2**: Performance & trust zone (trend analysis, benchmarks)
-3. **Tier 3**: Coverage & capability zone (value delivered, detection sources)
-4. **Tier 4**: Technical detail zone (response efficiency, collaboration, threat landscape)
-
-### Visualizations
-- **3-Month Trend Line Chart**: MTTR, MTTD, and false positive rate trends
-- **Operational Load Pie Chart**: Business hours vs. after-hours distribution
-- **MITRE ATT&CK Stacked Bar Chart**: Threat tactics by severity level
-
-### Current Report Configuration
-
-**File**: `escalation_report_enhanced-3.html`
-
-- **Client**: Example Corporation
-- **Tier**: Signature Tier MDR
-- **Period**: August 1-31, 2025 (31 days)
-- **Total Incidents Escalated**: 267
-- **Alerts Resolved by CS SOC**: 1,843
-- **Status**: Target Met (88% compliance)
-- **Generated**: November 5, 2025
-
-## Brand Guidelines Workspace
-
-The bulky DOCX guidelines have been replaced with Markdown templates under `brand/`. Use them as the living source of truth so future edits stay version-controlled:
-
-- `brand/brand-guidelines.md` – master narrative, messaging, and governance prompts
-- `brand/visual-identity.md` – logo usage, colors, typography, accessibility, and asset inventory
-- `brand/README.md` – instructions for updating the templates
-
-Populate these files once the approved copy is ready and keep assets (like `assets/critical-start-logo.svg`) linked from this directory for easy reference.
-
-## License and Confidentiality
-
-This project is proprietary to Critical Start and not for public redistribution.
-
-All datasets, code, and visualizations are confidential and intended solely for authorized internal and client use.
+## License & Confidentiality
+This project is proprietary to Critical Start. All datasets, code, and visualizations remain confidential and should only be used by authorized internal teams and approved clients. No public redistribution.
