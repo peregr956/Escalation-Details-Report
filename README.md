@@ -137,6 +137,16 @@ Users (CSMs or clients) can:
 - **Status**: Target Met (88% compliance)
 - **Generated**: November 5, 2025
 
+## Brand Guidelines Workspace
+
+The bulky DOCX guidelines have been replaced with Markdown templates under `brand/`. Use them as the living source of truth so future edits stay version-controlled:
+
+- `brand/brand-guidelines.md` – master narrative, messaging, and governance prompts
+- `brand/visual-identity.md` – logo usage, colors, typography, accessibility, and asset inventory
+- `brand/README.md` – instructions for updating the templates
+
+Populate these files once the approved copy is ready and keep assets (like `assets/critical-start-logo.svg`) linked from this directory for easy reference.
+
 ## License and Confidentiality
 
 This project is proprietary to Critical Start and not for public redistribution.
