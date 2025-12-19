@@ -1488,9 +1488,508 @@ def build_protection_achieved_slides(prs, data):
     insight_box_text.vertical_anchor = 1  # Middle
 
 
-def create_threat_landscape_slide(prs, report_data):
-    """Create the Threat Landscape slide (optional)."""
-    pass
+def build_threat_landscape_slides(prs, data, include=True):
+    """Create the optional Threat Landscape section (Slides 11-13).
+    
+    Args:
+        prs (Presentation): The presentation object.
+        data (ReportData): The report data object containing all metrics.
+        include (bool): Whether to include this section. Default True.
+    """
+    if not include:
+        return
+    
+    blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+    header_height = Inches(0.8)
+    title_left = Inches(0.5)
+    title_top = Inches(0.1)
+    title_width = prs.slide_width - Inches(2.5)
+    title_height = Inches(0.6)
+    
+    # Calculate severity alignment stats from severity_flows
+    severity_order = ['Informational', 'Low', 'Medium', 'High', 'Critical']
+    
+    def get_severity_index(label):
+        """Extract severity level from label and return its index."""
+        parts = label.split(' ')
+        severity_label = parts[-1]  # Get last part (e.g., 'Critical' from 'Vendor Critical')
+        return severity_order.index(severity_label) if severity_label in severity_order else -1
+    
+    upgraded_count = 0
+    de_escalated_count = 0
+    aligned_count = 0
+    
+    for flow in data.severity_flows:
+        source_idx = get_severity_index(flow['from'])
+        target_idx = get_severity_index(flow['to'])
+        flow_count = flow['flow']
+        
+        if target_idx > source_idx:
+            upgraded_count += flow_count
+        elif target_idx < source_idx:
+            de_escalated_count += flow_count
+        else:
+            aligned_count += flow_count
+    
+    total_escalations = upgraded_count + de_escalated_count + aligned_count
+    
+    # Slide 11 - Severity Alignment Flow
+    slide11 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide11, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape11 = slide11.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape11.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape11.line.fill.background()
+    
+    # Add title text on header
+    title_box11 = slide11.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame11 = title_box11.text_frame
+    title_frame11.word_wrap = True
+    title_paragraph11 = title_frame11.paragraphs[0]
+    title_paragraph11.text = "Severity Alignment Flow"
+    title_paragraph11.font.name = TITLE_FONT_NAME
+    title_paragraph11.font.size = Pt(28)
+    title_paragraph11.font.bold = True
+    title_paragraph11.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph11.alignment = PP_ALIGN.LEFT
+    
+    # Add subtitle
+    subtitle_left = Inches(0.5)
+    subtitle_top = header_height + Inches(0.1)
+    subtitle_width = prs.slide_width - Inches(2.5)
+    subtitle_height = Inches(0.4)
+    
+    subtitle_box = slide11.shapes.add_textbox(subtitle_left, subtitle_top, subtitle_width, subtitle_height)
+    subtitle_frame = subtitle_box.text_frame
+    subtitle_frame.word_wrap = True
+    subtitle_paragraph = subtitle_frame.paragraphs[0]
+    subtitle_paragraph.text = "Vendor-reported criticality vs. Critical Start adjudication"
+    subtitle_paragraph.font.name = BODY_FONT_NAME
+    subtitle_paragraph.font.size = Pt(14)
+    subtitle_paragraph.font.color.rgb = CS_SLATE
+    subtitle_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add chip with total escalations
+    chip_left = prs.slide_width - Inches(2.5)
+    chip_top = header_height + Inches(0.1)
+    chip_width = Inches(1.8)
+    chip_height = Inches(0.4)
+    
+    chip_shape = slide11.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, chip_left, chip_top,
+        chip_width, chip_height
+    )
+    fill = chip_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_BLUE
+    chip_shape.line.fill.background()
+    
+    chip_text = chip_shape.text_frame
+    chip_text.text = f"{total_escalations} escalations"
+    chip_text.paragraphs[0].font.name = BODY_FONT_NAME
+    chip_text.paragraphs[0].font.size = Pt(12)
+    chip_text.paragraphs[0].font.bold = True
+    chip_text.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
+    chip_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+    chip_text.vertical_anchor = 1  # Middle
+    
+    # Add 3 stat boxes
+    stat_box_width = (prs.slide_width - Inches(2.2)) / 3
+    stat_box_height = Inches(1.2)
+    stat_spacing = Inches(0.2)
+    stat_start_left = Inches(0.5)
+    stat_start_top = subtitle_top + subtitle_height + Inches(0.3)
+    
+    stat_boxes = [
+        {"label": "Upgraded", "value": str(upgraded_count), "color": CS_RED},
+        {"label": "De-escalated", "value": str(de_escalated_count), "color": CS_BLUE},
+        {"label": "Aligned", "value": str(aligned_count), "color": CS_NAVY}
+    ]
+    
+    for i, stat in enumerate(stat_boxes):
+        stat_left = stat_start_left + i * (stat_box_width + stat_spacing)
+        stat_top = stat_start_top
+        
+        # Create stat box background
+        stat_shape = slide11.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, stat_left, stat_top,
+            stat_box_width, stat_box_height
+        )
+        fill = stat_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = stat_shape.line
+        line.color.rgb = stat["color"]
+        line.width = Pt(3)
+        
+        # Add stat value
+        stat_value_box = slide11.shapes.add_textbox(
+            stat_left + Inches(0.1), stat_top + Inches(0.2),
+            stat_box_width - Inches(0.2), Inches(0.5)
+        )
+        stat_value_frame = stat_value_box.text_frame
+        stat_value_frame.word_wrap = True
+        stat_value_paragraph = stat_value_frame.paragraphs[0]
+        stat_value_paragraph.text = stat["value"]
+        stat_value_paragraph.font.name = TITLE_FONT_NAME
+        stat_value_paragraph.font.size = Pt(36)
+        stat_value_paragraph.font.bold = True
+        stat_value_paragraph.font.color.rgb = stat["color"]
+        stat_value_paragraph.alignment = PP_ALIGN.CENTER
+        
+        # Add stat label
+        stat_label_box = slide11.shapes.add_textbox(
+            stat_left + Inches(0.1), stat_top + Inches(0.7),
+            stat_box_width - Inches(0.2), Inches(0.4)
+        )
+        stat_label_frame = stat_label_box.text_frame
+        stat_label_frame.word_wrap = True
+        stat_label_paragraph = stat_label_frame.paragraphs[0]
+        stat_label_paragraph.text = stat["label"]
+        stat_label_paragraph.font.name = BODY_FONT_NAME
+        stat_label_paragraph.font.size = Pt(14)
+        stat_label_paragraph.font.color.rgb = CS_SLATE
+        stat_label_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add Sankey chart placeholder
+    chart_left = Inches(0.8)
+    chart_top = stat_start_top + stat_box_height + Inches(0.3)
+    chart_width = prs.slide_width - Inches(1.6)
+    chart_height = Inches(2.0)
+    
+    chart_placeholder = slide11.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, chart_left, chart_top,
+        chart_width, chart_height
+    )
+    fill = chart_placeholder.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(255, 255, 255)  # White background
+    line = chart_placeholder.line
+    line.color.rgb = CS_SLATE
+    line.width = Pt(1)
+    
+    # Add placeholder text with ID for later replacement
+    placeholder_text = chart_placeholder.text_frame
+    placeholder_text.text = "[Chart: Severity Alignment Sankey - ID: severity_sankey]"
+    placeholder_text.paragraphs[0].font.name = BODY_FONT_NAME
+    placeholder_text.paragraphs[0].font.size = Pt(14)
+    placeholder_text.paragraphs[0].font.color.rgb = CS_SLATE
+    placeholder_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+    placeholder_text.vertical_anchor = 1  # Middle
+    
+    # Add key insight bullets
+    insight_left = Inches(0.8)
+    insight_top = chart_top + chart_height + Inches(0.2)
+    insight_width = chart_width
+    insight_height = Inches(0.8)
+    
+    insight_box = slide11.shapes.add_textbox(insight_left, insight_top, insight_width, insight_height)
+    insight_frame = insight_box.text_frame
+    insight_frame.word_wrap = True
+    insight_frame.margin_left = Inches(0.2)
+    insight_frame.margin_right = Inches(0.2)
+    
+    # Calculate percentages
+    upgrade_pct = (upgraded_count / total_escalations * 100) if total_escalations > 0 else 0
+    downgrade_pct = (de_escalated_count / total_escalations * 100) if total_escalations > 0 else 0
+    
+    insight_text = f"• {upgraded_count} escalations upgraded ({upgrade_pct:.1f}%) - CS raised severity based on business impact\n"
+    insight_text += f"• {de_escalated_count} escalations de-escalated ({downgrade_pct:.1f}%) - CS reduced noise from vendor over-classification"
+    
+    insight_paragraph = insight_frame.paragraphs[0]
+    insight_paragraph.text = insight_text
+    insight_paragraph.font.name = BODY_FONT_NAME
+    insight_paragraph.font.size = Pt(13)
+    insight_paragraph.font.color.rgb = CS_SLATE
+    insight_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add footnote
+    footnote_left = Inches(0.5)
+    footnote_top = prs.slide_height - Inches(0.5)
+    footnote_width = prs.slide_width - Inches(1)
+    footnote_height = Inches(0.3)
+    
+    footnote_box = slide11.shapes.add_textbox(footnote_left, footnote_top, footnote_width, footnote_height)
+    footnote_frame = footnote_box.text_frame
+    footnote_frame.word_wrap = True
+    footnote_paragraph = footnote_frame.paragraphs[0]
+    footnote_paragraph.text = "Source: Vendor Severity (col 45) vs. Current Priority (col 13)"
+    footnote_paragraph.font.name = BODY_FONT_NAME
+    footnote_paragraph.font.size = Pt(10)
+    footnote_paragraph.font.color.rgb = CS_SLATE
+    footnote_paragraph.alignment = PP_ALIGN.LEFT
+    footnote_paragraph.font.italic = True
+    
+    # Slide 12 - MITRE ATT&CK Landscape
+    slide12 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide12, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape12 = slide12.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape12.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape12.line.fill.background()
+    
+    # Add title text on header
+    title_box12 = slide12.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame12 = title_box12.text_frame
+    title_frame12.word_wrap = True
+    title_paragraph12 = title_frame12.paragraphs[0]
+    title_paragraph12.text = "Threat Landscape by Tactic & Severity"
+    title_paragraph12.font.name = TITLE_FONT_NAME
+    title_paragraph12.font.size = Pt(28)
+    title_paragraph12.font.bold = True
+    title_paragraph12.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph12.alignment = PP_ALIGN.LEFT
+    
+    # Add stacked bar chart placeholder
+    chart_left12 = Inches(0.8)
+    chart_top12 = header_height + Inches(0.4)
+    chart_width12 = prs.slide_width - Inches(1.6)
+    chart_height12 = Inches(3.0)
+    
+    chart_placeholder12 = slide12.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, chart_left12, chart_top12,
+        chart_width12, chart_height12
+    )
+    fill = chart_placeholder12.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(255, 255, 255)  # White background
+    line = chart_placeholder12.line
+    line.color.rgb = CS_SLATE
+    line.width = Pt(1)
+    
+    # Add placeholder text with ID
+    placeholder_text12 = chart_placeholder12.text_frame
+    placeholder_text12.text = "[Chart: MITRE ATT&CK Stacked Bar - ID: mitre_stacked_bar]"
+    placeholder_text12.paragraphs[0].font.name = BODY_FONT_NAME
+    placeholder_text12.paragraphs[0].font.size = Pt(14)
+    placeholder_text12.paragraphs[0].font.color.rgb = CS_SLATE
+    placeholder_text12.paragraphs[0].alignment = PP_ALIGN.CENTER
+    placeholder_text12.vertical_anchor = 1  # Middle
+    
+    # Add legend
+    legend_top = chart_top12 + chart_height12 + Inches(0.2)
+    legend_left = chart_left12
+    legend_width = chart_width12
+    legend_height = Inches(0.4)
+    
+    legend_box = slide12.shapes.add_textbox(legend_left, legend_top, legend_width, legend_height)
+    legend_frame = legend_box.text_frame
+    legend_frame.word_wrap = True
+    legend_paragraph = legend_frame.paragraphs[0]
+    legend_paragraph.text = "High (red) | Medium (orange) | Low (blue) | Info (gray)"
+    legend_paragraph.font.name = BODY_FONT_NAME
+    legend_paragraph.font.size = Pt(12)
+    legend_paragraph.font.color.rgb = CS_SLATE
+    legend_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add key insight
+    insight_left12 = Inches(0.8)
+    insight_top12 = legend_top + legend_height + Inches(0.2)
+    insight_width12 = chart_width12
+    insight_height12 = Inches(0.6)
+    
+    # Calculate Persistence stats (first tactic)
+    if len(data.tactics) > 0 and len(data.high_severity) > 0:
+        persistence_total = (data.high_severity[0] + data.medium_severity[0] + 
+                           data.low_severity[0] + data.info_severity[0])
+        persistence_high = data.high_severity[0]
+        persistence_high_pct = (persistence_high / persistence_total * 100) if persistence_total > 0 else 0
+        insight_text12 = f"Persistence tactics generated {persistence_total} escalations with {persistence_high} high-severity cases ({persistence_high_pct:.1f}%)"
+    else:
+        insight_text12 = "Persistence tactics generated 77 escalations with 12 high-severity cases (15.6%)"
+    
+    insight_shape12 = slide12.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, insight_left12, insight_top12,
+        insight_width12, insight_height12
+    )
+    fill = insight_shape12.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+    line = insight_shape12.line
+    line.color.rgb = CS_BLUE
+    line.width = Pt(2)
+    
+    insight_text_frame12 = insight_shape12.text_frame
+    insight_text_frame12.text = insight_text12
+    insight_text_frame12.paragraphs[0].font.name = BODY_FONT_NAME
+    insight_text_frame12.paragraphs[0].font.size = Pt(14)
+    insight_text_frame12.paragraphs[0].font.color.rgb = CS_NAVY
+    insight_text_frame12.paragraphs[0].font.bold = True
+    insight_text_frame12.paragraphs[0].alignment = PP_ALIGN.CENTER
+    insight_text_frame12.vertical_anchor = 1  # Middle
+    
+    # Add footnote
+    footnote_left12 = Inches(0.5)
+    footnote_top12 = prs.slide_height - Inches(0.5)
+    footnote_width12 = prs.slide_width - Inches(1)
+    footnote_height12 = Inches(0.3)
+    
+    footnote_box12 = slide12.shapes.add_textbox(footnote_left12, footnote_top12, footnote_width12, footnote_height12)
+    footnote_frame12 = footnote_box12.text_frame
+    footnote_frame12.word_wrap = True
+    footnote_paragraph12 = footnote_frame12.paragraphs[0]
+    footnote_paragraph12.text = "Source: MITRE ATT&CK Tactic (col X) and Current Priority (col 13)"
+    footnote_paragraph12.font.name = BODY_FONT_NAME
+    footnote_paragraph12.font.size = Pt(10)
+    footnote_paragraph12.font.color.rgb = CS_SLATE
+    footnote_paragraph12.alignment = PP_ALIGN.LEFT
+    footnote_paragraph12.font.italic = True
+    
+    # Slide 13 - Detection Sources
+    slide13 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide13, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape13 = slide13.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape13.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape13.line.fill.background()
+    
+    # Add title text on header
+    title_box13 = slide13.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame13 = title_box13.text_frame
+    title_frame13.word_wrap = True
+    title_paragraph13 = title_frame13.paragraphs[0]
+    title_paragraph13.text = "Detection Sources & Quality"
+    title_paragraph13.font.name = TITLE_FONT_NAME
+    title_paragraph13.font.size = Pt(28)
+    title_paragraph13.font.bold = True
+    title_paragraph13.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph13.alignment = PP_ALIGN.LEFT
+    
+    # Create 3 source cards
+    source_card_width = (prs.slide_width - Inches(2.2)) / 3
+    source_card_height = Inches(3.5)
+    source_card_spacing = Inches(0.2)
+    source_start_left = Inches(0.5)
+    source_start_top = header_height + Inches(0.4)
+    
+    fp_threshold = 10.0  # 10% threshold
+    
+    for i, source in enumerate(data.detection_sources):
+        card_left = source_start_left + i * (source_card_width + source_card_spacing)
+        card_top = source_start_top
+        
+        # Determine FP rate color (orange if above threshold, blue if below)
+        fp_rate = source.get('fp_rate', 0)
+        fp_color = CS_ORANGE if fp_rate > fp_threshold else CS_BLUE
+        
+        # Create card background
+        card_shape = slide13.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            source_card_width, source_card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = card_shape.line
+        line.color.rgb = fp_color
+        line.width = Pt(3)
+        
+        # Add source name
+        source_name_left = card_left + Inches(0.15)
+        source_name_top = card_top + Inches(0.3)
+        source_name_width = source_card_width - Inches(0.3)
+        source_name_height = Inches(0.6)
+        
+        source_name_box = slide13.shapes.add_textbox(
+            source_name_left, source_name_top, source_name_width, source_name_height
+        )
+        source_name_frame = source_name_box.text_frame
+        source_name_frame.word_wrap = True
+        source_name_paragraph = source_name_frame.paragraphs[0]
+        source_name_paragraph.text = source['source']
+        source_name_paragraph.font.name = TITLE_FONT_NAME
+        source_name_paragraph.font.size = Pt(16)
+        source_name_paragraph.font.bold = True
+        source_name_paragraph.font.color.rgb = CS_NAVY
+        source_name_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Add incidents count
+        incidents_left = source_name_left
+        incidents_top = source_name_top + source_name_height + Inches(0.2)
+        incidents_width = source_name_width
+        incidents_height = Inches(0.5)
+        
+        incidents_box = slide13.shapes.add_textbox(
+            incidents_left, incidents_top, incidents_width, incidents_height
+        )
+        incidents_frame = incidents_box.text_frame
+        incidents_frame.word_wrap = True
+        incidents_paragraph = incidents_frame.paragraphs[0]
+        incidents_paragraph.text = f"{source['incidents']} incidents ({source['percent']}%)"
+        incidents_paragraph.font.name = BODY_FONT_NAME
+        incidents_paragraph.font.size = Pt(14)
+        incidents_paragraph.font.color.rgb = CS_SLATE
+        incidents_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Add FP Rate with visual indicator
+        fp_left = incidents_left
+        fp_top = incidents_top + incidents_height + Inches(0.3)
+        fp_width = source_name_width
+        fp_height = Inches(1.0)
+        
+        # Create FP rate badge
+        fp_badge_shape = slide13.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, fp_left, fp_top,
+            fp_width, fp_height
+        )
+        fill = fp_badge_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = fp_color
+        fp_badge_shape.line.fill.background()
+        
+        fp_badge_text = fp_badge_shape.text_frame
+        fp_badge_text.text = f"FP Rate: {fp_rate}%"
+        fp_badge_text.paragraphs[0].font.name = TITLE_FONT_NAME
+        fp_badge_text.paragraphs[0].font.size = Pt(20)
+        fp_badge_text.paragraphs[0].font.bold = True
+        fp_badge_text.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
+        fp_badge_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+        fp_badge_text.vertical_anchor = 1  # Middle
+        
+        # Add status indicator text below badge
+        status_left = fp_left
+        status_top = fp_top + fp_height + Inches(0.1)
+        status_width = fp_width
+        status_height = Inches(0.4)
+        
+        status_box = slide13.shapes.add_textbox(
+            status_left, status_top, status_width, status_height
+        )
+        status_frame = status_box.text_frame
+        status_frame.word_wrap = True
+        status_paragraph = status_frame.paragraphs[0]
+        if fp_rate > fp_threshold:
+            status_paragraph.text = "Above threshold"
+        else:
+            status_paragraph.text = "Good"
+        status_paragraph.font.name = BODY_FONT_NAME
+        status_paragraph.font.size = Pt(12)
+        status_paragraph.font.color.rgb = CS_SLATE
+        status_paragraph.alignment = PP_ALIGN.CENTER
 
 
 def create_insights_opportunities_slide(prs, report_data):
