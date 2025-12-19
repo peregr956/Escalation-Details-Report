@@ -336,6 +336,322 @@ def main():
     pass
 
 
+def build_executive_summary_slides(prs, data):
+    """Create the Title slide and Executive Summary slides (Slides 1-3).
+    
+    Args:
+        prs (Presentation): The presentation object.
+        data (ReportData): The report data object containing all metrics.
+    """
+    # Slide 1 - Title Slide
+    blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+    slide1 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add navy background
+    background_shape = slide1.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, prs.slide_height
+    )
+    fill = background_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    background_shape.line.fill.background()
+    
+    # Add logo at top left
+    add_logo(slide1, position='top_left', prs=prs)
+    
+    # Add main title
+    title_left = Inches(1)
+    title_top = Inches(1.8)
+    title_width = prs.slide_width - Inches(2)
+    title_height = Inches(0.8)
+    
+    title_box = slide1.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame = title_box.text_frame
+    title_frame.word_wrap = True
+    title_paragraph = title_frame.paragraphs[0]
+    title_paragraph.text = "Escalation to Client Details Report"
+    title_paragraph.font.name = TITLE_FONT_NAME
+    title_paragraph.font.size = Pt(44)
+    title_paragraph.font.bold = True
+    title_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add subtitle
+    subtitle_left = Inches(1)
+    subtitle_top = Inches(2.6)
+    subtitle_width = prs.slide_width - Inches(2)
+    subtitle_height = Inches(0.5)
+    
+    subtitle_box = slide1.shapes.add_textbox(subtitle_left, subtitle_top, subtitle_width, subtitle_height)
+    subtitle_frame = subtitle_box.text_frame
+    subtitle_frame.word_wrap = True
+    subtitle_paragraph = subtitle_frame.paragraphs[0]
+    subtitle_paragraph.text = data.tier
+    subtitle_paragraph.font.name = BODY_FONT_NAME
+    subtitle_paragraph.font.size = Pt(24)
+    subtitle_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    subtitle_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add client name
+    client_left = Inches(1)
+    client_top = Inches(3.3)
+    client_width = prs.slide_width - Inches(2)
+    client_height = Inches(0.5)
+    
+    client_box = slide1.shapes.add_textbox(client_left, client_top, client_width, client_height)
+    client_frame = client_box.text_frame
+    client_frame.word_wrap = True
+    client_paragraph = client_frame.paragraphs[0]
+    client_paragraph.text = data.client_name
+    client_paragraph.font.name = BODY_FONT_NAME
+    client_paragraph.font.size = Pt(20)
+    client_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    client_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add period
+    # Format: "August 1-31, 2025 (31 days)"
+    start_month_day = data.period_start.split(',')[0].strip()  # "August 1"
+    end_month_day = data.period_end.split(',')[0].strip()  # "August 31"
+    year = data.period_end.split(',')[1].strip()  # "2025"
+    
+    # Extract month and day numbers
+    start_parts = start_month_day.split()
+    end_parts = end_month_day.split()
+    
+    if len(start_parts) == 2 and len(end_parts) == 2 and start_parts[0] == end_parts[0]:
+        # Same month, format as "August 1-31, 2025"
+        period_text = f"{start_parts[0]} {start_parts[1]}-{end_parts[1]}, {year} ({data.period_days} days)"
+    else:
+        # Different months, use full format
+        period_text = f"{start_month_day} - {end_month_day}, {year} ({data.period_days} days)"
+    period_left = Inches(1)
+    period_top = Inches(3.9)
+    period_width = prs.slide_width - Inches(2)
+    period_height = Inches(0.5)
+    
+    period_box = slide1.shapes.add_textbox(period_left, period_top, period_width, period_height)
+    period_frame = period_box.text_frame
+    period_frame.word_wrap = True
+    period_paragraph = period_frame.paragraphs[0]
+    period_paragraph.text = period_text
+    period_paragraph.font.name = BODY_FONT_NAME
+    period_paragraph.font.size = Pt(18)
+    period_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    period_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add report date at bottom
+    report_date_left = Inches(1)
+    report_date_top = prs.slide_height - Inches(0.6)
+    report_date_width = prs.slide_width - Inches(2)
+    report_date_height = Inches(0.4)
+    
+    report_date_box = slide1.shapes.add_textbox(report_date_left, report_date_top, report_date_width, report_date_height)
+    report_date_frame = report_date_box.text_frame
+    report_date_frame.word_wrap = True
+    report_date_paragraph = report_date_frame.paragraphs[0]
+    report_date_paragraph.text = f"Report Date: {data.report_date}"
+    report_date_paragraph.font.name = BODY_FONT_NAME
+    report_date_paragraph.font.size = Pt(14)
+    report_date_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    report_date_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Slide 2 - Key Metrics Overview
+    slide2 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide2, position='top_right', prs=prs)
+    
+    # Add title header
+    header_height = Inches(0.8)
+    header_shape = slide2.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape.line.fill.background()
+    
+    # Add title text on header
+    slide2_title_left = Inches(0.5)
+    slide2_title_top = Inches(0.1)
+    slide2_title_width = prs.slide_width - Inches(2.5)
+    slide2_title_height = Inches(0.6)
+    
+    slide2_title_box = slide2.shapes.add_textbox(slide2_title_left, slide2_title_top, slide2_title_width, slide2_title_height)
+    slide2_title_frame = slide2_title_box.text_frame
+    slide2_title_frame.word_wrap = True
+    slide2_title_paragraph = slide2_title_frame.paragraphs[0]
+    slide2_title_paragraph.text = "Executive Summary"
+    slide2_title_paragraph.font.name = TITLE_FONT_NAME
+    slide2_title_paragraph.font.size = Pt(28)
+    slide2_title_paragraph.font.bold = True
+    slide2_title_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    slide2_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add large headline metric
+    metric_left = Inches(1)
+    metric_top = header_height + Inches(0.8)
+    metric_width = prs.slide_width - Inches(2)
+    metric_height = Inches(1.2)
+    
+    metric_box = slide2.shapes.add_textbox(metric_left, metric_top, metric_width, metric_height)
+    metric_frame = metric_box.text_frame
+    metric_frame.word_wrap = True
+    metric_paragraph = metric_frame.paragraphs[0]
+    metric_paragraph.text = f"{data.incidents_escalated} Incidents Escalated"
+    metric_paragraph.font.name = TITLE_FONT_NAME
+    metric_paragraph.font.size = Pt(56)
+    metric_paragraph.font.bold = True
+    metric_paragraph.font.color.rgb = CS_NAVY
+    metric_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add subtext
+    subtext_left = Inches(1)
+    subtext_top = metric_top + Inches(1.3)
+    subtext_width = prs.slide_width - Inches(2)
+    subtext_height = Inches(0.6)
+    
+    subtext_box = slide2.shapes.add_textbox(subtext_left, subtext_top, subtext_width, subtext_height)
+    subtext_frame = subtext_box.text_frame
+    subtext_frame.word_wrap = True
+    subtext_paragraph = subtext_frame.paragraphs[0]
+    subtext_paragraph.text = f"Average {data.incidents_per_day} per day requiring your team's attention"
+    subtext_paragraph.font.name = BODY_FONT_NAME
+    subtext_paragraph.font.size = Pt(20)
+    subtext_paragraph.font.color.rgb = CS_SLATE
+    subtext_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add additional context
+    context_left = Inches(1)
+    context_top = subtext_top + Inches(0.8)
+    context_width = prs.slide_width - Inches(2)
+    context_height = Inches(1)
+    
+    context_box = slide2.shapes.add_textbox(context_left, context_top, context_width, context_height)
+    context_frame = context_box.text_frame
+    context_frame.word_wrap = True
+    context_paragraph = context_frame.paragraphs[0]
+    client_touch_percent = int((data.client_touch_decisions / data.alerts_triaged) * 100) if data.alerts_triaged > 0 else 0
+    context_paragraph.text = f"CS SOC triaged {data.alerts_triaged:,} alerts this period—{data.client_touch_decisions:,} ({client_touch_percent}%) guided with your team and {data.closed_end_to_end:,} closed end-to-end"
+    context_paragraph.font.name = BODY_FONT_NAME
+    context_paragraph.font.size = Pt(16)
+    context_paragraph.font.color.rgb = CS_SLATE
+    context_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Slide 3 - Period Highlights
+    slide3 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide3, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape3 = slide3.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape3.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape3.line.fill.background()
+    
+    # Add title text on header
+    slide3_title_box = slide3.shapes.add_textbox(slide2_title_left, slide2_title_top, slide2_title_width, slide2_title_height)
+    slide3_title_frame = slide3_title_box.text_frame
+    slide3_title_frame.word_wrap = True
+    slide3_title_paragraph = slide3_title_frame.paragraphs[0]
+    slide3_title_paragraph.text = "Period Highlights"
+    slide3_title_paragraph.font.name = TITLE_FONT_NAME
+    slide3_title_paragraph.font.size = Pt(28)
+    slide3_title_paragraph.font.bold = True
+    slide3_title_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    slide3_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Calculate after-hours percentage
+    after_hours_percent = int((data.after_hours_escalations / data.incidents_escalated) * 100) if data.incidents_escalated > 0 else 0
+    
+    # Define 4 highlight cards
+    highlights = [
+        {
+            "title": "Threat Outcomes",
+            "value": f"{data.true_threats_contained} threats contained, zero breaches"
+        },
+        {
+            "title": "Response Advantage",
+            "value": f"{int(data.response_advantage_percent)}% faster MTTR vs peers ({data.mttr_minutes}m vs {data.industry_median_minutes}m)"
+        },
+        {
+            "title": "24/7 Protection",
+            "value": f"{after_hours_percent}% of escalations handled after-hours"
+        },
+        {
+            "title": "Detection Quality",
+            "value": f"{data.false_positive_rate}% false positive rate"
+        }
+    ]
+    
+    # Position cards in a 2x2 grid
+    card_width = (prs.slide_width - Inches(2.5)) / 2  # Two columns with margins
+    card_height = Inches(1.5)
+    card_spacing = Inches(0.3)
+    
+    start_left = Inches(0.5)
+    start_top = header_height + Inches(0.5)
+    
+    for i, highlight in enumerate(highlights):
+        row = i // 2
+        col = i % 2
+        
+        card_left = start_left + col * (card_width + Inches(0.3))
+        card_top = start_top + row * (card_height + card_spacing)
+        
+        # Create card background with light blue tint
+        card_shape = slide3.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            card_width, card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = card_shape.line
+        line.color.rgb = CS_BLUE
+        line.width = Pt(2)
+        
+        # Add card title
+        card_title_left = card_left + Inches(0.2)
+        card_title_top = card_top + Inches(0.15)
+        card_title_width = card_width - Inches(0.4)
+        card_title_height = Inches(0.4)
+        
+        card_title_box = slide3.shapes.add_textbox(card_title_left, card_title_top, card_title_width, card_title_height)
+        card_title_frame = card_title_box.text_frame
+        card_title_frame.word_wrap = True
+        card_title_paragraph = card_title_frame.paragraphs[0]
+        card_title_paragraph.text = highlight["title"]
+        card_title_paragraph.font.name = TITLE_FONT_NAME
+        card_title_paragraph.font.size = Pt(18)
+        card_title_paragraph.font.bold = True
+        card_title_paragraph.font.color.rgb = CS_NAVY
+        card_title_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Add card value
+        card_value_left = card_left + Inches(0.2)
+        card_value_top = card_title_top + Inches(0.45)
+        card_value_width = card_width - Inches(0.4)
+        card_value_height = Inches(0.8)
+        
+        card_value_box = slide3.shapes.add_textbox(card_value_left, card_value_top, card_value_width, card_value_height)
+        card_value_frame = card_value_box.text_frame
+        card_value_frame.word_wrap = True
+        card_value_paragraph = card_value_frame.paragraphs[0]
+        card_value_paragraph.text = highlight["value"]
+        card_value_paragraph.font.name = BODY_FONT_NAME
+        card_value_paragraph.font.size = Pt(14)
+        card_value_paragraph.font.color.rgb = CS_SLATE
+        card_value_paragraph.alignment = PP_ALIGN.LEFT
+
+
 def create_executive_summary_slide(prs, report_data):
     """Create the Executive Summary slide."""
     pass
