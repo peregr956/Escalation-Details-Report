@@ -1992,9 +1992,419 @@ def build_threat_landscape_slides(prs, data, include=True):
         status_paragraph.alignment = PP_ALIGN.CENTER
 
 
-def create_insights_opportunities_slide(prs, report_data):
-    """Create the Insights and Opportunities slide."""
-    pass
+def build_insights_slides(prs, data):
+    """Create the Insights section (Slides 14-15).
+    
+    Args:
+        prs (Presentation): The presentation object.
+        data (ReportData): The report data object containing all metrics.
+    """
+    blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+    header_height = Inches(0.8)
+    title_left = Inches(0.5)
+    title_top = Inches(0.1)
+    title_width = prs.slide_width - Inches(2.5)
+    title_height = Inches(0.6)
+    
+    # Slide 14 - Prioritized Improvement Plan
+    slide14 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide14, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape14 = slide14.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape14.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape14.line.fill.background()
+    
+    # Add title text on header
+    title_box14 = slide14.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame14 = title_box14.text_frame
+    title_frame14.word_wrap = True
+    title_paragraph14 = title_frame14.paragraphs[0]
+    title_paragraph14.text = "Prioritized Improvement Plan"
+    title_paragraph14.font.name = TITLE_FONT_NAME
+    title_paragraph14.font.size = Pt(28)
+    title_paragraph14.font.bold = True
+    title_paragraph14.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph14.alignment = PP_ALIGN.LEFT
+    
+    # Create improvement items cards
+    card_start_top = header_height + Inches(0.4)
+    card_width = prs.slide_width - Inches(1.0)
+    card_height = Inches(1.3)
+    card_spacing = Inches(0.2)
+    card_left = Inches(0.5)
+    
+    # Map priority to colors
+    priority_colors = {
+        "HIGH": CS_RED,
+        "MEDIUM": CS_ORANGE,
+        "LOW": CS_BLUE
+    }
+    
+    # Expected impact text for each item
+    expected_impacts = [
+        "Reduce escalations by ~20%",
+        "Reduce manual review burden",
+        "Improved detection of advanced threats"
+    ]
+    
+    # Concise descriptions as per requirements
+    concise_descriptions = [
+        "Palo Alto Cortex XDR false positive rate is 11.2%, exceeding the 10.0% threshold",
+        "Manual escalations at 14% exceed 12% target. 38 incidents required analyst judgment",
+        "Persistence + Defense Evasion account for 67% of high-severity incidents"
+    ]
+    
+    for i, item in enumerate(data.improvement_items):
+        card_top = card_start_top + i * (card_height + card_spacing)
+        
+        # Determine priority color
+        priority = item.get("priority", "MEDIUM")
+        border_color = priority_colors.get(priority, CS_ORANGE)
+        
+        # Create card background with colored left border
+        card_shape = slide14.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            card_width, card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = card_shape.line
+        line.color.rgb = border_color
+        line.width = Pt(4)  # Thicker left border
+        
+        # Add priority badge at top left
+        badge_width = Inches(1.0)
+        badge_height = Inches(0.35)
+        badge_left = card_left + Inches(0.2)
+        badge_top = card_top + Inches(0.15)
+        
+        badge_shape = slide14.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, badge_left, badge_top,
+            badge_width, badge_height
+        )
+        fill = badge_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = border_color
+        badge_shape.line.fill.background()
+        
+        badge_text = badge_shape.text_frame
+        badge_text.text = priority
+        badge_text.paragraphs[0].font.name = TITLE_FONT_NAME
+        badge_text.paragraphs[0].font.size = Pt(12)
+        badge_text.paragraphs[0].font.bold = True
+        badge_text.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
+        badge_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+        badge_text.vertical_anchor = 1  # Middle
+        
+        # Add item title next to badge
+        item_title_left = badge_left + badge_width + Inches(0.2)
+        item_title_top = badge_top
+        item_title_width = card_width - badge_width - Inches(0.6)
+        item_title_height = badge_height
+        
+        item_title_box = slide14.shapes.add_textbox(
+            item_title_left, item_title_top, item_title_width, item_title_height
+        )
+        item_title_frame = item_title_box.text_frame
+        item_title_frame.word_wrap = True
+        item_title_paragraph = item_title_frame.paragraphs[0]
+        item_title_paragraph.text = f"Item {i+1} - {item['title']}"
+        item_title_paragraph.font.name = TITLE_FONT_NAME
+        item_title_paragraph.font.size = Pt(16)
+        item_title_paragraph.font.bold = True
+        item_title_paragraph.font.color.rgb = CS_NAVY
+        item_title_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Add description
+        desc_left = card_left + Inches(0.2)
+        desc_top = badge_top + badge_height + Inches(0.15)
+        desc_width = card_width - Inches(0.4)
+        desc_height = Inches(0.4)
+        
+        desc_box = slide14.shapes.add_textbox(desc_left, desc_top, desc_width, desc_height)
+        desc_frame = desc_box.text_frame
+        desc_frame.word_wrap = True
+        desc_paragraph = desc_frame.paragraphs[0]
+        desc_paragraph.text = concise_descriptions[i]
+        desc_paragraph.font.name = BODY_FONT_NAME
+        desc_paragraph.font.size = Pt(12)
+        desc_paragraph.font.color.rgb = CS_SLATE
+        desc_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Add metadata (Owner, Target, Expected Impact) in two rows
+        meta_left = desc_left
+        meta_top = desc_top + desc_height + Inches(0.1)
+        meta_width = card_width - Inches(0.4)
+        meta_height = Inches(0.35)
+        
+        # Row 1: Owner and Target
+        meta_text1 = f"Owner: {item['owner']} | Target: {item['target']}"
+        meta_box1 = slide14.shapes.add_textbox(meta_left, meta_top, meta_width, meta_height)
+        meta_frame1 = meta_box1.text_frame
+        meta_frame1.word_wrap = True
+        meta_paragraph1 = meta_frame1.paragraphs[0]
+        meta_paragraph1.text = meta_text1
+        meta_paragraph1.font.name = BODY_FONT_NAME
+        meta_paragraph1.font.size = Pt(11)
+        meta_paragraph1.font.color.rgb = CS_SLATE
+        meta_paragraph1.alignment = PP_ALIGN.LEFT
+        
+        # Row 2: Expected Impact
+        meta_top2 = meta_top + meta_height + Inches(0.05)
+        meta_text2 = f"Expected Impact: {expected_impacts[i]}"
+        meta_box2 = slide14.shapes.add_textbox(meta_left, meta_top2, meta_width, meta_height)
+        meta_frame2 = meta_box2.text_frame
+        meta_frame2.word_wrap = True
+        meta_paragraph2 = meta_frame2.paragraphs[0]
+        meta_paragraph2.text = meta_text2
+        meta_paragraph2.font.name = BODY_FONT_NAME
+        meta_paragraph2.font.size = Pt(11)
+        meta_paragraph2.font.bold = True
+        meta_paragraph2.font.color.rgb = CS_NAVY
+        meta_paragraph2.alignment = PP_ALIGN.LEFT
+    
+    # Slide 15 - Operational Insights
+    slide15 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide15, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape15 = slide15.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape15.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape15.line.fill.background()
+    
+    # Add title text on header
+    title_box15 = slide15.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame15 = title_box15.text_frame
+    title_frame15.word_wrap = True
+    title_paragraph15 = title_frame15.paragraphs[0]
+    title_paragraph15.text = "Operational Insights"
+    title_paragraph15.font.name = TITLE_FONT_NAME
+    title_paragraph15.font.size = Pt(28)
+    title_paragraph15.font.bold = True
+    title_paragraph15.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph15.alignment = PP_ALIGN.LEFT
+    
+    # Create two-column layout
+    column_width = (prs.slide_width - Inches(1.8)) / 2  # Two columns with spacing
+    column_spacing = Inches(0.3)
+    left_column_left = Inches(0.5)
+    right_column_left = left_column_left + column_width + column_spacing
+    column_top = header_height + Inches(0.4)
+    column_height = Inches(3.5)
+    
+    # Left column - After-Hours Coverage
+    left_card_shape = slide15.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, left_column_left, column_top,
+        column_width, column_height
+    )
+    fill = left_card_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+    line = left_card_shape.line
+    line.color.rgb = CS_BLUE
+    line.width = Pt(2)
+    
+    # Left column title
+    left_title_left = left_column_left + Inches(0.2)
+    left_title_top = column_top + Inches(0.2)
+    left_title_width = column_width - Inches(0.4)
+    left_title_height = Inches(0.4)
+    
+    left_title_box = slide15.shapes.add_textbox(
+        left_title_left, left_title_top, left_title_width, left_title_height
+    )
+    left_title_frame = left_title_box.text_frame
+    left_title_frame.word_wrap = True
+    left_title_paragraph = left_title_frame.paragraphs[0]
+    left_title_paragraph.text = "After-Hours Coverage"
+    left_title_paragraph.font.name = TITLE_FONT_NAME
+    left_title_paragraph.font.size = Pt(18)
+    left_title_paragraph.font.bold = True
+    left_title_paragraph.font.color.rgb = CS_NAVY
+    left_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # After Hours Calls: 18% (136 of 756)
+    after_hours_left = left_title_left
+    after_hours_top = left_title_top + left_title_height + Inches(0.3)
+    after_hours_width = left_title_width
+    after_hours_height = Inches(0.5)
+    
+    after_hours_box = slide15.shapes.add_textbox(
+        after_hours_left, after_hours_top, after_hours_width, after_hours_height
+    )
+    after_hours_frame = after_hours_box.text_frame
+    after_hours_frame.word_wrap = True
+    after_hours_paragraph = after_hours_frame.paragraphs[0]
+    after_hours_paragraph.text = "After Hours Calls: 18% (136 of 756)"
+    after_hours_paragraph.font.name = BODY_FONT_NAME
+    after_hours_paragraph.font.size = Pt(14)
+    after_hours_paragraph.font.color.rgb = CS_SLATE
+    after_hours_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Weekend Calls: 15% (22 of 147)
+    weekend_left = after_hours_left
+    weekend_top = after_hours_top + after_hours_height + Inches(0.2)
+    weekend_width = after_hours_width
+    weekend_height = after_hours_height
+    
+    weekend_box = slide15.shapes.add_textbox(
+        weekend_left, weekend_top, weekend_width, weekend_height
+    )
+    weekend_frame = weekend_box.text_frame
+    weekend_frame.word_wrap = True
+    weekend_paragraph = weekend_frame.paragraphs[0]
+    weekend_paragraph.text = "Weekend Calls: 15% (22 of 147)"
+    weekend_paragraph.font.name = BODY_FONT_NAME
+    weekend_paragraph.font.size = Pt(14)
+    weekend_paragraph.font.color.rgb = CS_SLATE
+    weekend_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Total Off-Hours Calls: 158
+    total_left = weekend_left
+    total_top = weekend_top + weekend_height + Inches(0.2)
+    total_width = weekend_width
+    total_height = after_hours_height
+    
+    total_box = slide15.shapes.add_textbox(
+        total_left, total_top, total_width, total_height
+    )
+    total_frame = total_box.text_frame
+    total_frame.word_wrap = True
+    total_paragraph = total_frame.paragraphs[0]
+    total_paragraph.text = f"Total Off-Hours Calls: {data.after_hours_escalations}"
+    total_paragraph.font.name = BODY_FONT_NAME
+    total_paragraph.font.size = Pt(14)
+    total_paragraph.font.bold = True
+    total_paragraph.font.color.rgb = CS_NAVY
+    total_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Right column - Collaboration Quality
+    right_card_shape = slide15.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, right_column_left, column_top,
+        column_width, column_height
+    )
+    fill = right_card_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+    line = right_card_shape.line
+    line.color.rgb = CS_BLUE
+    line.width = Pt(2)
+    
+    # Right column title
+    right_title_left = right_column_left + Inches(0.2)
+    right_title_top = column_top + Inches(0.2)
+    right_title_width = column_width - Inches(0.4)
+    right_title_height = Inches(0.4)
+    
+    right_title_box = slide15.shapes.add_textbox(
+        right_title_left, right_title_top, right_title_width, right_title_height
+    )
+    right_title_frame = right_title_box.text_frame
+    right_title_frame.word_wrap = True
+    right_title_paragraph = right_title_frame.paragraphs[0]
+    right_title_paragraph.text = "Collaboration Quality"
+    right_title_paragraph.font.name = TITLE_FONT_NAME
+    right_title_paragraph.font.size = Pt(18)
+    right_title_paragraph.font.bold = True
+    right_title_paragraph.font.color.rgb = CS_NAVY
+    right_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Average Touches per Incident: 2.3
+    touches_left = right_title_left
+    touches_top = right_title_top + right_title_height + Inches(0.3)
+    touches_width = right_title_width
+    touches_height = after_hours_height
+    
+    touches_box = slide15.shapes.add_textbox(
+        touches_left, touches_top, touches_width, touches_height
+    )
+    touches_frame = touches_box.text_frame
+    touches_frame.word_wrap = True
+    touches_paragraph = touches_frame.paragraphs[0]
+    touches_paragraph.text = f"Average Touches per Incident: {data.avg_touches}"
+    touches_paragraph.font.name = BODY_FONT_NAME
+    touches_paragraph.font.size = Pt(14)
+    touches_paragraph.font.color.rgb = CS_SLATE
+    touches_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Active Client Participation: 72%
+    participation_left = touches_left
+    participation_top = touches_top + touches_height + Inches(0.2)
+    participation_width = touches_width
+    participation_height = touches_height
+    
+    participation_box = slide15.shapes.add_textbox(
+        participation_left, participation_top, participation_width, participation_height
+    )
+    participation_frame = participation_box.text_frame
+    participation_frame.word_wrap = True
+    participation_paragraph = participation_frame.paragraphs[0]
+    participation_paragraph.text = f"Active Client Participation: {data.client_participation}"
+    participation_paragraph.font.name = BODY_FONT_NAME
+    participation_paragraph.font.size = Pt(14)
+    participation_paragraph.font.color.rgb = CS_SLATE
+    participation_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Client-Led Closures: 21%
+    closures_left = participation_left
+    closures_top = participation_top + participation_height + Inches(0.2)
+    closures_width = participation_width
+    closures_height = touches_height
+    
+    closures_box = slide15.shapes.add_textbox(
+        closures_left, closures_top, closures_width, closures_height
+    )
+    closures_frame = closures_box.text_frame
+    closures_frame.word_wrap = True
+    closures_paragraph = closures_frame.paragraphs[0]
+    closures_paragraph.text = f"Client-Led Closures: {data.client_led_closures}"
+    closures_paragraph.font.name = BODY_FONT_NAME
+    closures_paragraph.font.size = Pt(14)
+    closures_paragraph.font.bold = True
+    closures_paragraph.font.color.rgb = CS_NAVY
+    closures_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add insight box at bottom spanning both columns
+    insight_box_top = column_top + column_height + Inches(0.3)
+    insight_box_left = left_column_left
+    insight_box_width = prs.slide_width - Inches(1.0)
+    insight_box_height = Inches(0.7)
+    
+    insight_box_shape = slide15.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, insight_box_left, insight_box_top,
+        insight_box_width, insight_box_height
+    )
+    fill = insight_box_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+    line = insight_box_shape.line
+    line.color.rgb = CS_BLUE
+    line.width = Pt(2)
+    
+    insight_text = insight_box_shape.text_frame
+    insight_text.text = "82.5% of after-hours alerts handled by CS SOC without requiring customer notification"
+    insight_text.paragraphs[0].font.name = BODY_FONT_NAME
+    insight_text.paragraphs[0].font.size = Pt(15)
+    insight_text.paragraphs[0].font.bold = True
+    insight_text.paragraphs[0].font.color.rgb = CS_NAVY
+    insight_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+    insight_text.vertical_anchor = 1  # Middle
 
 
 def create_forward_direction_slide(prs, report_data):
