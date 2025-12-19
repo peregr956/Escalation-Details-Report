@@ -3,6 +3,11 @@ from pptx.util import Inches, Pt, RGBColor
 from pptx.enum.text import PP_ALIGN
 from pptx.enum.shapes import MSO_SHAPE
 from pathlib import Path
+import argparse
+import logging
+import shutil
+from datetime import datetime
+from typing import Dict, Optional
 
 # Brand Color Constants
 CS_BLUE = RGBColor(0, 156, 222)
@@ -331,9 +336,380 @@ def create_content_slide_layout(prs, slide_title, content_items=None):
     return slide
 
 
+def prepare_chart_data(data) -> Dict:
+    """Prepare chart data dictionary from ReportData for chart rendering.
+    
+    Args:
+        data: ReportData instance containing all metrics
+    
+    Returns:
+        Dictionary with chart data structured for different chart types
+    """
+    chart_data = {}
+    
+    # Trend chart data (MTTR, MTTD, FP% trends)
+    chart_data['trend'] = {
+        'labels': data.period_labels,
+        'datasets': [
+            {
+                'label': 'MTTR (min)',
+                'data': data.mttr_trend,
+                'borderColor': '#009CDE',
+                'backgroundColor': 'rgba(0, 156, 222, 0.1)',
+                'borderWidth': 3,
+                'tension': 0.4,
+                'pointRadius': 4,
+                'pointHoverRadius': 6
+            },
+            {
+                'label': 'MTTD (min)',
+                'data': data.mttd_trend,
+                'borderColor': '#004C97',
+                'backgroundColor': 'rgba(0, 76, 151, 0.1)',
+                'borderWidth': 3,
+                'tension': 0.4,
+                'pointRadius': 4,
+                'pointHoverRadius': 6
+            },
+            {
+                'label': 'FP %',
+                'data': data.fp_trend,
+                'borderColor': '#EF3340',
+                'backgroundColor': 'rgba(239, 51, 64, 0.1)',
+                'borderWidth': 3,
+                'borderDash': [8, 4],
+                'tension': 0.4,
+                'pointRadius': 4,
+                'pointHoverRadius': 6,
+                'yAxisID': 'y1'
+            }
+        ]
+    }
+    
+    # Pie chart data (Operational Load)
+    chart_data['pie'] = {
+        'labels': ['Business Hours', 'After Hours', 'Weekend'],
+        'data': [
+            int(data.business_hours_percent),
+            int(data.after_hours_percent),
+            int(data.weekend_percent)
+        ],
+        'backgroundColor': ['#009CDE', '#702F8A', '#EF3340']
+    }
+    
+    # Sankey chart data (Severity Flow)
+    chart_data['sankey'] = {
+        'flows': data.severity_flows
+    }
+    
+    # Stacked bar chart data (MITRE ATT&CK)
+    chart_data['stacked_bar'] = {
+        'labels': data.tactics,
+        'datasets': [
+            {
+                'label': 'High',
+                'data': data.high_severity,
+                'backgroundColor': '#EF3340'
+            },
+            {
+                'label': 'Medium',
+                'data': data.medium_severity,
+                'backgroundColor': '#FF6A14'
+            },
+            {
+                'label': 'Low',
+                'data': data.low_severity,
+                'backgroundColor': '#009CDE'
+            },
+            {
+                'label': 'Info',
+                'data': data.info_severity,
+                'backgroundColor': '#702F8A'
+            }
+        ]
+    }
+    
+    return chart_data
+
+
+def insert_chart_image(slide, placeholder_id: Optional[str], image_path: str):
+    """Replace a placeholder shape with a chart image.
+    
+    Args:
+        slide: The slide object containing the placeholder
+        placeholder_id: Optional ID string to identify the placeholder (e.g., "severity_sankey")
+                       If None, searches for first placeholder with "[Chart:" text
+        image_path: Path to the image file to insert
+    
+    Returns:
+        bool: True if placeholder was found and replaced, False otherwise
+    """
+    image_path_obj = Path(image_path)
+    if not image_path_obj.exists():
+        logging.warning(f"Chart image not found: {image_path}")
+        return False
+    
+    # Find the placeholder shape
+    placeholder_shape = None
+    
+    for shape in slide.shapes:
+        if hasattr(shape, 'text_frame') and shape.text_frame:
+            text = shape.text_frame.text
+            if "[Chart:" in text:
+                # If placeholder_id is specified, check if it matches
+                if placeholder_id:
+                    if f"ID: {placeholder_id}" in text:
+                        placeholder_shape = shape
+                        break
+                else:
+                    # Use first placeholder found
+                    placeholder_shape = shape
+                    break
+    
+    if not placeholder_shape:
+        logging.warning(f"Placeholder not found on slide (ID: {placeholder_id})")
+        return False
+    
+    # Get placeholder position and size
+    left = placeholder_shape.left
+    top = placeholder_shape.top
+    width = placeholder_shape.width
+    height = placeholder_shape.height
+    
+    # Remove the placeholder shape
+    slide.shapes._spTree.remove(placeholder_shape._element)
+    
+    # Insert the image
+    try:
+        slide.shapes.add_picture(str(image_path), left, top, width, height)
+        logging.info(f"Inserted chart image: {image_path} (ID: {placeholder_id})")
+        return True
+    except Exception as e:
+        logging.error(f"Failed to insert chart image {image_path}: {e}")
+        return False
+
+
 def main():
-    """Main function to orchestrate slide generation."""
-    pass
+    """Main function to orchestrate slide generation.
+    
+    This function:
+    1. Loads report data
+    2. Renders all charts
+    3. Creates presentation
+    4. Builds all slides in order
+    5. Inserts chart images
+    6. Saves presentation
+    """
+    # Set up logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
+    logger = logging.getLogger(__name__)
+    
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+        description='Generate Escalation Details Report PowerPoint presentation'
+    )
+    parser.add_argument(
+        '--client-name',
+        type=str,
+        help='Client name to use in the report (overrides data default)'
+    )
+    parser.add_argument(
+        '--no-threat-landscape',
+        action='store_true',
+        help='Exclude threat landscape slides from the presentation'
+    )
+    parser.add_argument(
+        '--output-dir',
+        type=str,
+        default='output',
+        help='Output directory for the presentation file (default: output)'
+    )
+    parser.add_argument(
+        '--keep-charts',
+        action='store_true',
+        help='Keep temporary chart images after generation (default: delete)'
+    )
+    
+    args = parser.parse_args()
+    
+    logger.info("=" * 60)
+    logger.info("Starting Escalation Details Report Generation")
+    logger.info("=" * 60)
+    
+    # Step 1: Import and load data
+    logger.info("Step 1: Loading report data...")
+    try:
+        from report_data import get_report_data, ReportData
+        data = get_report_data()
+        
+        # Override client name if provided
+        if args.client_name:
+            data.client_name = args.client_name
+            logger.info(f"Using client name: {args.client_name}")
+        else:
+            logger.info(f"Using client name from data: {data.client_name}")
+        
+        logger.info(f"✓ Loaded data for {data.client_name}")
+        logger.info(f"  Period: {data.period_start} to {data.period_end}")
+        logger.info(f"  Incidents escalated: {data.incidents_escalated}")
+    except Exception as e:
+        logger.error(f"Failed to load report data: {e}")
+        return 1
+    
+    # Step 2: Prepare chart data
+    logger.info("Step 2: Preparing chart data...")
+    try:
+        chart_data = prepare_chart_data(data)
+        logger.info("✓ Chart data prepared")
+        logger.info(f"  Charts to render: trend, pie, sankey, stacked_bar")
+    except Exception as e:
+        logger.error(f"Failed to prepare chart data: {e}")
+        return 1
+    
+    # Step 3: Render charts
+    logger.info("Step 3: Rendering charts...")
+    try:
+        from chart_renderer import render_charts_sync
+        
+        temp_charts_dir = "temp_charts"
+        chart_images = render_charts_sync(chart_data, output_dir=temp_charts_dir)
+        
+        # Log rendered charts
+        rendered_count = sum(1 for v in chart_images.values() if v is not None)
+        logger.info(f"✓ Rendered {rendered_count}/{len(chart_images)} charts")
+        for chart_name, path in chart_images.items():
+            if path:
+                logger.info(f"  - {chart_name}: {path}")
+            else:
+                logger.warning(f"  - {chart_name}: FAILED")
+    except Exception as e:
+        logger.error(f"Failed to render charts: {e}")
+        return 1
+    
+    # Step 4: Create presentation
+    logger.info("Step 4: Creating presentation...")
+    try:
+        prs = create_presentation()
+        apply_branding(prs)
+        logger.info("✓ Presentation created")
+    except Exception as e:
+        logger.error(f"Failed to create presentation: {e}")
+        return 1
+    
+    # Step 5: Build slides
+    logger.info("Step 5: Building slides...")
+    try:
+        # Build slides in order
+        logger.info("  Building executive summary slides (1-3)...")
+        build_executive_summary_slides(prs, data)
+        
+        logger.info("  Building value delivered slides (4-5)...")
+        build_value_delivered_slides(prs, data)
+        
+        logger.info("  Building protection achieved slides (6-8)...")
+        build_protection_achieved_slides(prs, data)
+        
+        if not args.no_threat_landscape:
+            logger.info("  Building threat landscape slides (9-12)...")
+            build_threat_landscape_slides(prs, data, include=True)
+        else:
+            logger.info("  Skipping threat landscape slides (--no-threat-landscape)")
+            build_threat_landscape_slides(prs, data, include=False)
+        
+        logger.info("  Building insights slides (13-15)...")
+        build_insights_slides(prs, data)
+        
+        logger.info("  Building forward direction slide (16)...")
+        build_forward_direction_slide(prs, data)
+        
+        logger.info(f"✓ Built {len(prs.slides)} slides")
+    except Exception as e:
+        logger.error(f"Failed to build slides: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return 1
+    
+    # Step 6: Insert chart images
+    logger.info("Step 6: Inserting chart images...")
+    try:
+        charts_inserted = 0
+        
+        # Search through all slides for chart placeholders
+        for slide_idx, slide in enumerate(prs.slides):
+            # Check all shapes for chart placeholders
+            for shape in slide.shapes:
+                if hasattr(shape, 'text_frame') and shape.text_frame:
+                    text = shape.text_frame.text
+                    
+                    # Trend chart - "Performance Trends"
+                    if chart_images.get('trend') and "[Chart: Performance Trends]" in text:
+                        if insert_chart_image(slide, None, chart_images['trend']):
+                            charts_inserted += 1
+                            logger.info(f"  Inserted trend chart into slide {slide_idx + 1}")
+                            break  # Move to next slide
+                    
+                    # Sankey chart - "Severity Alignment Sankey"
+                    if chart_images.get('sankey') and 'severity_sankey' in text:
+                        if insert_chart_image(slide, 'severity_sankey', chart_images['sankey']):
+                            charts_inserted += 1
+                            logger.info(f"  Inserted sankey chart into slide {slide_idx + 1}")
+                            break  # Move to next slide
+                    
+                    # Stacked bar chart - "MITRE ATT&CK Stacked Bar"
+                    if chart_images.get('stacked_bar') and 'mitre_stacked_bar' in text:
+                        if insert_chart_image(slide, 'mitre_stacked_bar', chart_images['stacked_bar']):
+                            charts_inserted += 1
+                            logger.info(f"  Inserted stacked bar chart into slide {slide_idx + 1}")
+                            break  # Move to next slide
+        
+        logger.info(f"✓ Inserted {charts_inserted} chart images")
+    except Exception as e:
+        logger.error(f"Failed to insert chart images: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return 1
+    
+    # Step 7: Save presentation
+    logger.info("Step 7: Saving presentation...")
+    try:
+        # Create output directory
+        output_dir = Path(args.output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Generate filename with date
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        output_filename = f"escalation_report_{date_str}.pptx"
+        output_path = output_dir / output_filename
+        
+        prs.save(str(output_path))
+        logger.info(f"✓ Presentation saved")
+        logger.info(f"  Path: {output_path}")
+        logger.info(f"  Total slides: {len(prs.slides)}")
+    except Exception as e:
+        logger.error(f"Failed to save presentation: {e}")
+        return 1
+    
+    # Step 8: Cleanup (optional)
+    if not args.keep_charts:
+        logger.info("Step 8: Cleaning up temporary files...")
+        try:
+            temp_charts_path = Path(temp_charts_dir)
+            if temp_charts_path.exists():
+                shutil.rmtree(temp_charts_path)
+                logger.info(f"✓ Deleted {temp_charts_dir}/")
+        except Exception as e:
+            logger.warning(f"Failed to cleanup temp files: {e}")
+    else:
+        logger.info(f"Step 8: Keeping temporary charts in {temp_charts_dir}/")
+    
+    logger.info("=" * 60)
+    logger.info("✓ Presentation generation completed successfully!")
+    logger.info("=" * 60)
+    
+    return 0
 
 
 def build_executive_summary_slides(prs, data):
