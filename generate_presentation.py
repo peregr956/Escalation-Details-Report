@@ -657,9 +657,311 @@ def create_executive_summary_slide(prs, report_data):
     pass
 
 
-def create_value_delivered_slide(prs, report_data):
-    """Create the Value Delivered slide."""
-    pass
+def build_value_delivered_slides(prs, data):
+    """Create the Value Delivered section (Slides 4-6).
+    
+    Args:
+        prs (Presentation): The presentation object.
+        data (ReportData): The report data object containing all metrics.
+    """
+    blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+    
+    # Slide 4 - Cost Avoidance Hero
+    slide4 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide4, position='top_right', prs=prs)
+    
+    # Add title
+    title_left = Inches(0.5)
+    title_top = Inches(0.3)
+    title_width = prs.slide_width - Inches(2.5)
+    title_height = Inches(0.6)
+    
+    title_box = slide4.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame = title_box.text_frame
+    title_frame.word_wrap = True
+    title_paragraph = title_frame.paragraphs[0]
+    title_paragraph.text = "Modeled Cost Exposure Avoided"
+    title_paragraph.font.name = TITLE_FONT_NAME
+    title_paragraph.font.size = Pt(32)
+    title_paragraph.font.bold = True
+    title_paragraph.font.color.rgb = CS_NAVY
+    title_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add hero number (~$7.55M)
+    # Format total_modeled: 7550000 -> $7.55M
+    total_millions = data.total_modeled / 1000000
+    hero_value = f"~${total_millions:.2f}M"
+    
+    hero_left = Inches(0.5)
+    hero_top = Inches(1.5)
+    hero_width = prs.slide_width - Inches(1)
+    hero_height = Inches(1.5)
+    
+    hero_box = slide4.shapes.add_textbox(hero_left, hero_top, hero_width, hero_height)
+    hero_frame = hero_box.text_frame
+    hero_frame.word_wrap = True
+    hero_paragraph = hero_frame.paragraphs[0]
+    hero_paragraph.text = hero_value
+    hero_paragraph.font.name = TITLE_FONT_NAME
+    hero_paragraph.font.size = Pt(80)
+    hero_paragraph.font.bold = True
+    hero_paragraph.font.color.rgb = CS_NAVY
+    hero_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add subtitle
+    subtitle_left = Inches(0.5)
+    subtitle_top = Inches(3.2)
+    subtitle_width = prs.slide_width - Inches(1)
+    subtitle_height = Inches(0.6)
+    
+    subtitle_box = slide4.shapes.add_textbox(subtitle_left, subtitle_top, subtitle_width, subtitle_height)
+    subtitle_frame = subtitle_box.text_frame
+    subtitle_frame.word_wrap = True
+    subtitle_paragraph = subtitle_frame.paragraphs[0]
+    subtitle_paragraph.text = "Modeled cost exposure avoided across operations, coverage, and threat containment"
+    subtitle_paragraph.font.name = BODY_FONT_NAME
+    subtitle_paragraph.font.size = Pt(20)
+    subtitle_paragraph.font.color.rgb = CS_SLATE
+    subtitle_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add note at bottom
+    note_left = Inches(0.5)
+    note_top = prs.slide_height - Inches(0.8)
+    note_width = prs.slide_width - Inches(1)
+    note_height = Inches(0.4)
+    
+    note_box = slide4.shapes.add_textbox(note_left, note_top, note_width, note_height)
+    note_frame = note_box.text_frame
+    note_frame.word_wrap = True
+    note_paragraph = note_frame.paragraphs[0]
+    note_paragraph.text = "Illustrative impact only; not redeployable budget"
+    note_paragraph.font.name = BODY_FONT_NAME
+    note_paragraph.font.size = Pt(14)
+    note_paragraph.font.color.rgb = CS_SLATE
+    note_paragraph.alignment = PP_ALIGN.CENTER
+    note_paragraph.font.italic = True
+    
+    # Slide 5 - Value Breakdown
+    slide5 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide5, position='top_right', prs=prs)
+    
+    # Add title header
+    header_height = Inches(0.8)
+    header_shape = slide5.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape.line.fill.background()
+    
+    # Add title text on header
+    slide5_title_left = Inches(0.5)
+    slide5_title_top = Inches(0.1)
+    slide5_title_width = prs.slide_width - Inches(2.5)
+    slide5_title_height = Inches(0.6)
+    
+    slide5_title_box = slide5.shapes.add_textbox(slide5_title_left, slide5_title_top, slide5_title_width, slide5_title_height)
+    slide5_title_frame = slide5_title_box.text_frame
+    slide5_title_frame.word_wrap = True
+    slide5_title_paragraph = slide5_title_frame.paragraphs[0]
+    slide5_title_paragraph.text = "Value Delivered - Breakdown"
+    slide5_title_paragraph.font.name = TITLE_FONT_NAME
+    slide5_title_paragraph.font.size = Pt(28)
+    slide5_title_paragraph.font.bold = True
+    slide5_title_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    slide5_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Create 3-column layout with cards
+    card_width = (prs.slide_width - Inches(2.2)) / 3  # Three columns with margins
+    card_height = Inches(3.2)
+    card_spacing = Inches(0.2)
+    
+    start_left = Inches(0.5)
+    start_top = header_height + Inches(0.4)
+    
+    # Format values
+    analyst_k = data.analyst_cost_equivalent / 1000
+    coverage_k = data.coverage_cost_equivalent / 1000
+    breach_m = data.breach_exposure_avoided / 1000000
+    
+    # Define 3 value cards
+    value_cards = [
+        {
+            "title": "Security Operations",
+            "value1": f"{data.analyst_hours} analyst hours delivered",
+            "value2": f"~${analyst_k:.0f}K equivalent"
+        },
+        {
+            "title": "24/7 Coverage",
+            "value1": f"{data.coverage_hours} hours of monitoring",
+            "value2": f"~${coverage_k:.0f}K equivalent"
+        },
+        {
+            "title": "Threat Prevention",
+            "value1": f"{data.true_threats_contained} intrusions contained",
+            "value2": f"~${breach_m:.2f}M breach exposure avoided"
+        }
+    ]
+    
+    for i, card in enumerate(value_cards):
+        card_left = start_left + i * (card_width + card_spacing)
+        card_top = start_top
+        
+        # Create card background with light blue tint
+        card_shape = slide5.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            card_width, card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = card_shape.line
+        line.color.rgb = CS_BLUE
+        line.width = Pt(2)
+        
+        # Add card title
+        card_title_left = card_left + Inches(0.2)
+        card_title_top = card_top + Inches(0.3)
+        card_title_width = card_width - Inches(0.4)
+        card_title_height = Inches(0.5)
+        
+        card_title_box = slide5.shapes.add_textbox(card_title_left, card_title_top, card_title_width, card_title_height)
+        card_title_frame = card_title_box.text_frame
+        card_title_frame.word_wrap = True
+        card_title_paragraph = card_title_frame.paragraphs[0]
+        card_title_paragraph.text = card["title"]
+        card_title_paragraph.font.name = TITLE_FONT_NAME
+        card_title_paragraph.font.size = Pt(20)
+        card_title_paragraph.font.bold = True
+        card_title_paragraph.font.color.rgb = CS_NAVY
+        card_title_paragraph.alignment = PP_ALIGN.CENTER
+        
+        # Add value 1
+        card_value1_left = card_left + Inches(0.2)
+        card_value1_top = card_title_top + Inches(0.7)
+        card_value1_width = card_width - Inches(0.4)
+        card_value1_height = Inches(0.8)
+        
+        card_value1_box = slide5.shapes.add_textbox(card_value1_left, card_value1_top, card_value1_width, card_value1_height)
+        card_value1_frame = card_value1_box.text_frame
+        card_value1_frame.word_wrap = True
+        card_value1_paragraph = card_value1_frame.paragraphs[0]
+        card_value1_paragraph.text = card["value1"]
+        card_value1_paragraph.font.name = BODY_FONT_NAME
+        card_value1_paragraph.font.size = Pt(16)
+        card_value1_paragraph.font.color.rgb = CS_SLATE
+        card_value1_paragraph.alignment = PP_ALIGN.CENTER
+        
+        # Add value 2 (cost equivalent)
+        card_value2_left = card_left + Inches(0.2)
+        card_value2_top = card_value1_top + Inches(1.0)
+        card_value2_width = card_width - Inches(0.4)
+        card_value2_height = Inches(0.6)
+        
+        card_value2_box = slide5.shapes.add_textbox(card_value2_left, card_value2_top, card_value2_width, card_value2_height)
+        card_value2_frame = card_value2_box.text_frame
+        card_value2_frame.word_wrap = True
+        card_value2_paragraph = card_value2_frame.paragraphs[0]
+        card_value2_paragraph.text = card["value2"]
+        card_value2_paragraph.font.name = TITLE_FONT_NAME
+        card_value2_paragraph.font.size = Pt(24)
+        card_value2_paragraph.font.bold = True
+        card_value2_paragraph.font.color.rgb = CS_NAVY
+        card_value2_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add footer methodology note
+    footer_left = Inches(0.5)
+    footer_top = start_top + card_height + Inches(0.3)
+    footer_width = prs.slide_width - Inches(1)
+    footer_height = Inches(0.4)
+    
+    footer_box = slide5.shapes.add_textbox(footer_left, footer_top, footer_width, footer_height)
+    footer_frame = footer_box.text_frame
+    footer_frame.word_wrap = True
+    footer_paragraph = footer_frame.paragraphs[0]
+    footer_paragraph.text = "Methodology: Cost equivalents based on industry-standard rates for SOC analyst time, 24/7 monitoring infrastructure, and average breach cost per incident."
+    footer_paragraph.font.name = BODY_FONT_NAME
+    footer_paragraph.font.size = Pt(11)
+    footer_paragraph.font.color.rgb = CS_SLATE
+    footer_paragraph.alignment = PP_ALIGN.CENTER
+    footer_paragraph.font.italic = True
+    
+    # Slide 6 - Security Outcomes
+    slide6 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide6, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape6 = slide6.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape6.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape6.line.fill.background()
+    
+    # Add title text on header
+    slide6_title_box = slide6.shapes.add_textbox(slide5_title_left, slide5_title_top, slide5_title_width, slide5_title_height)
+    slide6_title_frame = slide6_title_box.text_frame
+    slide6_title_frame.word_wrap = True
+    slide6_title_paragraph = slide6_title_frame.paragraphs[0]
+    slide6_title_paragraph.text = "Security Outcomes This Period"
+    slide6_title_paragraph.font.name = TITLE_FONT_NAME
+    slide6_title_paragraph.font.size = Pt(28)
+    slide6_title_paragraph.font.bold = True
+    slide6_title_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+    slide6_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Create checklist/bullet format with outcomes
+    outcomes = [
+        f"{data.alerts_triaged:,} Alerts Triaged",
+        f"{data.client_touch_decisions:,} Client-Touch Decisions",
+        f"{data.closed_end_to_end:,} Closed End-to-End",
+        f"{data.true_threats_contained} True Threats Contained",
+        f"{int(data.response_advantage_percent)}% Faster Than Industry",
+        f"{data.p90_minutes}-Minute P90 Response",
+        f"{data.after_hours_escalations} After-Hours Escalations",
+        f"{data.coverage_hours} Hours of Coverage"
+    ]
+    
+    # Create two-column layout for outcomes
+    content_left = Inches(0.8)
+    content_top = header_height + Inches(0.5)
+    content_width = prs.slide_width - Inches(1.6)
+    content_height = prs.slide_height - content_top - Inches(0.3)
+    
+    # Use textbox with bullet points
+    content_box = slide6.shapes.add_textbox(content_left, content_top, content_width, content_height)
+    content_frame = content_box.text_frame
+    content_frame.word_wrap = True
+    content_frame.margin_left = Inches(0.3)
+    content_frame.margin_right = Inches(0.3)
+    content_frame.margin_top = Inches(0.2)
+    content_frame.margin_bottom = Inches(0.2)
+    
+    # Add outcomes as bullet points
+    for i, outcome in enumerate(outcomes):
+        if i == 0:
+            paragraph = content_frame.paragraphs[0]
+        else:
+            paragraph = content_frame.add_paragraph()
+        
+        # Add bullet character to text
+        paragraph.text = "• " + outcome
+        paragraph.font.name = BODY_FONT_NAME
+        paragraph.font.size = Pt(18)
+        paragraph.font.color.rgb = CS_SLATE
+        paragraph.level = 0
+        paragraph.space_after = Pt(12)
+        paragraph.font.bold = False
 
 
 def create_protection_achieved_slide(prs, report_data):
