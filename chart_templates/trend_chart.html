@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Trend Chart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', system-ui, sans-serif;
+            background-color: white;
+            padding: 20px;
+        }
+        #trendChart {
+            width: 900px;
+            height: 350px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="trendChart"></canvas>
+
+    <script>
+        // Get data from window.CHART_DATA or URL query params
+        let chartData = window.CHART_DATA || {};
+        
+        // Parse URL query params if no embedded data
+        if (!chartData || Object.keys(chartData).length === 0) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('data')) {
+                try {
+                    chartData = JSON.parse(decodeURIComponent(params.get('data')));
+                } catch (e) {
+                    console.error('Failed to parse URL data:', e);
+                }
+            }
+        }
+
+        // Default data structure
+        const defaultData = {
+            labels: ['Period -2', 'Period -1', 'Current'],
+            datasets: [
+                {
+                    label: 'MTTR (min)',
+                    data: [168, 150, 126],
+                    borderColor: '#009CDE',
+                    backgroundColor: 'rgba(0, 156, 222, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'MTTD (min)',
+                    data: [54, 48, 42],
+                    borderColor: '#004C97',
+                    backgroundColor: 'rgba(0, 76, 151, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'FP %',
+                    data: [12.1, 10.8, 9.0],
+                    borderColor: '#EF3340',
+                    backgroundColor: 'rgba(239, 51, 64, 0.1)',
+                    borderWidth: 3,
+                    borderDash: [8, 4],
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    yAxisID: 'y1'
+                }
+            ]
+        };
+
+        // Merge provided data with defaults
+        const labels = chartData.labels || defaultData.labels;
+        const datasets = chartData.datasets || defaultData.datasets;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 12
+                                },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const datasetLabel = context.dataset.label || '';
+                                    const value = context.parsed.y;
+                                    if (datasetLabel.includes('FP')) {
+                                        return datasetLabel + ': ' + value.toFixed(1) + '%';
+                                    }
+                                    return datasetLabel + ': ' + Math.round(value) + ' min';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Minutes',
+                                font: {
+                                    family: 'Roboto',
+                                    size: 12
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 11
+                                }
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'False Positive %',
+                                font: {
+                                    family: 'Roboto',
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Severity Alignment Sankey Chart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.14.0/dist/chartjs-chart-sankey.min.js" integrity="sha512-p9MnIc0Xzj4QcoFGM2vuBWpT+8mDtCgpLju/3i1F7w3LVRTIWEpXgEmVH1SUMulnO5A55oHdku3IjS7BwYFm0w==" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', system-ui, sans-serif;
+            background-color: white;
+            padding: 20px;
+        }
+        #sankeyChart {
+            width: 800px;
+            height: 400px;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: rgba(52, 55, 65, 0.85);
+        }
+        .legend-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="sankeyChart"></canvas>
+    <div class="legend" id="sankeyLegend"></div>
+
+    <script>
+        // Get data from window.CHART_DATA or URL query params
+        let chartData = window.CHART_DATA || {};
+        
+        // Parse URL query params if no embedded data
+        if (!chartData || Object.keys(chartData).length === 0) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('data')) {
+                try {
+                    chartData = JSON.parse(decodeURIComponent(params.get('data')));
+                } catch (e) {
+                    console.error('Failed to parse URL data:', e);
+                }
+            }
+        }
+
+        // Default flow data
+        const defaultFlows = [
+            { from: 'Vendor Critical', to: 'CS Critical', flow: 7 },
+            { from: 'Vendor Critical', to: 'CS High', flow: 1 },
+            { from: 'Vendor High', to: 'CS Critical', flow: 2 },
+            { from: 'Vendor High', to: 'CS High', flow: 7 },
+            { from: 'Vendor High', to: 'CS Medium', flow: 4 },
+            { from: 'Vendor High', to: 'CS Low', flow: 2 },
+            { from: 'Vendor Medium', to: 'CS High', flow: 9 },
+            { from: 'Vendor Medium', to: 'CS Medium', flow: 72 },
+            { from: 'Vendor Medium', to: 'CS Low', flow: 32 },
+            { from: 'Vendor Medium', to: 'CS Informational', flow: 8 },
+            { from: 'Vendor Low', to: 'CS Medium', flow: 18 },
+            { from: 'Vendor Low', to: 'CS Low', flow: 67 },
+            { from: 'Vendor Low', to: 'CS Informational', flow: 18 },
+            { from: 'Vendor Informational', to: 'CS Low', flow: 5 },
+            { from: 'Vendor Informational', to: 'CS Informational', flow: 15 }
+        ];
+
+        const flows = chartData.flows || defaultFlows;
+
+        // Severity colors
+        const severityColors = {
+            Critical: '#EF3340',
+            High: '#FF6A14',
+            Medium: '#FDBA4D',
+            Low: '#009CDE',
+            Informational: '#9CA3AF',
+            Info: '#9CA3AF'
+        };
+
+        // Build node color map
+        const nodeColorMap = {};
+        Object.keys(severityColors).forEach((severity) => {
+            nodeColorMap[`Vendor ${severity}`] = severityColors[severity];
+            nodeColorMap[`CS ${severity}`] = severityColors[severity];
+            // Handle "Informational" vs "Info"
+            if (severity === 'Informational') {
+                nodeColorMap[`Vendor Info`] = severityColors[severity];
+                nodeColorMap[`CS Info`] = severityColors[severity];
+            }
+        });
+
+        // Extract unique nodes
+        const nodes = new Set();
+        flows.forEach(flow => {
+            nodes.add(flow.from);
+            nodes.add(flow.to);
+        });
+        const nodeList = Array.from(nodes);
+
+        // Build priority map for nodes
+        const sankeyPriorityOrder = ['Critical', 'High', 'Medium', 'Low', 'Informational'];
+        const nodePriorityMap = sankeyPriorityOrder.reduce((acc, severity, index) => {
+            acc[`Vendor ${severity}`] = index;
+            acc[`CS ${severity}`] = index;
+            return acc;
+        }, {});
+
+        // Build datasets for Chart.js Sankey
+        const datasets = [{
+            label: 'Severity alignment',
+            data: flows,
+            colorFrom: (ctx) => {
+                const link = ctx.dataset.data[ctx.dataIndex];
+                return nodeColorMap[link.from] || '#009CDE';
+            },
+            colorTo: (ctx) => {
+                const link = ctx.dataset.data[ctx.dataIndex];
+                return nodeColorMap[link.to] || '#004C97';
+            },
+            priority: nodePriorityMap,
+            colorMode: 'gradient',
+            nodeWidth: 18,
+            nodePadding: 18,
+            borderColor: 'rgba(255, 255, 255, 0.9)',
+            borderWidth: 1
+        }];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('sankeyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'sankey',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: () => '',
+                                label: (context) => {
+                                    const link = context.raw || context.dataset.data[context.dataIndex];
+                                    return `${link.from} → ${link.to}: ${link.flow} alerts`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create legend
+            const legendContainer = document.getElementById('sankeyLegend');
+            const severityOrder = ['Informational', 'Low', 'Medium', 'High', 'Critical'];
+            severityOrder.slice().reverse().forEach((severity) => {
+                const color = severityColors[severity];
+                if (color) {
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    legendItem.innerHTML = `
+                        <div class="legend-color" style="background-color: ${color};"></div>
+                        <span>${severity}</span>
+                    `;
+                    legendContainer.appendChild(legendItem);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

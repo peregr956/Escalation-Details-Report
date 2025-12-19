@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MITRE ATT&CK Stacked Bar Chart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', system-ui, sans-serif;
+            background-color: white;
+            padding: 20px;
+        }
+        #stackedBarChart {
+            width: 900px;
+            height: 350px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stackedBarChart"></canvas>
+
+    <script>
+        // Get data from window.CHART_DATA or URL query params
+        let chartData = window.CHART_DATA || {};
+        
+        // Parse URL query params if no embedded data
+        if (!chartData || Object.keys(chartData).length === 0) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('data')) {
+                try {
+                    chartData = JSON.parse(decodeURIComponent(params.get('data')));
+                } catch (e) {
+                    console.error('Failed to parse URL data:', e);
+                }
+            }
+        }
+
+        // Default data structure
+        const defaultData = {
+            labels: ['Persistence', 'Defense Evasion', 'Execution', 'Discovery', 'Initial Access'],
+            datasets: [
+                {
+                    label: 'High',
+                    data: [12, 8, 5, 3, 2],
+                    backgroundColor: '#EF3340',
+                    borderRadius: 0
+                },
+                {
+                    label: 'Medium',
+                    data: [38, 31, 22, 18, 12],
+                    backgroundColor: '#FF6A14',
+                    borderRadius: 0
+                },
+                {
+                    label: 'Low',
+                    data: [22, 18, 15, 24, 16],
+                    backgroundColor: '#009CDE',
+                    borderRadius: 0
+                },
+                {
+                    label: 'Info',
+                    data: [5, 3, 2, 8, 3],
+                    backgroundColor: '#9CA3AF',
+                    borderRadius: 0
+                }
+            ]
+        };
+
+        // Merge provided data with defaults
+        const labels = chartData.labels || defaultData.labels;
+        const datasets = chartData.datasets || defaultData.datasets;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('stackedBarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 12
+                                },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operational Load Pie Chart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', system-ui, sans-serif;
+            background-color: white;
+            padding: 20px;
+        }
+        #pieChart {
+            width: 400px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pieChart"></canvas>
+
+    <script>
+        // Get data from window.CHART_DATA or URL query params
+        let chartData = window.CHART_DATA || {};
+        
+        // Parse URL query params if no embedded data
+        if (!chartData || Object.keys(chartData).length === 0) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('data')) {
+                try {
+                    chartData = JSON.parse(decodeURIComponent(params.get('data')));
+                } catch (e) {
+                    console.error('Failed to parse URL data:', e);
+                }
+            }
+        }
+
+        // Default data
+        const defaultData = {
+            labels: ['Business Hours', 'After Hours', 'Weekend'],
+            data: [51, 41, 8],
+            backgroundColor: ['#009CDE', '#702F8A', '#EF3340']
+        };
+
+        const labels = chartData.labels || defaultData.labels;
+        const data = chartData.data || defaultData.data;
+        const backgroundColor = chartData.backgroundColor || defaultData.backgroundColor;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Roboto',
+                                    size: 12
+                                },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
