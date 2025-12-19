@@ -9,6 +9,7 @@ import logging
 import shutil
 from datetime import datetime
 from typing import Dict, Optional
+from PIL import Image
 
 # Brand Color Constants
 CS_BLUE = RGBColor(0, 156, 222)
@@ -474,16 +475,50 @@ def insert_chart_image(slide, placeholder_id: Optional[str], image_path: str):
     # Get placeholder position and size
     left = placeholder_shape.left
     top = placeholder_shape.top
-    width = placeholder_shape.width
-    height = placeholder_shape.height
+    placeholder_width = placeholder_shape.width
+    placeholder_height = placeholder_shape.height
+    
+    # Get actual image dimensions to preserve aspect ratio
+    # Charts are rendered at scale=2, so we need to account for that
+    # The images are rendered at 2x DPI, so physical size is half the pixel dimensions
+    try:
+        with Image.open(image_path) as img:
+            img_width_px, img_height_px = img.size
+            # Convert pixels to inches (assuming 96 DPI base, but rendered at 2x scale = 192 DPI effective)
+            # So 1 pixel = 1/192 inches at the rendered scale
+            # But since we're fitting to placeholder, we just need aspect ratio
+            img_aspect_ratio = img_width_px / img_height_px
+    except Exception as e:
+        logging.warning(f"Could not read image dimensions for {image_path}: {e}. Using placeholder dimensions.")
+        img_aspect_ratio = placeholder_width / placeholder_height
+    
+    # Calculate placeholder aspect ratio
+    placeholder_aspect_ratio = placeholder_width / placeholder_height
+    
+    # Adjust dimensions to preserve image aspect ratio while fitting within placeholder bounds
+    # Work with the aspect ratios and fit to the constraining dimension
+    if img_aspect_ratio > placeholder_aspect_ratio:
+        # Image is wider relative to placeholder - fit to placeholder width, adjust height
+        width = placeholder_width
+        height = placeholder_width / img_aspect_ratio
+        # Center vertically if height is less than placeholder
+        if height < placeholder_height:
+            top = top + (placeholder_height - height) / 2
+    else:
+        # Image is taller relative to placeholder - fit to placeholder height, adjust width
+        height = placeholder_height
+        width = placeholder_height * img_aspect_ratio
+        # Center horizontally if width is less than placeholder
+        if width < placeholder_width:
+            left = left + (placeholder_width - width) / 2
     
     # Remove the placeholder shape
     slide.shapes._spTree.remove(placeholder_shape._element)
     
-    # Insert the image
+    # Insert the image with preserved aspect ratio
     try:
         slide.shapes.add_picture(str(image_path), left, top, width, height)
-        logging.info(f"Inserted chart image: {image_path} (ID: {placeholder_id})")
+        logging.info(f"Inserted chart image: {image_path} (ID: {placeholder_id}) - Size: {width}x{height}, Aspect ratio preserved")
         return True
     except Exception as e:
         logging.error(f"Failed to insert chart image {image_path}: {e}")
