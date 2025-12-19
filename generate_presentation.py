@@ -964,9 +964,528 @@ def build_value_delivered_slides(prs, data):
         paragraph.font.bold = False
 
 
-def create_protection_achieved_slide(prs, report_data):
-    """Create the How Protection Was Achieved slide."""
-    pass
+def build_protection_achieved_slides(prs, data):
+    """Create the Protection section (Slides 7-10).
+    
+    Args:
+        prs (Presentation): The presentation object.
+        data (ReportData): The report data object containing all metrics.
+    """
+    blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+    header_height = Inches(0.8)
+    
+    # Slide 7 - Performance Trends
+    slide7 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide7, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape7 = slide7.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape7.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape7.line.fill.background()
+    
+    # Add title text on header
+    title_left = Inches(0.5)
+    title_top = Inches(0.1)
+    title_width = prs.slide_width - Inches(2.5)
+    title_height = Inches(0.6)
+    
+    title_box7 = slide7.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame7 = title_box7.text_frame
+    title_frame7.word_wrap = True
+    title_paragraph7 = title_frame7.paragraphs[0]
+    title_paragraph7.text = "Getting Better Every Period"
+    title_paragraph7.font.name = TITLE_FONT_NAME
+    title_paragraph7.font.size = Pt(28)
+    title_paragraph7.font.bold = True
+    title_paragraph7.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph7.alignment = PP_ALIGN.LEFT
+    
+    # Add chart placeholder (rectangle with border)
+    chart_left = Inches(0.8)
+    chart_top = header_height + Inches(0.4)
+    chart_width = prs.slide_width - Inches(1.6)
+    chart_height = Inches(2.8)
+    
+    chart_placeholder = slide7.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, chart_left, chart_top,
+        chart_width, chart_height
+    )
+    fill = chart_placeholder.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(255, 255, 255)  # White background
+    line = chart_placeholder.line
+    line.color.rgb = CS_SLATE
+    line.width = Pt(1)
+    
+    # Add placeholder text
+    placeholder_text = chart_placeholder.text_frame
+    placeholder_text.text = "[Chart: Performance Trends]"
+    placeholder_text.paragraphs[0].font.name = BODY_FONT_NAME
+    placeholder_text.paragraphs[0].font.size = Pt(14)
+    placeholder_text.paragraphs[0].font.color.rgb = CS_SLATE
+    placeholder_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+    placeholder_text.vertical_anchor = 1  # Middle
+    
+    # Add legend below chart
+    legend_top = chart_top + chart_height + Inches(0.2)
+    legend_left = chart_left
+    legend_width = chart_width
+    legend_height = Inches(0.5)
+    
+    legend_box = slide7.shapes.add_textbox(legend_left, legend_top, legend_width, legend_height)
+    legend_frame = legend_box.text_frame
+    legend_frame.word_wrap = True
+    legend_paragraph = legend_frame.paragraphs[0]
+    legend_paragraph.text = "MTTR (blue) | MTTD (navy) | FP% (red dashed)"
+    legend_paragraph.font.name = BODY_FONT_NAME
+    legend_paragraph.font.size = Pt(14)
+    legend_paragraph.font.color.rgb = CS_SLATE
+    legend_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add insight box
+    insight_left = Inches(0.8)
+    insight_top = legend_top + legend_height + Inches(0.2)
+    insight_width = chart_width
+    insight_height = Inches(0.8)
+    
+    insight_shape = slide7.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, insight_left, insight_top,
+        insight_width, insight_height
+    )
+    fill = insight_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+    line = insight_shape.line
+    line.color.rgb = CS_BLUE
+    line.width = Pt(2)
+    
+    insight_text = insight_shape.text_frame
+    insight_text.text = "MTTR decreased 25% to 126 minutes, MTTD improved 22% to 42 minutes"
+    insight_text.paragraphs[0].font.name = BODY_FONT_NAME
+    insight_text.paragraphs[0].font.size = Pt(16)
+    insight_text.paragraphs[0].font.color.rgb = CS_NAVY
+    insight_text.paragraphs[0].font.bold = True
+    insight_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+    insight_text.vertical_anchor = 1  # Middle
+    
+    # Slide 8 - Industry Comparison
+    slide8 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide8, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape8 = slide8.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape8.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape8.line.fill.background()
+    
+    # Add title text on header
+    title_box8 = slide8.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame8 = title_box8.text_frame
+    title_frame8.word_wrap = True
+    title_paragraph8 = title_frame8.paragraphs[0]
+    title_paragraph8.text = "Industry Comparison"
+    title_paragraph8.font.name = TITLE_FONT_NAME
+    title_paragraph8.font.size = Pt(28)
+    title_paragraph8.font.bold = True
+    title_paragraph8.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph8.alignment = PP_ALIGN.LEFT
+    
+    # Create table for comparison
+    table_top = header_height + Inches(0.5)
+    table_left = Inches(1)
+    table_width = prs.slide_width - Inches(2)
+    table_height = Inches(2.5)
+    
+    # Calculate row and column dimensions
+    num_rows = len(data.industry_comparison) + 1  # +1 for header
+    num_cols = 4
+    row_height = table_height / num_rows
+    col_width = table_width / num_cols
+    
+    # Create table using shapes (python-pptx doesn't have native table support)
+    # Create header row background
+    header_row_shape = slide8.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, table_left, table_top,
+        table_width, row_height
+    )
+    fill = header_row_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_row_shape.line.fill.background()
+    
+    # Add header text
+    headers = ["Metric", "Your Performance", "Industry Average", "Difference"]
+    for col_idx, header_text in enumerate(headers):
+        header_cell_left = table_left + col_idx * col_width
+        header_cell_width = col_width
+        header_cell_top = table_top
+        
+        header_cell_box = slide8.shapes.add_textbox(
+            header_cell_left + Inches(0.1), header_cell_top + Inches(0.05),
+            header_cell_width - Inches(0.2), row_height - Inches(0.1)
+        )
+        header_cell_frame = header_cell_box.text_frame
+        header_cell_frame.word_wrap = True
+        header_cell_paragraph = header_cell_frame.paragraphs[0]
+        header_cell_paragraph.text = header_text
+        header_cell_paragraph.font.name = BODY_FONT_NAME
+        header_cell_paragraph.font.size = Pt(14)
+        header_cell_paragraph.font.bold = True
+        header_cell_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+        header_cell_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add data rows
+    for row_idx, comparison in enumerate(data.industry_comparison):
+        row_top = table_top + (row_idx + 1) * row_height
+        
+        # Alternate row background color
+        if row_idx % 2 == 0:
+            row_bg = slide8.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE, table_left, row_top,
+                table_width, row_height
+            )
+            fill = row_bg.fill
+            fill.solid()
+            fill.fore_color.rgb = RGBColor(250, 250, 250)  # Light gray
+            row_bg.line.fill.background()
+        
+        # Metric name
+        metric_cell_box = slide8.shapes.add_textbox(
+            table_left + Inches(0.1), row_top + Inches(0.05),
+            col_width - Inches(0.2), row_height - Inches(0.1)
+        )
+        metric_cell_frame = metric_cell_box.text_frame
+        metric_cell_frame.word_wrap = True
+        metric_cell_paragraph = metric_cell_frame.paragraphs[0]
+        metric_cell_paragraph.text = f"{comparison['metric']} (minutes)" if comparison['metric'] != "Incidents/Day" else comparison['metric']
+        metric_cell_paragraph.font.name = BODY_FONT_NAME
+        metric_cell_paragraph.font.size = Pt(13)
+        metric_cell_paragraph.font.color.rgb = CS_SLATE
+        metric_cell_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Your Performance
+        your_cell_box = slide8.shapes.add_textbox(
+            table_left + col_width + Inches(0.1), row_top + Inches(0.05),
+            col_width - Inches(0.2), row_height - Inches(0.1)
+        )
+        your_cell_frame = your_cell_box.text_frame
+        your_cell_frame.word_wrap = True
+        your_cell_paragraph = your_cell_frame.paragraphs[0]
+        your_cell_paragraph.text = str(comparison['yours'])
+        your_cell_paragraph.font.name = BODY_FONT_NAME
+        your_cell_paragraph.font.size = Pt(13)
+        your_cell_paragraph.font.color.rgb = CS_SLATE
+        your_cell_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Industry Average
+        industry_cell_box = slide8.shapes.add_textbox(
+            table_left + 2 * col_width + Inches(0.1), row_top + Inches(0.05),
+            col_width - Inches(0.2), row_height - Inches(0.1)
+        )
+        industry_cell_frame = industry_cell_box.text_frame
+        industry_cell_frame.word_wrap = True
+        industry_cell_paragraph = industry_cell_frame.paragraphs[0]
+        industry_cell_paragraph.text = str(comparison['industry'])
+        industry_cell_paragraph.font.name = BODY_FONT_NAME
+        industry_cell_paragraph.font.size = Pt(13)
+        industry_cell_paragraph.font.color.rgb = CS_SLATE
+        industry_cell_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Difference (with blue badge)
+        diff_cell_left = table_left + 3 * col_width + Inches(0.1)
+        diff_cell_top = row_top + Inches(0.05)
+        diff_cell_width = col_width - Inches(0.2)
+        diff_cell_height = row_height - Inches(0.1)
+        
+        # Create blue badge background
+        badge_shape = slide8.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, diff_cell_left, diff_cell_top,
+            diff_cell_width, diff_cell_height
+        )
+        fill = badge_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = CS_BLUE
+        badge_shape.line.fill.background()
+        
+        diff_cell_box = slide8.shapes.add_textbox(
+            diff_cell_left, diff_cell_top,
+            diff_cell_width, diff_cell_height
+        )
+        diff_cell_frame = diff_cell_box.text_frame
+        diff_cell_frame.word_wrap = True
+        diff_cell_paragraph = diff_cell_frame.paragraphs[0]
+        diff_cell_paragraph.text = comparison['difference']
+        diff_cell_paragraph.font.name = BODY_FONT_NAME
+        diff_cell_paragraph.font.size = Pt(13)
+        diff_cell_paragraph.font.bold = True
+        diff_cell_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+        diff_cell_paragraph.alignment = PP_ALIGN.CENTER
+        diff_cell_frame.vertical_anchor = 1  # Middle
+    
+    # Slide 9 - Response Efficiency
+    slide9 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide9, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape9 = slide9.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape9.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape9.line.fill.background()
+    
+    # Add title text on header
+    title_box9 = slide9.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame9 = title_box9.text_frame
+    title_frame9.word_wrap = True
+    title_paragraph9 = title_frame9.paragraphs[0]
+    title_paragraph9.text = "Response Efficiency"
+    title_paragraph9.font.name = TITLE_FONT_NAME
+    title_paragraph9.font.size = Pt(28)
+    title_paragraph9.font.bold = True
+    title_paragraph9.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph9.alignment = PP_ALIGN.LEFT
+    
+    # Create 3 metric cards
+    card_width = (prs.slide_width - Inches(2.2)) / 3
+    card_height = Inches(3)
+    card_spacing = Inches(0.2)
+    cards_start_left = Inches(0.5)
+    cards_start_top = header_height + Inches(0.5)
+    
+    # Calculate containment count (round to nearest integer)
+    containment_count = round((data.containment_rate / 100) * data.incidents_escalated)
+    
+    efficiency_cards = [
+        {
+            "title": "Containment Rate",
+            "value": f"{data.containment_rate}%",
+            "subtitle": f"({containment_count} of {data.incidents_escalated})",
+            "accent_color": CS_BLUE
+        },
+        {
+            "title": "Playbook Automation",
+            "value": f"{data.playbook_auto['percent']}%",
+            "subtitle": f"({data.playbook_auto['count']} incidents)",
+            "accent_color": CS_BLUE
+        },
+        {
+            "title": "Analyst Escalation",
+            "value": f"{data.analyst_escalation['percent']}%",
+            "subtitle": f"({data.analyst_escalation['count']} incidents)",
+            "accent_color": CS_ORANGE
+        }
+    ]
+    
+    for i, card in enumerate(efficiency_cards):
+        card_left = cards_start_left + i * (card_width + card_spacing)
+        card_top = cards_start_top
+        
+        # Create card background
+        card_shape = slide9.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            card_width, card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = card_shape.line
+        line.color.rgb = card["accent_color"]
+        line.width = Pt(3)
+        
+        # Add card title
+        card_title_box = slide9.shapes.add_textbox(
+            card_left + Inches(0.2), card_top + Inches(0.3),
+            card_width - Inches(0.4), Inches(0.5)
+        )
+        card_title_frame = card_title_box.text_frame
+        card_title_frame.word_wrap = True
+        card_title_paragraph = card_title_frame.paragraphs[0]
+        card_title_paragraph.text = card["title"]
+        card_title_paragraph.font.name = TITLE_FONT_NAME
+        card_title_paragraph.font.size = Pt(18)
+        card_title_paragraph.font.bold = True
+        card_title_paragraph.font.color.rgb = CS_NAVY
+        card_title_paragraph.alignment = PP_ALIGN.CENTER
+        
+        # Add card value
+        card_value_box = slide9.shapes.add_textbox(
+            card_left + Inches(0.2), card_top + Inches(1.0),
+            card_width - Inches(0.4), Inches(1.0)
+        )
+        card_value_frame = card_value_box.text_frame
+        card_value_frame.word_wrap = True
+        card_value_paragraph = card_value_frame.paragraphs[0]
+        card_value_paragraph.text = card["value"]
+        card_value_paragraph.font.name = TITLE_FONT_NAME
+        card_value_paragraph.font.size = Pt(48)
+        card_value_paragraph.font.bold = True
+        card_value_paragraph.font.color.rgb = card["accent_color"]
+        card_value_paragraph.alignment = PP_ALIGN.CENTER
+        
+        # Add card subtitle
+        card_subtitle_box = slide9.shapes.add_textbox(
+            card_left + Inches(0.2), card_top + Inches(2.2),
+            card_width - Inches(0.4), Inches(0.6)
+        )
+        card_subtitle_frame = card_subtitle_box.text_frame
+        card_subtitle_frame.word_wrap = True
+        card_subtitle_paragraph = card_subtitle_frame.paragraphs[0]
+        card_subtitle_paragraph.text = card["subtitle"]
+        card_subtitle_paragraph.font.name = BODY_FONT_NAME
+        card_subtitle_paragraph.font.size = Pt(14)
+        card_subtitle_paragraph.font.color.rgb = CS_SLATE
+        card_subtitle_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Slide 10 - Detection Quality
+    slide10 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide10, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape10 = slide10.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape10.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape10.line.fill.background()
+    
+    # Add title text on header
+    title_box10 = slide10.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame10 = title_box10.text_frame
+    title_frame10.word_wrap = True
+    title_paragraph10 = title_frame10.paragraphs[0]
+    title_paragraph10.text = "Detection Quality"
+    title_paragraph10.font.name = TITLE_FONT_NAME
+    title_paragraph10.font.size = Pt(28)
+    title_paragraph10.font.bold = True
+    title_paragraph10.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph10.alignment = PP_ALIGN.LEFT
+    
+    # Create 2x2 grid of metric cards
+    grid_card_width = (prs.slide_width - Inches(2.2)) / 2
+    grid_card_height = Inches(1.5)
+    grid_spacing = Inches(0.2)
+    grid_start_left = Inches(0.5)
+    grid_start_top = header_height + Inches(0.5)
+    
+    quality_cards = [
+        {
+            "title": "True Threat Precision",
+            "value": f"{data.true_threat_precision}%",
+            "accent_color": CS_RED
+        },
+        {
+            "title": "Signal Fidelity",
+            "value": f"{data.signal_fidelity}%",
+            "accent_color": CS_BLUE
+        },
+        {
+            "title": "False Positive Rate",
+            "value": f"{data.false_positive_rate}%",
+            "accent_color": CS_ORANGE
+        },
+        {
+            "title": "Client-Validated",
+            "value": f"{data.client_validated}%",
+            "accent_color": CS_BLUE
+        }
+    ]
+    
+    for i, card in enumerate(quality_cards):
+        row = i // 2
+        col = i % 2
+        
+        card_left = grid_start_left + col * (grid_card_width + grid_spacing)
+        card_top = grid_start_top + row * (grid_card_height + grid_spacing)
+        
+        # Create card background
+        card_shape = slide10.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            grid_card_width, grid_card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = card_shape.line
+        line.color.rgb = card["accent_color"]
+        line.width = Pt(3)
+        
+        # Add card title
+        card_title_box = slide10.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.2),
+            grid_card_width - Inches(0.3), Inches(0.4)
+        )
+        card_title_frame = card_title_box.text_frame
+        card_title_frame.word_wrap = True
+        card_title_paragraph = card_title_frame.paragraphs[0]
+        card_title_paragraph.text = card["title"]
+        card_title_paragraph.font.name = TITLE_FONT_NAME
+        card_title_paragraph.font.size = Pt(16)
+        card_title_paragraph.font.bold = True
+        card_title_paragraph.font.color.rgb = CS_NAVY
+        card_title_paragraph.alignment = PP_ALIGN.LEFT
+        
+        # Add card value
+        card_value_box = slide10.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.7),
+            grid_card_width - Inches(0.3), Inches(0.6)
+        )
+        card_value_frame = card_value_box.text_frame
+        card_value_frame.word_wrap = True
+        card_value_paragraph = card_value_frame.paragraphs[0]
+        card_value_paragraph.text = card["value"]
+        card_value_paragraph.font.name = TITLE_FONT_NAME
+        card_value_paragraph.font.size = Pt(36)
+        card_value_paragraph.font.bold = True
+        card_value_paragraph.font.color.rgb = card["accent_color"]
+        card_value_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Add key insight box at bottom
+    insight_box_top = grid_start_top + 2 * (grid_card_height + grid_spacing) + Inches(0.3)
+    insight_box_left = grid_start_left
+    insight_box_width = prs.slide_width - Inches(1)
+    insight_box_height = Inches(0.7)
+    
+    insight_box_shape = slide10.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, insight_box_left, insight_box_top,
+        insight_box_width, insight_box_height
+    )
+    fill = insight_box_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+    line = insight_box_shape.line
+    line.color.rgb = CS_BLUE
+    line.width = Pt(2)
+    
+    insight_box_text = insight_box_shape.text_frame
+    insight_box_text.text = "Signal quality improved: false positives fell from 10.8% to 9.0%"
+    insight_box_text.paragraphs[0].font.name = BODY_FONT_NAME
+    insight_box_text.paragraphs[0].font.size = Pt(16)
+    insight_box_text.paragraphs[0].font.color.rgb = CS_NAVY
+    insight_box_text.paragraphs[0].font.bold = True
+    insight_box_text.paragraphs[0].alignment = PP_ALIGN.CENTER
+    insight_box_text.vertical_anchor = 1  # Middle
 
 
 def create_threat_landscape_slide(prs, report_data):
