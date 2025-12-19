@@ -2407,9 +2407,209 @@ def build_insights_slides(prs, data):
     insight_text.vertical_anchor = 1  # Middle
 
 
-def create_forward_direction_slide(prs, report_data):
-    """Create the Forward Direction slide."""
-    pass
+def build_forward_direction_slide(prs, data):
+    """Create the Forward Direction slide (Slide 16).
+    
+    Args:
+        prs (Presentation): The presentation object.
+        data (ReportData): The report data object containing all metrics.
+    """
+    blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+    header_height = Inches(0.8)
+    title_left = Inches(0.5)
+    title_top = Inches(0.1)
+    title_width = prs.slide_width - Inches(2.5)
+    title_height = Inches(0.6)
+    
+    # Slide 16 - Forward Direction
+    slide16 = prs.slides.add_slide(blank_slide_layout)
+    
+    # Add logo at top right
+    add_logo(slide16, position='top_right', prs=prs)
+    
+    # Add title header
+    header_shape16 = slide16.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0,
+        prs.slide_width, header_height
+    )
+    fill = header_shape16.fill
+    fill.solid()
+    fill.fore_color.rgb = CS_NAVY
+    header_shape16.line.fill.background()
+    
+    # Add title text on header
+    title_box16 = slide16.shapes.add_textbox(title_left, title_top, title_width, title_height)
+    title_frame16 = title_box16.text_frame
+    title_frame16.word_wrap = True
+    title_paragraph16 = title_frame16.paragraphs[0]
+    title_paragraph16.text = "Looking Ahead"
+    title_paragraph16.font.name = TITLE_FONT_NAME
+    title_paragraph16.font.size = Pt(28)
+    title_paragraph16.font.bold = True
+    title_paragraph16.font.color.rgb = RGBColor(255, 255, 255)
+    title_paragraph16.alignment = PP_ALIGN.LEFT
+    
+    # Section 1 - Next Period Targets
+    section1_top = header_height + Inches(0.4)
+    section1_left = Inches(0.5)
+    section1_width = prs.slide_width - Inches(1.0)
+    section1_height = Inches(1.2)
+    
+    # Section 1 title
+    section1_title_box = slide16.shapes.add_textbox(
+        section1_left, section1_top, section1_width, Inches(0.4)
+    )
+    section1_title_frame = section1_title_box.text_frame
+    section1_title_frame.word_wrap = True
+    section1_title_paragraph = section1_title_frame.paragraphs[0]
+    section1_title_paragraph.text = "Next Period Targets"
+    section1_title_paragraph.font.name = TITLE_FONT_NAME
+    section1_title_paragraph.font.size = Pt(20)
+    section1_title_paragraph.font.bold = True
+    section1_title_paragraph.font.color.rgb = CS_NAVY
+    section1_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Section 1 content (bullets)
+    section1_content_top = section1_top + Inches(0.5)
+    section1_content_box = slide16.shapes.add_textbox(
+        section1_left + Inches(0.3), section1_content_top,
+        section1_width - Inches(0.3), section1_height - Inches(0.5)
+    )
+    section1_content_frame = section1_content_box.text_frame
+    section1_content_frame.word_wrap = True
+    section1_content_frame.margin_left = Inches(0.2)
+    section1_content_frame.margin_right = Inches(0.2)
+    section1_content_frame.margin_top = Inches(0.1)
+    section1_content_frame.margin_bottom = Inches(0.1)
+    
+    # Get Palo Alto XDR FP rate from detection_sources
+    palo_alto_fp_rate = 11.2
+    for source in data.detection_sources:
+        if "Palo Alto" in source.get('source', ''):
+            palo_alto_fp_rate = source.get('fp_rate', 11.2)
+            break
+    
+    # Calculate reduction (11.2% to 10% = ~4 fewer escalations)
+    # Assuming 189 incidents at 11.2% FP rate, reducing to 10% would save ~2-4 escalations
+    target1_text = f"Trim Palo Alto XDR false positives from {palo_alto_fp_rate}% to 10% threshold (~4 fewer escalations)"
+    target2_text = f"Reduce manual escalations from {data.analyst_escalation['count']} ({data.analyst_escalation['percent']}%) to 32 or fewer (12% target)"
+    
+    # Add bullet points with checkmark-like styling (using blue color)
+    para1 = section1_content_frame.paragraphs[0]
+    para1.text = "✓ " + target1_text
+    para1.font.name = BODY_FONT_NAME
+    para1.font.size = Pt(14)
+    para1.font.color.rgb = CS_BLUE
+    para1.level = 0
+    para1.space_after = Pt(8)
+    
+    para2 = section1_content_frame.add_paragraph()
+    para2.text = "✓ " + target2_text
+    para2.font.name = BODY_FONT_NAME
+    para2.font.size = Pt(14)
+    para2.font.color.rgb = CS_BLUE
+    para2.level = 0
+    para2.space_after = Pt(8)
+    
+    # Section 2 - Strategic Focus
+    section2_top = section1_top + section1_height + Inches(0.3)
+    section2_height = Inches(1.0)
+    
+    # Section 2 title
+    section2_title_box = slide16.shapes.add_textbox(
+        section1_left, section2_top, section1_width, Inches(0.4)
+    )
+    section2_title_frame = section2_title_box.text_frame
+    section2_title_frame.word_wrap = True
+    section2_title_paragraph = section2_title_frame.paragraphs[0]
+    section2_title_paragraph.text = "Strategic Focus"
+    section2_title_paragraph.font.name = TITLE_FONT_NAME
+    section2_title_paragraph.font.size = Pt(20)
+    section2_title_paragraph.font.bold = True
+    section2_title_paragraph.font.color.rgb = CS_NAVY
+    section2_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Section 2 content
+    section2_content_top = section2_top + Inches(0.5)
+    section2_content_box = slide16.shapes.add_textbox(
+        section1_left + Inches(0.3), section2_content_top,
+        section1_width - Inches(0.3), section2_height - Inches(0.5)
+    )
+    section2_content_frame = section2_content_box.text_frame
+    section2_content_frame.word_wrap = True
+    section2_content_frame.margin_left = Inches(0.2)
+    section2_content_frame.margin_right = Inches(0.2)
+    section2_content_frame.margin_top = Inches(0.1)
+    section2_content_frame.margin_bottom = Inches(0.1)
+    
+    focus1_text = "Proactive hunts targeting Persistence and Defense Evasion tactics"
+    focus2_text = "Additional playbook coverage for analyst-escalated scenarios"
+    
+    para3 = section2_content_frame.paragraphs[0]
+    para3.text = "✓ " + focus1_text
+    para3.font.name = BODY_FONT_NAME
+    para3.font.size = Pt(14)
+    para3.font.color.rgb = CS_BLUE
+    para3.level = 0
+    para3.space_after = Pt(8)
+    
+    para4 = section2_content_frame.add_paragraph()
+    para4.text = "✓ " + focus2_text
+    para4.font.name = BODY_FONT_NAME
+    para4.font.size = Pt(14)
+    para4.font.color.rgb = CS_BLUE
+    para4.level = 0
+    para4.space_after = Pt(8)
+    
+    # Section 3 - Your Partnership
+    section3_top = section2_top + section2_height + Inches(0.3)
+    section3_height = Inches(0.8)
+    
+    # Section 3 title
+    section3_title_box = slide16.shapes.add_textbox(
+        section1_left, section3_top, section1_width, Inches(0.4)
+    )
+    section3_title_frame = section3_title_box.text_frame
+    section3_title_frame.word_wrap = True
+    section3_title_paragraph = section3_title_frame.paragraphs[0]
+    section3_title_paragraph.text = "Your Partnership"
+    section3_title_paragraph.font.name = TITLE_FONT_NAME
+    section3_title_paragraph.font.size = Pt(20)
+    section3_title_paragraph.font.bold = True
+    section3_title_paragraph.font.color.rgb = CS_NAVY
+    section3_title_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Section 3 content
+    section3_content_top = section3_top + Inches(0.5)
+    section3_content_box = slide16.shapes.add_textbox(
+        section1_left, section3_content_top,
+        section1_width, section3_height - Inches(0.5)
+    )
+    section3_content_frame = section3_content_box.text_frame
+    section3_content_frame.word_wrap = True
+    section3_content_paragraph = section3_content_frame.paragraphs[0]
+    section3_content_paragraph.text = "Questions? Your Customer Success Manager is here to help."
+    section3_content_paragraph.font.name = BODY_FONT_NAME
+    section3_content_paragraph.font.size = Pt(16)
+    section3_content_paragraph.font.color.rgb = CS_SLATE
+    section3_content_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Footer - Report generated date and data sources
+    footer_top = prs.slide_height - Inches(0.5)
+    footer_left = Inches(0.5)
+    footer_width = prs.slide_width - Inches(1.0)
+    footer_height = Inches(0.3)
+    
+    footer_box = slide16.shapes.add_textbox(footer_left, footer_top, footer_width, footer_height)
+    footer_frame = footer_box.text_frame
+    footer_frame.word_wrap = True
+    footer_paragraph = footer_frame.paragraphs[0]
+    footer_paragraph.text = f"Report generated: {data.report_date} | Data sources: Escalation Details Report"
+    footer_paragraph.font.name = BODY_FONT_NAME
+    footer_paragraph.font.size = Pt(10)
+    footer_paragraph.font.color.rgb = CS_SLATE
+    footer_paragraph.alignment = PP_ALIGN.LEFT
+    footer_paragraph.font.italic = True
 
 
 if __name__ == "__main__":
