@@ -95,7 +95,51 @@ Use this guide alongside the narrative brand guidelines to ensure every touch-po
 | Gradient Background | (export via design system) | `.png` / `.svg` | Blue sweep default background. |
 | Typography Package | Request from Brand | `.ttf` / `.otf` | Includes Roboto weights + Arial guidance. |
 
-## 10. Revision History
+## 10. Slide Branding Guidelines
+
+Per the CRITICALSTART Slide Branding specifications, PowerPoint presentations follow these rules:
+
+### 10.1 Master Slide Layout
+
+| Element | Content | Typography |
+|---------|---------|------------|
+| **Header (Left)** | Short presentation title (e.g., "ESCALATION REPORT") | Footer (12px/9pt) |
+| **Header (Center)** | "CRITICAL START" | Footer (12px/9pt) |
+| **Header (Right)** | Slide number | Footer (12px/9pt) |
+| **Footer (Left)** | Date (e.g., "DECEMBER 2025") | Footer (12px/9pt) |
+| **Footer (Center)** | "©2025 CRITICAL START" | Footer (12px/9pt) |
+| **Footer (Right)** | Intent summary (e.g., "EBR") | Footer (12px/9pt) |
+
+**Note:** Header and footer have transparent backgrounds. Title slides have footer only (no header).
+
+### 10.2 Typography Scale
+
+| Style | Size (px) | Size (pt) | Line Height | Usage |
+|-------|-----------|-----------|-------------|-------|
+| H1 | 152 | 114 | 152px | Hero/title slides only |
+| H2 | 96 | 72 | 104px | Section headers, large metrics |
+| H3 | 64 | 48 | 72px | Slide titles |
+| H4 | 36 | 27 | 38px | Subheadings |
+| H5 | 24 | 18 | 32px | Card titles |
+| H6 | 16 | 12 | 24px | Labels |
+| Paragraph | 16 | 12 | 24px | Body text |
+| Footer | 12 | 9 | 16px | Header/footer elements |
+
+### 10.3 Slide Dimensions
+
+- **Aspect Ratio:** 16:9 widescreen
+- **Dimensions:** 10" × 5.625"
+- **Margins:** 0.5" standard, 1.0" for content areas
+
+### 10.4 Title Slide Exceptions
+
+- No header bar (footer only)
+- Blue sweep gradient background (#009CDE → #004C97)
+- Hero title using H1 typography (114pt)
+
+## 11. Revision History
+
 | Date | Version | Author | Summary |
 | --- | --- | --- | --- |
 | 2025-11-17 | v1.0 | AI (ChatGPT) | Converted brand visual guidelines to Markdown. |
+| 2025-12-22 | v1.1 | AI (Claude) | Added Section 10: Slide Branding Guidelines with typography scale and master slide layout. |

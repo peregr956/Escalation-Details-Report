@@ -19,28 +19,69 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
 | Path | Description |
 | --- | --- |
 | `escalation_report_enhanced-3.html` | Signature Tier sample of the interactive report. Pure HTML+CSS+JS with Chart.js 4.4.0 and Font Awesome 6.5.1. |
+| `generate_presentation.py` | PowerPoint presentation generator—creates branded slides from report data. |
+| `report_data.py` | Data model (ReportData dataclass) containing all report metrics. |
+| `chart_renderer.py` | Chart rendering module—uses Playwright to render Chart.js charts to PNG. |
+| `chart_templates/` | HTML templates for chart rendering (pie, trend, stacked bar, sankey). |
 | `Report Extract.xlsx` | Sanitized slice of the Escalation to Client Details export used to validate numbers/columns. Keep aligned with CORR. |
 | `brand/brand-guidelines.md` | Master narrative, voice, governance prompts, and revision log. |
 | `brand/visual-identity.md` | Logo usage, palette (#009CDE, #004C97, #EF3340, #FF6A14), typography, accessibility, and asset inventory. |
 | `brand/README.md` | How-to for maintaining the Markdown guidelines. |
+| `docs/CURRENT_STATE.md` | Technical documentation of the PowerPoint generation system architecture. |
+| `docs/SLIDE_STRUCTURE.md` | Detailed slide-by-slide documentation and layout specifications. |
+| `ROADMAP.md` | Phased improvement plan for the presentation system. |
 | `assets/critical-start-logo.svg` | Approved vector lockup embedded directly in the HTML header. |
+| `output/` | Generated PowerPoint presentations. |
 
 ## Tech Stack
+
+### HTML Report
 - Static HTML5 document with inline CSS for easier PDF exports.
 - Vanilla JavaScript + Chart.js (line, pie, stacked bar, and Sankey via `chartjs-chart-sankey`).
 - Google Fonts (Roboto) and Font Awesome icons.
-- Fully responsive layout with print styles tuned for “Save as PDF”.
+- Fully responsive layout with print styles tuned for "Save as PDF".
+
+### PowerPoint Generator
+- Python 3.14+ with `python-pptx` for presentation generation.
+- Playwright for headless browser chart rendering.
+- PIL/Pillow for image processing.
+- Brand-compliant typography (Roboto/Arial fallback) and color palette.
 
 ## Quick Start
 
-### Preview the dashboard locally
+### Preview the HTML report locally
 1. `cd /workspace`
 2. `python3 -m http.server 4173`
 3. Navigate to `http://localhost:4173/escalation_report_enhanced-3.html`
 4. Stop the server with `Ctrl+C` when finished. (You can also open the file directly in a browser, but a local server keeps font/CDN calls consistent.)
 
+### Generate PowerPoint Presentation
+1. Set up the virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   playwright install chromium
+   ```
+
+2. Generate the presentation:
+   ```bash
+   python generate_presentation.py
+   ```
+
+3. The presentation will be saved to `output/escalation_report_YYYY-MM-DD.pptx`
+
+**Command-line options:**
+```bash
+python generate_presentation.py --help
+python generate_presentation.py --output-dir ./custom_output
+python generate_presentation.py --no-threat-landscape  # Exclude threat slides
+python generate_presentation.py --keep-charts          # Keep temp chart images
+```
+
 ### Export or share
-- Use the browser’s `Print → Save as PDF` workflow with “Background graphics” enabled.
+- **HTML Report:** Use the browser's `Print → Save as PDF` workflow with "Background graphics" enabled.
+- **PowerPoint:** Open the generated `.pptx` file in PowerPoint or Google Slides.
 - For executive walkthroughs, keep the tab in full-screen (1920×1080) or export to PDF before sending.
 
 ## Updating Data & Narrative
