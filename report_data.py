@@ -88,6 +88,39 @@ class ReportData:
     avg_touches: float = 0.0
     client_participation: str = ""
     client_led_closures: str = ""
+    
+    # After-Hours Details (for detailed breakdown slide)
+    after_hours_weeknight: int = 0
+    after_hours_weekend: int = 0
+    after_hours_critical: int = 0
+    after_hours_high: int = 0
+    after_hours_medium: int = 0
+    after_hours_low: int = 0
+    notification_methods: List[Dict[str, Any]] = field(default_factory=list)
+    
+    # Response Efficiency Details (for response efficiency slide)
+    response_by_priority: List[Dict[str, Any]] = field(default_factory=list)
+    sla_compliance_rate: float = 0.0
+    avg_response_time: int = 0
+    fastest_response_time: int = 0
+    
+    # Detection Quality Context (for detailed detection quality slide)
+    detection_quality_trend: str = ""
+    tuning_recommendations: List[str] = field(default_factory=list)
+    signal_to_noise_ratio: float = 0.0
+    
+    # Security Outcomes Summary (for comprehensive outcomes slide)
+    zero_breaches: bool = True
+    threats_blocked: int = 0
+    vulnerabilities_identified: int = 0
+    compliance_status: str = ""
+    risk_reduction_percent: float = 0.0
+    
+    # Executive Insights (for key takeaways and messaging)
+    key_achievements: List[str] = field(default_factory=list)
+    areas_of_focus: List[str] = field(default_factory=list)
+    next_period_goals: List[str] = field(default_factory=list)
+    executive_summary_narrative: str = ""
 
 
 def get_report_data() -> ReportData:
@@ -257,5 +290,64 @@ def get_report_data() -> ReportData:
         # Collaboration Metrics
         avg_touches=2.3,
         client_participation="72%",
-        client_led_closures="21%"
+        client_led_closures="21%",
+        
+        # After-Hours Details
+        after_hours_weeknight=129,
+        after_hours_weekend=29,
+        after_hours_critical=3,
+        after_hours_high=18,
+        after_hours_medium=89,
+        after_hours_low=48,
+        notification_methods=[
+            {"method": "Email", "count": 142, "percent": 89.9},
+            {"method": "Phone", "count": 12, "percent": 7.6},
+            {"method": "Slack/Teams", "count": 4, "percent": 2.5}
+        ],
+        
+        # Response Efficiency Details
+        response_by_priority=[
+            {"priority": "Critical", "count": 9, "avg_response": 23, "target": 30, "met_sla": True},
+            {"priority": "High", "count": 21, "avg_response": 67, "target": 60, "met_sla": False},
+            {"priority": "Medium", "count": 165, "avg_response": 126, "target": 180, "met_sla": True},
+            {"priority": "Low", "count": 72, "avg_response": 52, "target": 240, "met_sla": True}
+        ],
+        sla_compliance_rate=94.8,
+        avg_response_time=126,
+        fastest_response_time=8,
+        
+        # Detection Quality Context
+        detection_quality_trend="improving",
+        tuning_recommendations=[
+            "Reduce Palo Alto Cortex XDR false positive rate from 11.2% to target 10.0%",
+            "Optimize Microsoft Sentinel rules for better signal fidelity",
+            "Review CrowdStrike Falcon detection thresholds"
+        ],
+        signal_to_noise_ratio=9.1,
+        
+        # Security Outcomes Summary
+        zero_breaches=True,
+        threats_blocked=11,
+        vulnerabilities_identified=23,
+        compliance_status="Fully Compliant",
+        risk_reduction_percent=34.0,
+        
+        # Executive Insights
+        key_achievements=[
+            "34% faster response than industry peers",
+            "100% threat containment with zero breaches",
+            "158 after-hours escalations handled seamlessly",
+            "$7.55M modeled cost exposure avoided"
+        ],
+        areas_of_focus=[
+            "Reduce Palo Alto Cortex XDR false positive rate",
+            "Expand playbook automation coverage",
+            "Proactive threat hunting for Persistence tactics"
+        ],
+        next_period_goals=[
+            "Achieve 10% or lower overall false positive rate",
+            "Reduce manual escalations to 12% or below",
+            "Implement enhanced detection for Defense Evasion"
+        ],
+        executive_summary_narrative="Your security posture remained strong this reporting period. CS SOC triaged 2,110 alerts, partnering with your team on 1,690 decisions and closing 420 end-to-end. Response speed landed 34% faster than sector medians (126-minute MTTR, 87-minute P90), while 158 escalations were absorbed after hours without gaps in coverage. Of the 267 incidents escalated, we identified 11 true positive threats and contained each before business impact, keeping false positives at 9.0%."
     )
