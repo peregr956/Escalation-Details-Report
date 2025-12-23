@@ -2,31 +2,46 @@
 
 This document provides a detailed breakdown of each slide in the Escalation to Client Details Report PowerPoint presentation.
 
+## Narrative Flow
+
+The presentation follows a clear narrative arc designed for C-suite executives and security leadership:
+
+**Current State → Value Delivered → Performance → Threats → Opportunities**
+
+Gray section title cards with narrative subtitles guide executives through the story, making it easy for CSMs to drive renewal and product expansion conversations.
+
 ## Slide Overview
 
-| # | Section | Title | Primary Content |
-|---|---------|-------|-----------------|
-| 1 | Executive Summary | Title Slide | Client name, tier, period, report date |
-| 2 | Executive Summary | Key Metrics Overview | Alerts triaged hero metric |
-| 3 | Executive Summary | Period Highlights | Achievement summary |
-| 4 | Value Delivered | Cost Avoidance Hero | $7.55M modeled cost avoided |
-| 5 | Value Delivered | Value Breakdown | Security Ops, Coverage, Threat Prevention |
-| 6 | Value Delivered | Detection Sources | Source breakdown table |
-| 7 | Protection Achieved | Performance Trends | MTTR/MTTD/FP% trend chart |
-| 8 | Protection Achieved | Industry Comparison | Comparison table |
-| 9 | Protection Achieved | Target Metrics | P90, Priority-based MTTR |
-| 10 | Threat Landscape | MITRE Tactics | Stacked bar chart |
-| 11 | Threat Landscape | Severity Alignment | Sankey diagram |
-| 12 | Threat Landscape | Escalation Methods | Auto vs manual breakdown |
-| 13 | Threat Landscape | Additional Context | Reserved |
-| 14 | Insights | Prioritized Improvement Plan | 3 improvement items |
-| 15 | Insights | Operational Insights | Metrics summary |
-| 16 | Additional Content | After-Hours Notifications | After-hours breakdown |
-| 17 | Additional Content | Response Efficiency | Priority-based response |
-| 18 | Additional Content | Collaboration Quality | Participation metrics |
-| 19 | Additional Content | Detection Quality | Quality breakdown |
-| 20 | Additional Content | Security Outcomes | Comprehensive summary |
-| 21 | Forward Direction | Looking Ahead | Next steps, recommendations |
+| # | Type | Section | Title | Primary Content |
+|---|------|---------|-------|-----------------|
+| 1 | Content | Opening | Title Slide | Client name, tier, period, report date |
+| 2 | **Section Card** | Executive Summary | Executive Summary | *"A comprehensive view of your security posture and the value delivered this period"* |
+| 3 | Content | Executive Summary | Key Metrics Overview | Alerts triaged hero metric |
+| 4 | Content | Executive Summary | Period Highlights | Achievement summary |
+| 5 | **Section Card** | Value Delivered | Value Delivered | *"Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention"* |
+| 6 | Content | Value Delivered | Cost Avoidance Hero | $7.55M modeled cost avoided |
+| 7 | Content | Value Delivered | Value Breakdown | Security Ops, Coverage, Threat Prevention |
+| 8 | Content | Value Delivered | Detection Sources | Source breakdown table |
+| 9 | **Section Card** | Protection Achieved | Protection Achieved | *"Measurable outcomes that exceed industry standards and reduce your breach risk"* |
+| 10 | Content | Protection Achieved | Performance Trends | MTTR/MTTD/FP% trend chart |
+| 11 | Content | Protection Achieved | Industry Comparison | Comparison table |
+| 12 | Content | Protection Achieved | Target Metrics | P90, Priority-based MTTR |
+| 13 | **Section Card** | Threat Landscape | Threat Landscape | *"Understanding the threats we're seeing and how we're adapting to protect your organization"* |
+| 14 | Content | Threat Landscape | MITRE Tactics | Stacked bar chart |
+| 15 | Content | Threat Landscape | Severity Alignment | Sankey diagram |
+| 16 | Content | Threat Landscape | Escalation Methods | Auto vs manual breakdown |
+| 17 | Content | Threat Landscape | Additional Context | Reserved |
+| 18 | **Section Card** | Insights | Insights & Continuous Improvement | *"How we're evolving our partnership to advance your security maturity"* |
+| 19 | Content | Insights | Prioritized Improvement Plan | 3 improvement items |
+| 20 | Content | Insights | Operational Insights | Metrics summary |
+| 21 | Content | Additional Content | After-Hours Notifications | After-hours breakdown |
+| 22 | Content | Additional Content | Response Efficiency | Priority-based response |
+| 23 | Content | Additional Content | Collaboration Quality | Participation metrics |
+| 24 | Content | Additional Content | Detection Quality | Quality breakdown |
+| 25 | Content | Additional Content | Security Outcomes | Comprehensive summary |
+| 26 | Content | Additional Content | Key Takeaways | Period summary |
+| 27 | **Section Card** | Forward Direction | Forward Direction | *"Strategic recommendations to strengthen your security posture and maximize partnership value"* |
+| 28 | Content | Forward Direction | Looking Ahead | Next steps, recommendations |
 
 ---
 
@@ -117,6 +132,46 @@ Per the CRITICALSTART Slide Branding guidelines, all slides follow a master temp
 ---
 
 ## Detailed Slide Specifications
+
+### Section Title Card (Narrative Transition Slides)
+
+Section title cards use a distinctive gray background to visually separate presentation sections and provide narrative context for executives.
+
+**Background:** Charcoal gray (CS_SLATE #343741)
+**Header:** Transparent with title/CRITICAL START/slide#
+**Footer:** Yes (date, copyright, intent)
+
+**Elements:**
+- Logo (top-right, 1.6" × 0.35")
+- Section title: Centered (H2 - 72pt, white, bold)
+- Narrative subtitle: Centered below title (H4 - 27pt, white, regular)
+
+**Layout:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ESCALATION REPORT    CRITICAL START              N         │  ← Header
+│                                                   [LOGO]   │
+│                                                             │
+│                    Section Title                            │  ← H2 (72pt)
+│      "Narrative subtitle describing what's next"           │  ← H4 (27pt)
+│                                                             │
+│                                                             │
+│ DECEMBER 2025       ©2025 CRITICAL START           EBR     │  ← Footer
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Narrative Messages:**
+
+| Section | Title | Narrative Subtitle |
+|---------|-------|-------------------|
+| Executive Summary | Executive Summary | A comprehensive view of your security posture and the value delivered this period |
+| Value Delivered | Value Delivered | Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention |
+| Protection Achieved | Protection Achieved | Measurable outcomes that exceed industry standards and reduce your breach risk |
+| Threat Landscape | Threat Landscape | Understanding the threats we're seeing and how we're adapting to protect your organization |
+| Insights | Insights & Continuous Improvement | How we're evolving our partnership to advance your security maturity |
+| Forward Direction | Forward Direction | Strategic recommendations to strengthen your security posture and maximize partnership value |
+
+---
 
 ### Slide 1: Title Slide (Special Layout)
 
@@ -287,3 +342,4 @@ Places Critical Start logo at specified position.
 |------|---------|--------|---------|
 | 2025-12-22 | 1.0 | AI (Claude) | Initial slide structure documentation |
 | 2025-12-22 | 2.0 | AI (Claude) | Updated for CRITICALSTART branding guidelines (transparent header/footer, typography scale) |
+| 2025-12-23 | 3.0 | AI (Claude) | Added gray section title cards with narrative subtitles for executive storytelling |

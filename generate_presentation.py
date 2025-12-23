@@ -61,6 +61,36 @@ PRESENTATION_TITLE = "ESCALATION REPORT"
 PRESENTATION_INTENT = "EBR"  # Executive Business Review
 COPYRIGHT_TEXT = "©2025 CRITICAL START"
 
+# Section Narrative Constants
+# These narrative subtitles appear on gray section title slides to guide executives
+# through a clear story arc: Current State → Value Delivered → Performance → Threats → Opportunities
+SECTION_NARRATIVES = {
+    "executive_summary": {
+        "title": "Executive Summary",
+        "narrative": "A comprehensive view of your security posture and the value delivered this period"
+    },
+    "value_delivered": {
+        "title": "Value Delivered",
+        "narrative": "Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention"
+    },
+    "protection_achieved": {
+        "title": "Protection Achieved",
+        "narrative": "Measurable outcomes that exceed industry standards and reduce your breach risk"
+    },
+    "threat_landscape": {
+        "title": "Threat Landscape",
+        "narrative": "Understanding the threats we're seeing and how we're adapting to protect your organization"
+    },
+    "insights": {
+        "title": "Insights & Continuous Improvement",
+        "narrative": "How we're evolving our partnership to advance your security maturity"
+    },
+    "forward_direction": {
+        "title": "Forward Direction",
+        "narrative": "Strategic recommendations to strengthen your security posture and maximize partnership value"
+    }
+}
+
 
 def get_brand_colors():
     """Return dict of RGBColor objects for brand colors.
@@ -865,37 +895,53 @@ def create_title_slide_layout(prs, title_text, subtitle_text=None):
     return slide
 
 
-def create_section_header_layout(prs, section_title):
-    """Create section divider slide.
+def create_section_header_layout(prs, section_title, narrative_subtitle=None):
+    """Create section divider slide with gray background and optional narrative subtitle.
+    
+    Per brand guidelines, section title slides use Charcoal gray background (#343741)
+    with white text. These slides serve as narrative transitions that guide executives
+    through the presentation story.
     
     Args:
         prs (Presentation): The presentation object.
-        section_title (str): Section title text.
+        section_title (str): Section title text (H2 typography, 72pt).
+        narrative_subtitle (str, optional): Narrative subtitle text (H4 typography, 27pt).
     
     Returns:
         Slide: The created slide object.
     """
     blank_slide_layout = prs.slide_layouts[6]  # Blank layout
     slide = prs.slides.add_slide(blank_slide_layout)
+    slide_number = get_slide_number(prs)
     
-    # Add gradient background
+    # Add gray background (CS_SLATE - Charcoal #343741)
     background_shape = slide.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, 0, 0,
         prs.slide_width, prs.slide_height
     )
     fill = background_shape.fill
     fill.solid()
-    fill.fore_color.rgb = CS_BLUE  # Use blue as base
+    fill.fore_color.rgb = CS_SLATE  # Use charcoal gray per brand guidelines
     background_shape.line.fill.background()
+    
+    # Add master slide elements (header and footer)
+    add_master_slide_elements(slide, prs, slide_number=slide_number,
+                               include_header=True, include_footer=True)
     
     # Add logo
     add_logo(slide, position='top_right', prs=prs)
     
-    # Add section title (centered)
+    # Calculate vertical positioning
+    # If we have a subtitle, move title up slightly to accommodate both
+    if narrative_subtitle:
+        title_top = Inches(1.8)
+    else:
+        title_top = Inches(2.2)
+    
+    # Add section title (centered) - H2 typography (72pt)
     title_left = Inches(1)
-    title_top = Inches(2)
     title_width = prs.slide_width - Inches(2)
-    title_height = Inches(1.5)
+    title_height = Inches(1.2)
     
     title_box = slide.shapes.add_textbox(title_left, title_top,
                                         title_width, title_height)
@@ -904,10 +950,27 @@ def create_section_header_layout(prs, section_title):
     title_paragraph = title_frame.paragraphs[0]
     title_paragraph.text = section_title
     title_paragraph.font.name = TITLE_FONT_NAME
-    title_paragraph.font.size = Pt(44)
+    title_paragraph.font.size = H2_FONT_SIZE  # 72pt per typography scale
     title_paragraph.font.bold = True
     title_paragraph.font.color.rgb = RGBColor(255, 255, 255)  # White text
     title_paragraph.alignment = PP_ALIGN.CENTER
+    
+    # Add narrative subtitle if provided - H4 typography (27pt)
+    if narrative_subtitle:
+        subtitle_top = title_top + Inches(1.3)  # 0.3" below title
+        subtitle_height = Inches(0.8)
+        
+        subtitle_box = slide.shapes.add_textbox(title_left, subtitle_top,
+                                                title_width, subtitle_height)
+        subtitle_frame = subtitle_box.text_frame
+        subtitle_frame.word_wrap = True
+        subtitle_paragraph = subtitle_frame.paragraphs[0]
+        subtitle_paragraph.text = narrative_subtitle
+        subtitle_paragraph.font.name = BODY_FONT_NAME
+        subtitle_paragraph.font.size = H4_FONT_SIZE  # 27pt per typography scale
+        subtitle_paragraph.font.bold = False
+        subtitle_paragraph.font.color.rgb = RGBColor(255, 255, 255)  # White text
+        subtitle_paragraph.alignment = PP_ALIGN.CENTER
     
     return slide
 
@@ -1302,24 +1365,58 @@ def main():
     # Step 5: Build slides
     logger.info("Step 5: Building slides...")
     try:
-        # Build slides in order
-        logger.info("  Building executive summary slides (1-3)...")
+        # Build slides in order with section title cards for narrative flow
+        # Narrative Arc: Current State → Value Delivered → Performance → Threats → Opportunities
+        
+        logger.info("  Building executive summary slides (includes title slide and section card)...")
         build_executive_summary_slides(prs, data)
         
-        logger.info("  Building value delivered slides (4-5)...")
+        # Insert Value Delivered section title card
+        logger.info("  Inserting 'Value Delivered' section card...")
+        create_section_header_layout(
+            prs,
+            SECTION_NARRATIVES["value_delivered"]["title"],
+            SECTION_NARRATIVES["value_delivered"]["narrative"]
+        )
+        
+        logger.info("  Building value delivered slides...")
         build_value_delivered_slides(prs, data)
         
-        logger.info("  Building protection achieved slides (6-8)...")
+        # Insert Protection Achieved section title card
+        logger.info("  Inserting 'Protection Achieved' section card...")
+        create_section_header_layout(
+            prs,
+            SECTION_NARRATIVES["protection_achieved"]["title"],
+            SECTION_NARRATIVES["protection_achieved"]["narrative"]
+        )
+        
+        logger.info("  Building protection achieved slides...")
         build_protection_achieved_slides(prs, data)
         
         if not args.no_threat_landscape:
-            logger.info("  Building threat landscape slides (9-12)...")
+            # Insert Threat Landscape section title card
+            logger.info("  Inserting 'Threat Landscape' section card...")
+            create_section_header_layout(
+                prs,
+                SECTION_NARRATIVES["threat_landscape"]["title"],
+                SECTION_NARRATIVES["threat_landscape"]["narrative"]
+            )
+            
+            logger.info("  Building threat landscape slides...")
             build_threat_landscape_slides(prs, data, include=True)
         else:
             logger.info("  Skipping threat landscape slides (--no-threat-landscape)")
             build_threat_landscape_slides(prs, data, include=False)
         
-        logger.info("  Building insights slides (13-15)...")
+        # Insert Insights section title card
+        logger.info("  Inserting 'Insights & Continuous Improvement' section card...")
+        create_section_header_layout(
+            prs,
+            SECTION_NARRATIVES["insights"]["title"],
+            SECTION_NARRATIVES["insights"]["narrative"]
+        )
+        
+        logger.info("  Building insights slides...")
         build_insights_slides(prs, data)
         
         logger.info("  Building additional content slides (After-Hours, Response, Collaboration, Detection, Outcomes)...")
@@ -1334,6 +1431,14 @@ def main():
             f"{data.after_hours_escalations} after-hours escalations handled seamlessly with {int(data.automation_percent)}% automation"
         ]
         build_key_takeaways_slide(prs, "This Period", takeaways, data)
+        
+        # Insert Forward Direction section title card
+        logger.info("  Inserting 'Forward Direction' section card...")
+        create_section_header_layout(
+            prs,
+            SECTION_NARRATIVES["forward_direction"]["title"],
+            SECTION_NARRATIVES["forward_direction"]["narrative"]
+        )
         
         logger.info("  Building forward direction slide...")
         build_forward_direction_slide(prs, data)
@@ -1545,6 +1650,13 @@ def build_executive_summary_slides(prs, data):
     report_date_paragraph.font.size = Pt(14)
     report_date_paragraph.font.color.rgb = RGBColor(255, 255, 255)
     report_date_paragraph.alignment = PP_ALIGN.LEFT
+    
+    # Insert Executive Summary section title card (gray background with narrative)
+    create_section_header_layout(
+        prs, 
+        SECTION_NARRATIVES["executive_summary"]["title"],
+        SECTION_NARRATIVES["executive_summary"]["narrative"]
+    )
     
     # Slide 2 - Key Metrics Overview
     slide2 = prs.slides.add_slide(blank_slide_layout)
