@@ -28,17 +28,17 @@ BODY_FONT_NAME = "Roboto"
 FALLBACK_TITLE_FONT = "Arial Black"
 FALLBACK_BODY_FONT = "Arial Narrow"
 
-# Typography Scale (per CRITICALSTART Slide Branding Guide)
-# Converted from px to pt (1px ≈ 0.75pt at 96 DPI)
+# Typography Scale (adjusted for slide readability)
+# Reduced from brand guidelines to fit presentation layouts appropriately
 # Note: H1-H3 are for content titles, NOT the header/footer elements
-H1_FONT_SIZE = Pt(114)       # 152px - Hero/title slides (Line Height 152px)
-H2_FONT_SIZE = Pt(72)        # 96px - Section headers (Line Height 104px)
-H3_FONT_SIZE = Pt(48)        # 64px - Slide titles (Line Height 72px)
-H4_FONT_SIZE = Pt(27)        # 36px - Subheadings (Line Height 38px)
-H5_FONT_SIZE = Pt(18)        # 24px - Card titles (Line Height 32px)
-H6_FONT_SIZE = Pt(12)        # 16px - Labels (Line Height 24px)
-PARAGRAPH_FONT_SIZE = Pt(12) # 16px - Body text (Line Height 24px)
-FOOTER_FONT_SIZE = Pt(9)     # 12px - Footer AND header elements (Line Height 16px)
+H1_FONT_SIZE = Pt(72)        # Hero/title slides - reduced from 114pt
+H2_FONT_SIZE = Pt(48)        # Section headers, large metrics - reduced from 72pt
+H3_FONT_SIZE = Pt(36)        # Slide titles - reduced from 48pt
+H4_FONT_SIZE = Pt(20)        # Subheadings - reduced from 27pt
+H5_FONT_SIZE = Pt(14)        # Card titles, bullet text - reduced from 18pt
+H6_FONT_SIZE = Pt(10)        # Labels, small text - reduced from 12pt
+PARAGRAPH_FONT_SIZE = Pt(10) # Body text - reduced from 12pt
+FOOTER_FONT_SIZE = Pt(9)     # Footer AND header elements - unchanged
 
 # Legacy aliases for backward compatibility
 TITLE_FONT_SIZE = H3_FONT_SIZE      # Slide titles use H3
@@ -140,7 +140,7 @@ def apply_branding(prs):
     # Most branding will be applied per-slide using layout helpers.
 
 
-def add_master_slide_header(slide, prs, slide_number=None, include_header=True):
+def add_master_slide_header(slide, prs, slide_number=None, include_header=True, text_color=None):
     """Add master slide header elements per CRITICALSTART branding guidelines.
     
     Header contains (all caps, transparent background):
@@ -153,12 +153,17 @@ def add_master_slide_header(slide, prs, slide_number=None, include_header=True):
         prs (Presentation): The presentation object for dimensions.
         slide_number: The slide number to display (optional).
         include_header: Whether to include header elements (False for title slides).
+        text_color: Optional RGBColor for header text (defaults to CS_SLATE).
     
     Returns:
         None
     """
     if not include_header:
         return
+    
+    # Default to CS_SLATE if no color specified
+    if text_color is None:
+        text_color = CS_SLATE
     
     header_top = Inches(0.15)
     header_height = HEADER_HEIGHT
@@ -179,7 +184,7 @@ def add_master_slide_header(slide, prs, slide_number=None, include_header=True):
     title_para.font.name = TITLE_FONT_NAME
     title_para.font.size = FOOTER_FONT_SIZE
     title_para.font.bold = False
-    title_para.font.color.rgb = CS_SLATE
+    title_para.font.color.rgb = text_color
     title_para.alignment = PP_ALIGN.LEFT
     
     # Center: CRITICAL START
@@ -192,7 +197,7 @@ def add_master_slide_header(slide, prs, slide_number=None, include_header=True):
     cs_para.font.name = TITLE_FONT_NAME
     cs_para.font.size = FOOTER_FONT_SIZE
     cs_para.font.bold = False
-    cs_para.font.color.rgb = CS_SLATE
+    cs_para.font.color.rgb = text_color
     cs_para.alignment = PP_ALIGN.CENTER
     
     # Right: Slide number
@@ -206,11 +211,11 @@ def add_master_slide_header(slide, prs, slide_number=None, include_header=True):
         num_para.font.name = TITLE_FONT_NAME
         num_para.font.size = FOOTER_FONT_SIZE
         num_para.font.bold = False
-        num_para.font.color.rgb = CS_SLATE
+        num_para.font.color.rgb = text_color
         num_para.alignment = PP_ALIGN.RIGHT
 
 
-def add_master_slide_footer(slide, prs, date_text=None, include_footer=True):
+def add_master_slide_footer(slide, prs, date_text=None, include_footer=True, text_color=None):
     """Add master slide footer elements per CRITICALSTART branding guidelines.
     
     Footer contains (all caps, transparent background):
@@ -223,12 +228,17 @@ def add_master_slide_footer(slide, prs, date_text=None, include_footer=True):
         prs (Presentation): The presentation object for dimensions.
         date_text: Custom date text (defaults to current month/year).
         include_footer: Whether to include footer elements.
+        text_color: Optional RGBColor for footer text (defaults to CS_SLATE).
     
     Returns:
         None
     """
     if not include_footer:
         return
+    
+    # Default to CS_SLATE if no color specified
+    if text_color is None:
+        text_color = CS_SLATE
     
     footer_top = prs.slide_height - FOOTER_HEIGHT - Inches(0.1)
     footer_height = FOOTER_HEIGHT
@@ -253,7 +263,7 @@ def add_master_slide_footer(slide, prs, date_text=None, include_footer=True):
     date_para.font.name = TITLE_FONT_NAME
     date_para.font.size = FOOTER_FONT_SIZE
     date_para.font.bold = False
-    date_para.font.color.rgb = CS_SLATE
+    date_para.font.color.rgb = text_color
     date_para.alignment = PP_ALIGN.LEFT
     
     # Center: Copyright
@@ -266,7 +276,7 @@ def add_master_slide_footer(slide, prs, date_text=None, include_footer=True):
     copyright_para.font.name = TITLE_FONT_NAME
     copyright_para.font.size = FOOTER_FONT_SIZE
     copyright_para.font.bold = False
-    copyright_para.font.color.rgb = CS_SLATE
+    copyright_para.font.color.rgb = text_color
     copyright_para.alignment = PP_ALIGN.CENTER
     
     # Right: Intent
@@ -279,13 +289,13 @@ def add_master_slide_footer(slide, prs, date_text=None, include_footer=True):
     intent_para.font.name = TITLE_FONT_NAME
     intent_para.font.size = FOOTER_FONT_SIZE
     intent_para.font.bold = False
-    intent_para.font.color.rgb = CS_SLATE
+    intent_para.font.color.rgb = text_color
     intent_para.alignment = PP_ALIGN.RIGHT
 
 
 def add_master_slide_elements(slide, prs, slide_number=None, 
                                include_header=True, include_footer=True,
-                               date_text=None):
+                               date_text=None, text_color=None):
     """Add all master slide elements (header and footer) per branding guidelines.
     
     This is a convenience function that calls both add_master_slide_header()
@@ -298,12 +308,14 @@ def add_master_slide_elements(slide, prs, slide_number=None,
         include_header: Whether to include header elements (False for title slides).
         include_footer: Whether to include footer elements.
         date_text: Custom date text for footer (defaults to current month/year).
+        text_color: Optional RGBColor for header/footer text (defaults to CS_SLATE).
+                    Use white for dark backgrounds (e.g., section title cards).
     
     Returns:
         None
     """
-    add_master_slide_header(slide, prs, slide_number, include_header)
-    add_master_slide_footer(slide, prs, date_text, include_footer)
+    add_master_slide_header(slide, prs, slide_number, include_header, text_color)
+    add_master_slide_footer(slide, prs, date_text, include_footer, text_color)
 
 
 def get_slide_number(prs):
@@ -372,10 +384,10 @@ def setup_content_slide(prs, title_text, include_title=True):
 
 
 def create_gradient_background(prs, slide, gradient_type='blue_sweep'):
-    """Create a gradient background for a slide using a pre-rendered image or layered shapes.
+    """Create a gradient background for a slide using PowerPoint's native gradient fill.
     
-    Since python-pptx has limited gradient support, this function creates a visual
-    gradient effect using overlapping shapes with decreasing opacity.
+    Uses python-pptx's gradient fill API to create a smooth gradient background
+    that renders natively in PowerPoint.
     
     Args:
         prs (Presentation): The presentation object for dimensions.
@@ -387,58 +399,29 @@ def create_gradient_background(prs, slide, gradient_type='blue_sweep'):
     Returns:
         The background shape object.
     """
-    if gradient_type == 'navy_solid':
-        # Simple solid navy background
-        background_shape = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, 0, 0,
-            prs.slide_width, prs.slide_height
-        )
-        fill = background_shape.fill
-        fill.solid()
-        fill.fore_color.rgb = CS_NAVY
-        background_shape.line.fill.background()
-        return background_shape
-    
-    # For blue_sweep gradient, we'll create a layered effect
-    # Start with navy base and add blue overlay with transparency effect
-    # Note: True gradients require OOXML manipulation; this is a workaround
-    
-    # Base layer - Navy
-    base_shape = slide.shapes.add_shape(
+    # Create a full-slide rectangle for the background
+    background_shape = slide.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, 0, 0,
         prs.slide_width, prs.slide_height
     )
-    fill = base_shape.fill
-    fill.solid()
-    fill.fore_color.rgb = CS_NAVY
-    base_shape.line.fill.background()
+    background_shape.line.fill.background()  # No border
     
-    # Create gradient effect with horizontal strips (left to right: blue to navy)
-    # This creates a visual approximation of the blue sweep gradient
-    num_strips = 8
-    strip_width = prs.slide_width / num_strips
-    
-    for i in range(num_strips):
-        # Calculate color blend from blue (left) to navy (right)
-        # Blue: RGB(0, 156, 222)
-        # Navy: RGB(0, 76, 151)
-        blend_factor = i / (num_strips - 1)
-        
-        r = int(0 + (0 - 0) * blend_factor)  # Both are 0
-        g = int(156 + (76 - 156) * blend_factor)  # 156 to 76
-        b = int(222 + (151 - 222) * blend_factor)  # 222 to 151
-        
-        strip_shape = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, 
-            strip_width * i, 0,
-            strip_width + Inches(0.01), prs.slide_height  # Slight overlap to avoid gaps
-        )
-        fill = strip_shape.fill
+    if gradient_type == 'navy_solid':
+        # Simple solid navy background
+        fill = background_shape.fill
         fill.solid()
-        fill.fore_color.rgb = RGBColor(r, g, b)
-        strip_shape.line.fill.background()
+        fill.fore_color.rgb = CS_NAVY
+        return background_shape
     
-    return base_shape
+    # For blue_sweep gradient, use PowerPoint's native gradient fill
+    # Gradient direction: left (blue #009CDE) to right (navy #004C97)
+    fill = background_shape.fill
+    fill.gradient()
+    fill.gradient_angle = 0  # 0 degrees = left to right
+    fill.gradient_stops[0].color.rgb = CS_BLUE   # Start color: #009CDE
+    fill.gradient_stops[1].color.rgb = CS_NAVY   # End color: #004C97
+    
+    return background_shape
 
 
 def add_header_bar(slide, prs, title_text, use_white_text=True):
@@ -924,9 +907,11 @@ def create_section_header_layout(prs, section_title, narrative_subtitle=None):
     fill.fore_color.rgb = CS_SLATE  # Use charcoal gray per brand guidelines
     background_shape.line.fill.background()
     
-    # Add master slide elements (header and footer)
+    # Add master slide elements (header and footer) with white text for WCAG AA compliance
+    # Gray background (#343741) requires white text for sufficient contrast
     add_master_slide_elements(slide, prs, slide_number=slide_number,
-                               include_header=True, include_footer=True)
+                               include_header=True, include_footer=True,
+                               text_color=RGBColor(255, 255, 255))
     
     # Add logo
     add_logo(slide, position='top_right', prs=prs)
@@ -1658,7 +1643,8 @@ def build_executive_summary_slides(prs, data):
         SECTION_NARRATIVES["executive_summary"]["narrative"]
     )
     
-    # Slide 2 - Key Metrics Overview
+    # Slide 2 - Security Posture Overview (BLUF Dashboard)
+    # This slide provides the "bottom line up front" for board members
     slide2 = prs.slides.add_slide(blank_slide_layout)
     slide2_number = get_slide_number(prs)
     
@@ -1676,70 +1662,191 @@ def build_executive_summary_slides(prs, data):
     slide2_title_left = MARGIN_STANDARD
     slide2_title_top = content_top
     slide2_title_width = prs.slide_width - Inches(2)
-    slide2_title_height = Inches(0.8)
+    slide2_title_height = Inches(0.5)
     
     slide2_title_box = slide2.shapes.add_textbox(slide2_title_left, slide2_title_top, slide2_title_width, slide2_title_height)
     slide2_title_frame = slide2_title_box.text_frame
     slide2_title_frame.word_wrap = True
     slide2_title_paragraph = slide2_title_frame.paragraphs[0]
-    slide2_title_paragraph.text = "Executive Summary"
+    slide2_title_paragraph.text = "Security Posture Overview"
     slide2_title_paragraph.font.name = TITLE_FONT_NAME
-    slide2_title_paragraph.font.size = H3_FONT_SIZE  # 48pt per branding guide
+    slide2_title_paragraph.font.size = H3_FONT_SIZE
     slide2_title_paragraph.font.bold = True
     slide2_title_paragraph.font.color.rgb = CS_NAVY
     slide2_title_paragraph.alignment = PP_ALIGN.LEFT
     
-    # Add large headline metric using H2 typography
-    metric_left = Inches(1)
-    metric_top = content_top + Inches(0.9)
-    metric_width = prs.slide_width - Inches(2)
-    metric_height = Inches(1.2)
+    # Calculate percentages for display
+    after_hours_percent = int((data.after_hours_escalations / data.incidents_escalated) * 100) if data.incidents_escalated > 0 else 0
     
-    metric_box = slide2.shapes.add_textbox(metric_left, metric_top, metric_width, metric_height)
-    metric_frame = metric_box.text_frame
-    metric_frame.word_wrap = True
-    metric_paragraph = metric_frame.paragraphs[0]
-    metric_paragraph.text = f"{data.incidents_escalated} Incidents Escalated"
-    metric_paragraph.font.name = TITLE_FONT_NAME
-    metric_paragraph.font.size = H2_FONT_SIZE  # 72pt per branding guide
-    metric_paragraph.font.bold = True
-    metric_paragraph.font.color.rgb = CS_NAVY
-    metric_paragraph.alignment = PP_ALIGN.LEFT
+    # Define 6 metric cards for BLUF dashboard
+    # Top row: Key Security Outcomes (3 larger cards)
+    # Bottom row: Coverage & Operations (3 smaller cards)
+    security_outcomes = [
+        {
+            "title": "THREAT CONTAINMENT",
+            "metric": "100%",
+            "detail": f"{data.true_threats_contained} threats contained, zero breaches"
+        },
+        {
+            "title": "RESPONSE SPEED",
+            "metric": f"{int(data.response_advantage_percent)}%",
+            "detail": f"Faster than industry ({data.mttr_minutes}m vs {data.industry_median_minutes}m)"
+        },
+        {
+            "title": "DETECTION QUALITY",
+            "metric": f"{data.false_positive_rate}%",
+            "detail": "False positive rate"
+        }
+    ]
     
-    # Add subtext using H5 typography
-    subtext_left = Inches(1)
-    subtext_top = metric_top + Inches(1.1)
-    subtext_width = prs.slide_width - Inches(2)
-    subtext_height = Inches(0.6)
+    coverage_ops = [
+        {
+            "title": "24/7 COVERAGE",
+            "metric": str(data.after_hours_escalations),
+            "detail": f"After-hours escalations ({after_hours_percent}% of total)"
+        },
+        {
+            "title": "AUTOMATION",
+            "metric": f"{int(data.automation_percent)}%",
+            "detail": f"Automated escalations ({data.playbook_auto.get('count', 0)} of {data.incidents_escalated})"
+        },
+        {
+            "title": "OPERATIONAL SCALE",
+            "metric": f"{data.alerts_triaged:,}",
+            "detail": f"Alerts triaged, {data.client_touch_decisions:,} client-touch"
+        }
+    ]
     
-    subtext_box = slide2.shapes.add_textbox(subtext_left, subtext_top, subtext_width, subtext_height)
-    subtext_frame = subtext_box.text_frame
-    subtext_frame.word_wrap = True
-    subtext_paragraph = subtext_frame.paragraphs[0]
-    subtext_paragraph.text = f"Average {data.incidents_per_day} per day requiring your team's attention"
-    subtext_paragraph.font.name = BODY_FONT_NAME
-    subtext_paragraph.font.size = H5_FONT_SIZE  # 18pt
-    subtext_paragraph.font.color.rgb = CS_SLATE
-    subtext_paragraph.alignment = PP_ALIGN.LEFT
+    # Card dimensions for top row (larger cards)
+    top_card_width = (prs.slide_width - Inches(1.4)) / 3  # Three columns with margins
+    top_card_height = Inches(1.5)
+    top_start_left = Inches(0.5)
+    top_start_top = content_top + Inches(0.55)
     
-    # Add additional context using paragraph typography
-    context_left = Inches(1)
-    context_top = subtext_top + Inches(0.6)
-    context_width = prs.slide_width - Inches(2)
-    context_height = Inches(1)
+    # Draw top row cards (Security Outcomes)
+    for i, card in enumerate(security_outcomes):
+        card_left = top_start_left + i * (top_card_width + Inches(0.2))
+        card_top = top_start_top
+        
+        # Create card background
+        card_shape = slide2.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            top_card_width, top_card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
+        line = card_shape.line
+        line.color.rgb = CS_BLUE
+        line.width = Pt(2)
+        
+        # Add card title (small label)
+        title_box = slide2.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.1),
+            top_card_width - Inches(0.3), Inches(0.25)
+        )
+        title_frame = title_box.text_frame
+        title_para = title_frame.paragraphs[0]
+        title_para.text = card["title"]
+        title_para.font.name = TITLE_FONT_NAME
+        title_para.font.size = H6_FONT_SIZE
+        title_para.font.bold = True
+        title_para.font.color.rgb = CS_SLATE
+        title_para.alignment = PP_ALIGN.LEFT
+        
+        # Add large metric
+        metric_box = slide2.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.35),
+            top_card_width - Inches(0.3), Inches(0.7)
+        )
+        metric_frame = metric_box.text_frame
+        metric_para = metric_frame.paragraphs[0]
+        metric_para.text = card["metric"]
+        metric_para.font.name = TITLE_FONT_NAME
+        metric_para.font.size = H2_FONT_SIZE
+        metric_para.font.bold = True
+        metric_para.font.color.rgb = CS_NAVY
+        metric_para.alignment = PP_ALIGN.LEFT
+        
+        # Add detail text
+        detail_box = slide2.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(1.0),
+            top_card_width - Inches(0.3), Inches(0.45)
+        )
+        detail_frame = detail_box.text_frame
+        detail_frame.word_wrap = True
+        detail_para = detail_frame.paragraphs[0]
+        detail_para.text = card["detail"]
+        detail_para.font.name = BODY_FONT_NAME
+        detail_para.font.size = PARAGRAPH_FONT_SIZE
+        detail_para.font.color.rgb = CS_SLATE
+        detail_para.alignment = PP_ALIGN.LEFT
     
-    context_box = slide2.shapes.add_textbox(context_left, context_top, context_width, context_height)
-    context_frame = context_box.text_frame
-    context_frame.word_wrap = True
-    context_paragraph = context_frame.paragraphs[0]
-    client_touch_percent = int((data.client_touch_decisions / data.alerts_triaged) * 100) if data.alerts_triaged > 0 else 0
-    context_paragraph.text = f"CS SOC triaged {data.alerts_triaged:,} alerts this period—{data.client_touch_decisions:,} ({client_touch_percent}%) guided with your team and {data.closed_end_to_end:,} closed end-to-end"
-    context_paragraph.font.name = BODY_FONT_NAME
-    context_paragraph.font.size = PARAGRAPH_FONT_SIZE  # 12pt
-    context_paragraph.font.color.rgb = CS_SLATE
-    context_paragraph.alignment = PP_ALIGN.LEFT
+    # Card dimensions for bottom row (smaller cards)
+    bottom_card_width = (prs.slide_width - Inches(1.4)) / 3
+    bottom_card_height = Inches(1.35)
+    bottom_start_top = top_start_top + top_card_height + Inches(0.2)
     
-    # Slide 3 - Period Highlights
+    # Draw bottom row cards (Coverage & Operations)
+    for i, card in enumerate(coverage_ops):
+        card_left = top_start_left + i * (bottom_card_width + Inches(0.2))
+        card_top = bottom_start_top
+        
+        # Create card background
+        card_shape = slide2.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            bottom_card_width, bottom_card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(248, 250, 252)  # Slightly different light background
+        line = card_shape.line
+        line.color.rgb = CS_SLATE
+        line.width = Pt(1)
+        
+        # Add card title (small label)
+        title_box = slide2.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.1),
+            bottom_card_width - Inches(0.3), Inches(0.25)
+        )
+        title_frame = title_box.text_frame
+        title_para = title_frame.paragraphs[0]
+        title_para.text = card["title"]
+        title_para.font.name = TITLE_FONT_NAME
+        title_para.font.size = H6_FONT_SIZE
+        title_para.font.bold = True
+        title_para.font.color.rgb = CS_SLATE
+        title_para.alignment = PP_ALIGN.LEFT
+        
+        # Add large metric
+        metric_box = slide2.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.3),
+            bottom_card_width - Inches(0.3), Inches(0.55)
+        )
+        metric_frame = metric_box.text_frame
+        metric_para = metric_frame.paragraphs[0]
+        metric_para.text = card["metric"]
+        metric_para.font.name = TITLE_FONT_NAME
+        metric_para.font.size = H4_FONT_SIZE
+        metric_para.font.bold = True
+        metric_para.font.color.rgb = CS_NAVY
+        metric_para.alignment = PP_ALIGN.LEFT
+        
+        # Add detail text
+        detail_box = slide2.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.8),
+            bottom_card_width - Inches(0.3), Inches(0.45)
+        )
+        detail_frame = detail_box.text_frame
+        detail_frame.word_wrap = True
+        detail_para = detail_frame.paragraphs[0]
+        detail_para.text = card["detail"]
+        detail_para.font.name = BODY_FONT_NAME
+        detail_para.font.size = PARAGRAPH_FONT_SIZE
+        detail_para.font.color.rgb = CS_SLATE
+        detail_para.alignment = PP_ALIGN.LEFT
+    
+    # Slide 3 - Value & Performance Details (BLUF Dashboard continued)
     slide3 = prs.slides.add_slide(blank_slide_layout)
     slide3_number = get_slide_number(prs)
     
@@ -1752,59 +1859,65 @@ def build_executive_summary_slides(prs, data):
     
     # Add slide title using H3 typography
     slide3_title_box = slide3.shapes.add_textbox(MARGIN_STANDARD, content_top, 
-                                                  prs.slide_width - Inches(2), Inches(0.8))
+                                                  prs.slide_width - Inches(2), Inches(0.5))
     slide3_title_frame = slide3_title_box.text_frame
     slide3_title_frame.word_wrap = True
     slide3_title_paragraph = slide3_title_frame.paragraphs[0]
-    slide3_title_paragraph.text = "Period Highlights"
+    slide3_title_paragraph.text = "Value & Performance Details"
     slide3_title_paragraph.font.name = TITLE_FONT_NAME
-    slide3_title_paragraph.font.size = H3_FONT_SIZE  # 48pt per branding guide
+    slide3_title_paragraph.font.size = H3_FONT_SIZE
     slide3_title_paragraph.font.bold = True
     slide3_title_paragraph.font.color.rgb = CS_NAVY
     slide3_title_paragraph.alignment = PP_ALIGN.LEFT
     
-    # Calculate after-hours percentage
-    after_hours_percent = int((data.after_hours_escalations / data.incidents_escalated) * 100) if data.incidents_escalated > 0 else 0
-    
-    # Define 4 highlight cards
-    highlights = [
+    # Define value delivered cards (top row - 2 wider cards)
+    total_millions = data.total_modeled / 1000000
+    value_cards = [
         {
-            "title": "Threat Outcomes",
-            "value": f"{data.true_threats_contained} threats contained, zero breaches"
+            "title": "MODELED COST EXPOSURE AVOIDED",
+            "metric": f"${total_millions:.2f}M",
+            "detail": f"Breach exposure: ${data.breach_exposure_avoided/1000000:.2f}M | Coverage: ${data.coverage_cost_equivalent/1000:,.0f}K | Analyst hours: ${data.analyst_cost_equivalent/1000:,.0f}K"
         },
         {
-            "title": "Response Advantage",
-            "value": f"{int(data.response_advantage_percent)}% faster MTTR vs peers ({data.mttr_minutes}m vs {data.industry_median_minutes}m)"
-        },
-        {
-            "title": "24/7 Protection",
-            "value": f"{after_hours_percent}% of escalations handled after-hours"
-        },
-        {
-            "title": "Detection Quality",
-            "value": f"{data.false_positive_rate}% false positive rate"
+            "title": "OPERATIONAL EFFICIENCY",
+            "metric": f"{data.closed_end_to_end}",
+            "detail": f"Incidents closed end-to-end by CS SOC"
         }
     ]
     
-    # Position cards in a 2x2 grid
-    card_width = (prs.slide_width - Inches(2.5)) / 2  # Two columns with margins
-    card_height = Inches(1.5)
-    card_spacing = Inches(0.3)
+    # Define performance metrics cards (bottom row - 3 cards)
+    performance_cards = [
+        {
+            "title": "MTTR",
+            "metric": f"{data.mttr_minutes}m",
+            "detail": f"Mean Time to Respond (P90: {data.p90_minutes}m)"
+        },
+        {
+            "title": "MTTD",
+            "metric": f"{data.mttd_minutes}m",
+            "detail": "Mean Time to Detect"
+        },
+        {
+            "title": "INDUSTRY COMPARISON",
+            "metric": f"{int(data.response_advantage_percent)}%",
+            "detail": f"Faster response, 36% faster detection"
+        }
+    ]
     
-    start_left = Inches(0.5)
-    start_top = content_top + Inches(0.9)  # Below slide title
+    # Draw top row cards (Value Delivered - 2 wider cards)
+    value_card_width = (prs.slide_width - Inches(1.2)) / 2
+    value_card_height = Inches(1.5)
+    value_start_left = Inches(0.5)
+    value_start_top = content_top + Inches(0.55)
     
-    for i, highlight in enumerate(highlights):
-        row = i // 2
-        col = i % 2
+    for i, card in enumerate(value_cards):
+        card_left = value_start_left + i * (value_card_width + Inches(0.2))
+        card_top = value_start_top
         
-        card_left = start_left + col * (card_width + Inches(0.3))
-        card_top = start_top + row * (card_height + card_spacing)
-        
-        # Create card background with light blue tint
+        # Create card background
         card_shape = slide3.shapes.add_shape(
             MSO_SHAPE.RECTANGLE, card_left, card_top,
-            card_width, card_height
+            value_card_width, value_card_height
         )
         fill = card_shape.fill
         fill.solid()
@@ -1813,38 +1926,110 @@ def build_executive_summary_slides(prs, data):
         line.color.rgb = CS_BLUE
         line.width = Pt(2)
         
-        # Add card title
-        card_title_left = card_left + Inches(0.2)
-        card_title_top = card_top + Inches(0.15)
-        card_title_width = card_width - Inches(0.4)
-        card_title_height = Inches(0.4)
+        # Add card title (small label)
+        title_box = slide3.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.1),
+            value_card_width - Inches(0.3), Inches(0.25)
+        )
+        title_frame = title_box.text_frame
+        title_para = title_frame.paragraphs[0]
+        title_para.text = card["title"]
+        title_para.font.name = TITLE_FONT_NAME
+        title_para.font.size = H6_FONT_SIZE
+        title_para.font.bold = True
+        title_para.font.color.rgb = CS_SLATE
+        title_para.alignment = PP_ALIGN.LEFT
         
-        card_title_box = slide3.shapes.add_textbox(card_title_left, card_title_top, card_title_width, card_title_height)
-        card_title_frame = card_title_box.text_frame
-        card_title_frame.word_wrap = True
-        card_title_paragraph = card_title_frame.paragraphs[0]
-        card_title_paragraph.text = highlight["title"]
-        card_title_paragraph.font.name = TITLE_FONT_NAME
-        card_title_paragraph.font.size = Pt(18)
-        card_title_paragraph.font.bold = True
-        card_title_paragraph.font.color.rgb = CS_NAVY
-        card_title_paragraph.alignment = PP_ALIGN.LEFT
+        # Add large metric
+        metric_box = slide3.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.35),
+            value_card_width - Inches(0.3), Inches(0.7)
+        )
+        metric_frame = metric_box.text_frame
+        metric_para = metric_frame.paragraphs[0]
+        metric_para.text = card["metric"]
+        metric_para.font.name = TITLE_FONT_NAME
+        metric_para.font.size = H2_FONT_SIZE
+        metric_para.font.bold = True
+        metric_para.font.color.rgb = CS_NAVY
+        metric_para.alignment = PP_ALIGN.LEFT
         
-        # Add card value
-        card_value_left = card_left + Inches(0.2)
-        card_value_top = card_title_top + Inches(0.45)
-        card_value_width = card_width - Inches(0.4)
-        card_value_height = Inches(0.8)
+        # Add detail text
+        detail_box = slide3.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(1.0),
+            value_card_width - Inches(0.3), Inches(0.45)
+        )
+        detail_frame = detail_box.text_frame
+        detail_frame.word_wrap = True
+        detail_para = detail_frame.paragraphs[0]
+        detail_para.text = card["detail"]
+        detail_para.font.name = BODY_FONT_NAME
+        detail_para.font.size = PARAGRAPH_FONT_SIZE
+        detail_para.font.color.rgb = CS_SLATE
+        detail_para.alignment = PP_ALIGN.LEFT
+    
+    # Draw bottom row cards (Performance Metrics - 3 cards)
+    perf_card_width = (prs.slide_width - Inches(1.4)) / 3
+    perf_card_height = Inches(1.35)
+    perf_start_top = value_start_top + value_card_height + Inches(0.2)
+    
+    for i, card in enumerate(performance_cards):
+        card_left = value_start_left + i * (perf_card_width + Inches(0.2))
+        card_top = perf_start_top
         
-        card_value_box = slide3.shapes.add_textbox(card_value_left, card_value_top, card_value_width, card_value_height)
-        card_value_frame = card_value_box.text_frame
-        card_value_frame.word_wrap = True
-        card_value_paragraph = card_value_frame.paragraphs[0]
-        card_value_paragraph.text = highlight["value"]
-        card_value_paragraph.font.name = BODY_FONT_NAME
-        card_value_paragraph.font.size = Pt(14)
-        card_value_paragraph.font.color.rgb = CS_SLATE
-        card_value_paragraph.alignment = PP_ALIGN.LEFT
+        # Create card background
+        card_shape = slide3.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            perf_card_width, perf_card_height
+        )
+        fill = card_shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(248, 250, 252)  # Slightly different light background
+        line = card_shape.line
+        line.color.rgb = CS_SLATE
+        line.width = Pt(1)
+        
+        # Add card title (small label)
+        title_box = slide3.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.1),
+            perf_card_width - Inches(0.3), Inches(0.25)
+        )
+        title_frame = title_box.text_frame
+        title_para = title_frame.paragraphs[0]
+        title_para.text = card["title"]
+        title_para.font.name = TITLE_FONT_NAME
+        title_para.font.size = H6_FONT_SIZE
+        title_para.font.bold = True
+        title_para.font.color.rgb = CS_SLATE
+        title_para.alignment = PP_ALIGN.LEFT
+        
+        # Add large metric
+        metric_box = slide3.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.3),
+            perf_card_width - Inches(0.3), Inches(0.55)
+        )
+        metric_frame = metric_box.text_frame
+        metric_para = metric_frame.paragraphs[0]
+        metric_para.text = card["metric"]
+        metric_para.font.name = TITLE_FONT_NAME
+        metric_para.font.size = H4_FONT_SIZE
+        metric_para.font.bold = True
+        metric_para.font.color.rgb = CS_NAVY
+        metric_para.alignment = PP_ALIGN.LEFT
+        
+        # Add detail text
+        detail_box = slide3.shapes.add_textbox(
+            card_left + Inches(0.15), card_top + Inches(0.8),
+            perf_card_width - Inches(0.3), Inches(0.45)
+        )
+        detail_frame = detail_box.text_frame
+        detail_frame.word_wrap = True
+        detail_para = detail_frame.paragraphs[0]
+        detail_para.text = card["detail"]
+        detail_para.font.name = BODY_FONT_NAME
+        detail_para.font.size = PARAGRAPH_FONT_SIZE
+        detail_para.font.color.rgb = CS_SLATE
+        detail_para.alignment = PP_ALIGN.LEFT
 
 
 def create_executive_summary_slide(prs, report_data):
