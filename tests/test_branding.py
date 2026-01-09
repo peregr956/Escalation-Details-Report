@@ -1,13 +1,19 @@
 """Test script to verify branding functions work correctly."""
-from generate_presentation import (
+import sys
+sys.path.insert(0, '..')
+
+from helpers import (
     create_presentation,
     apply_branding,
     add_logo,
-    get_brand_colors,
+)
+from constants import get_brand_colors
+from generate_presentation import (
     create_title_slide_layout,
     create_section_header_layout,
     create_content_slide_layout
 )
+
 
 def test_branding():
     """Test all branding functions."""
@@ -51,12 +57,11 @@ def test_branding():
     print("✓ Content slide created")
     
     # Save test presentation
-    output_path = "output/test_branding.pptx"
+    output_path = "../output/test_branding.pptx"
     prs.save(output_path)
     print(f"✓ Test presentation saved to {output_path}")
     print("\nAll tests passed! ✓")
 
+
 if __name__ == "__main__":
     test_branding()
-
-

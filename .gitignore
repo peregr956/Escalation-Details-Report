@@ -32,6 +32,7 @@ env/
 *.swp
 *.swo
 *~
+.cursor/
 
 # OS
 .DS_Store
@@ -42,5 +43,15 @@ temp_charts/
 *.tmp
 *.temp
 
-# Keep output directory but don't track generated files by default
-# (specific output files can be force-added if needed)
+# Generated output files
+# PowerPoint presentations are generated artifacts - do not track
+output/*.pptx
+
+# Temporary chart images (generated during presentation build)
+*.png.tmp
+
+# Test output
+tests/__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/

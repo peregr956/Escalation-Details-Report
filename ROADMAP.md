@@ -4,7 +4,7 @@ This document outlines the phased improvement plan for the Escalation to Client 
 
 ## Executive Summary
 
-The PowerPoint generation system currently produces functional slides but has gaps in content coverage, audience optimization, and aesthetic alignment with brand guidelines. This roadmap defines a structured approach to address these gaps across five phases.
+The PowerPoint generation system produces branded executive-ready slides with a clear narrative arc. This roadmap defines remaining improvements across content, audience optimization, and advanced features.
 
 **Target Audience:** C-suite executives, CISOs, and security leadership
 
@@ -14,12 +14,31 @@ The PowerPoint generation system currently produces functional slides but has ga
 3. Align visuals with Critical Start brand guidelines
 4. Improve code maintainability and documentation
 
+**Last Updated:** January 2026
+
+---
+
+## Phase 0: Repository Cleanup (COMPLETED)
+
+**Status:** Completed January 2026
+
+### Completed Items
+- [x] Extracted constants to `constants.py`
+- [x] Extracted helper functions to `helpers.py`
+- [x] Reorganized repository structure (examples/, tests/, scripts/, data/)
+- [x] Updated .gitignore to exclude generated files
+- [x] Created CHANGELOG.md
+- [x] Created requirements-dev.txt
+- [x] Created docs/DEVELOPER_GUIDE.md
+- [x] Updated README.md with new structure
+
 ---
 
 ## Phase 1: Content Completeness
 
 **Priority:** High  
-**Timeline:** Immediate (Next Sprint)  
+**Timeline:** Next Sprint  
+**Status:** In Progress  
 **Goal:** Ensure all relevant content from HTML report is represented in PowerPoint
 
 ### 1.1 Add Missing Content Slides
@@ -384,15 +403,16 @@ def validate_report_data(data: ReportData) -> List[str]:
 
 ---
 
-## Stakeholder Sign-off
+## AI Opportunities
 
-| Phase | Stakeholder | Approval |
-|-------|-------------|----------|
-| Phase 1 | Product Owner | Pending |
-| Phase 2 | Customer Success | Pending |
-| Phase 3 | Brand/Marketing | Pending |
-| Phase 4 | Engineering | Pending |
-| Phase 5 | Executive Sponsor | Pending |
+Future enhancements that could leverage AI capabilities:
+
+| Opportunity | Description | Priority |
+|-------------|-------------|----------|
+| Auto-generate narratives | Generate "Key Insights" and "Looking Ahead" narratives from trend data | Medium |
+| Anomaly detection | Surface net-new recommendations beyond static thresholds from severity flows and MITRE data | Low |
+| Q&A helper | Build question-answering interface over Report Extract.xlsx for bespoke insights | Low |
+| Dynamic content | Auto-summarize dense slides based on content importance | Low |
 
 ---
 
@@ -400,6 +420,6 @@ def validate_report_data(data: ReportData) -> List[str]:
 
 | Date | Version | Author | Summary |
 |------|---------|--------|---------|
+| 2026-01-09 | 1.1 | AI (Claude) | Added Phase 0 (Repository Cleanup), AI Opportunities |
 | 2025-12-22 | 1.0 | AI (Claude) | Initial roadmap creation |
-
 
