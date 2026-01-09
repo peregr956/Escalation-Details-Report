@@ -8,40 +8,73 @@ The presentation follows a clear narrative arc designed for C-suite executives a
 
 **Current State → Value Delivered → Performance → Threats → Opportunities**
 
-Gray section title cards with narrative subtitles guide executives through the story, making it easy for CSMs to drive renewal and product expansion conversations.
+The presentation uses **6 section title cards** to guide the narrative and **14 content slides** for a total of **20 slides**.
 
-## Slide Overview
+## Slide Overview (Final 20-Slide Structure)
 
 | # | Type | Section | Title | Primary Content |
 |---|------|---------|-------|-----------------|
 | 1 | Content | Opening | Title Slide | Client name, tier, period, report date |
-| 2 | **Section Card** | Executive Summary | Executive Summary | *"A comprehensive view of your security posture and the value delivered this period"* |
-| 3 | Content | Executive Summary | Key Metrics Overview | Alerts triaged hero metric |
-| 4 | Content | Executive Summary | Period Highlights | Achievement summary |
-| 5 | **Section Card** | Value Delivered | Value Delivered | *"Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention"* |
-| 6 | Content | Value Delivered | Cost Avoidance Hero | $7.55M modeled cost avoided |
-| 7 | Content | Value Delivered | Value Breakdown | Security Ops, Coverage, Threat Prevention |
-| 8 | Content | Value Delivered | Detection Sources | Source breakdown table |
-| 9 | **Section Card** | Protection Achieved | Protection Achieved | *"Measurable outcomes that exceed industry standards and reduce your breach risk"* |
-| 10 | Content | Protection Achieved | Performance Trends | MTTR/MTTD/FP% trend chart |
-| 11 | Content | Protection Achieved | Industry Comparison | Comparison table |
-| 12 | Content | Protection Achieved | Target Metrics | P90, Priority-based MTTR |
-| 13 | **Section Card** | Threat Landscape | Threat Landscape | *"Understanding the threats we're seeing and how we're adapting to protect your organization"* |
-| 14 | Content | Threat Landscape | MITRE Tactics | Stacked bar chart |
-| 15 | Content | Threat Landscape | Severity Alignment | Sankey diagram |
-| 16 | Content | Threat Landscape | Escalation Methods | Auto vs manual breakdown |
-| 17 | Content | Threat Landscape | Additional Context | Reserved |
-| 18 | **Section Card** | Insights | Insights & Continuous Improvement | *"How we're evolving our partnership to advance your security maturity"* |
-| 19 | Content | Insights | Prioritized Improvement Plan | 3 improvement items |
-| 20 | Content | Insights | Operational Insights | Metrics summary |
-| 21 | Content | Additional Content | After-Hours Notifications | After-hours breakdown |
-| 22 | Content | Additional Content | Response Efficiency | Priority-based response |
-| 23 | Content | Additional Content | Collaboration Quality | Participation metrics |
-| 24 | Content | Additional Content | Detection Quality | Quality breakdown |
-| 25 | Content | Additional Content | Security Outcomes | Comprehensive summary |
-| 26 | Content | Additional Content | Key Takeaways | Period summary |
-| 27 | **Section Card** | Forward Direction | Forward Direction | *"Strategic recommendations to strengthen your security posture and maximize partnership value"* |
-| 28 | Content | Forward Direction | Looking Ahead | Next steps, recommendations |
+| 2 | **Section Card** | | Executive Summary | "A comprehensive view of your security posture and the value delivered this period" |
+| 3 | Content | Executive Summary | Executive Dashboard | 6 key metrics in 2×3 grid (threats, response, closed E2E, alerts, after-hours, FP rate) |
+| 4 | **Section Card** | | Value Delivered | "Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention" |
+| 5 | Content | Value | Value Delivered | Hero cost avoidance + 3 breakdown cards (ops, coverage, prevention) |
+| 6 | Content | Value | Security Operations Pipeline | Infographic flow: Inputs → Actions → Outcomes |
+| 7 | **Section Card** | | Protection Achieved | "Measurable outcomes that exceed industry standards and reduce your breach risk" |
+| 8 | Content | Performance | Performance Trends | MTTR/MTTD/FP% trend chart with insight |
+| 9 | Content | Performance | Industry Comparison | Comparison table (Your Performance vs Industry) + insight bar |
+| 10 | Content | Performance | Response & Detection | Dual-panel: Response Efficiency (3 cards) + Detection Quality (2×2 grid) |
+| 11 | **Section Card** | | Threat Landscape | "Understanding the threats we're seeing and how we're adapting to protect your organization" |
+| 12 | Content | Threats | Severity Alignment | Sankey diagram showing vendor → CS severity flows (MARQUEE VISUALIZATION) |
+| 13 | Content | Threats | Threat & Detection Sources | Split: MITRE tactics chart + Detection sources cards |
+| 14 | **Section Card** | | Insights & Continuous Improvement | "How we're evolving our partnership to advance your security maturity" |
+| 15 | Content | Insights | Prioritized Improvements | 3 improvement items with priority badges + insight bar |
+| 16 | Content | Insights | Operational Coverage | Dual-panel: After-Hours hero + Collaboration metrics |
+| 17 | **Section Card** | | Forward Direction | "Strategic recommendations to strengthen your security posture and maximize partnership value" |
+| 18 | Content | Closing | Key Takeaways | 4 executive summary bullets + insight bar |
+| 19 | Content | Closing | Looking Ahead | Next period targets, strategic focus, partnership + insight bar |
+| 20 | Content | Closing | Contact | Thank you + contact information |
+
+---
+
+## Changes from Previous 15-Slide Structure
+
+### Section Cards Restored
+- **6 section title cards** have been restored to guide the narrative flow
+- Section cards are gray background slides with section title and narrative subtitle
+
+### Content Redundancy Removed
+| Metric | Now Appears In | Removed From |
+|--------|---------------|--------------|
+| $7.55M Cost Avoided | Value Delivered (slide 5) only | Executive Dashboard, Key Takeaways |
+| Closed End-to-End | Executive Dashboard | Security Outcomes (now pipeline) |
+
+### Visual Improvements
+| Slide | Change |
+|-------|--------|
+| Security Outcomes | Converted from bullet list to **infographic pipeline flow** (Inputs → Actions → Outcomes) |
+| Executive Dashboard | Added insight bar; replaced Cost Avoided with Closed E2E metric |
+| Industry Comparison | Added insight bar |
+| Prioritized Improvements | Added insight bar |
+| Key Takeaways | Added insight bar; removed exact cost figure |
+| Looking Ahead | Added insight bar |
+
+### Insight Bars Added
+Every content slide now has a "blue bar" insight callout providing the "bottom line up front":
+
+| Slide | Insight Title | Purpose |
+|-------|--------------|---------|
+| Executive Dashboard | "Your Security Posture at a Glance" | Summary of dashboard metrics |
+| Security Operations Pipeline | "The Pipeline in Action" | Raw alerts → zero breaches message |
+| Performance Trends | (existing) | Trend interpretation |
+| Industry Comparison | "Outperforming Industry Benchmarks" | Competitive advantage message |
+| Response & Detection | (existing) | Detection quality insight |
+| Severity Alignment | (existing) | Severity flow interpretation |
+| Threat & Detection Sources | (existing) | Sources insight |
+| Prioritized Improvements | "Focus Areas for Continuous Improvement" | Improvement priorities |
+| Operational Coverage | (existing) | Coverage insight |
+| Key Takeaways | "Bottom Line" | Executive summary |
+| Looking Ahead | "Strategic Path Forward" | Recommendations summary |
 
 ---
 
@@ -69,6 +102,21 @@ Per the CRITICALSTART Slide Branding guidelines, all slides follow a master temp
                  10 × 5.625 inches (16:9)
 ```
 
+### Section Card Layout
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                                                             │
+│                  SECTION TITLE                              │ ← H2 (72pt, Navy)
+│                                                             │
+│    Narrative subtitle describing what this section covers   │ ← Paragraph (18pt, Slate)
+│                                                             │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+           Gray background (#F5F5F5), centered text
+```
+
 ### Header Elements (Transparent Background)
 
 | Position | Content | Typography |
@@ -77,7 +125,7 @@ Per the CRITICALSTART Slide Branding guidelines, all slides follow a master temp
 | Center | "CRITICAL START" | Footer (9pt) |
 | Right | Slide number | Footer (9pt) |
 
-**Note:** Title slide (Slide 1) has NO header—footer only.
+**Note:** Title slide (Slide 1) and Section Cards have NO header.
 
 ### Footer Elements (Transparent Background)
 
@@ -128,50 +176,27 @@ Per the CRITICALSTART Slide Branding guidelines, all slides follow a master temp
 | Critical alerts | CS_RED | #EF3340 | (239, 51, 64) |
 | Warnings/CTAs | CS_ORANGE | #FF6A14 | (255, 106, 20) |
 | Comparisons | CS_VIOLET | #702F8A | (112, 47, 138) |
+| Positive outcomes | CS_GREEN | #28A745 | (40, 167, 69) |
+
+---
+
+## Content Ownership Matrix
+
+This matrix ensures each key metric appears only once (or in carefully controlled contexts):
+
+| Metric | Primary Slide | Notes |
+|--------|--------------|-------|
+| $7.55M Cost Avoided | Value Delivered (slide 5) | Hero metric with breakdown |
+| Threats Contained | Executive Dashboard | Count and rate |
+| Response Advantage % | Executive Dashboard | With MTTR comparison |
+| Alerts Triaged | Pipeline Infographic (slide 6) | Part of INPUTS stage |
+| Closed End-to-End | Executive Dashboard | Replaced Cost Avoided |
+| After-Hours Count | Executive Dashboard + Operational Coverage | Dashboard shows count; Coverage shows breakdown |
+| Industry Comparison | Industry Comparison (slide 9) | Dedicated comparison table |
 
 ---
 
 ## Detailed Slide Specifications
-
-### Section Title Card (Narrative Transition Slides)
-
-Section title cards use a distinctive gray background to visually separate presentation sections and provide narrative context for executives.
-
-**Background:** Charcoal gray (CS_SLATE #343741)
-**Header:** Transparent with title/CRITICAL START/slide#
-**Footer:** Yes (date, copyright, intent)
-
-**Elements:**
-- Logo (top-right, 1.6" × 0.35")
-- Section title: Centered (H2 - 72pt, white, bold)
-- Narrative subtitle: Centered below title (H4 - 27pt, white, regular)
-
-**Layout:**
-```
-┌─────────────────────────────────────────────────────────────┐
-│ ESCALATION REPORT    CRITICAL START              N         │  ← Header
-│                                                   [LOGO]   │
-│                                                             │
-│                    Section Title                            │  ← H2 (72pt)
-│      "Narrative subtitle describing what's next"           │  ← H4 (27pt)
-│                                                             │
-│                                                             │
-│ DECEMBER 2025       ©2025 CRITICAL START           EBR     │  ← Footer
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Narrative Messages:**
-
-| Section | Title | Narrative Subtitle |
-|---------|-------|-------------------|
-| Executive Summary | Executive Summary | A comprehensive view of your security posture and the value delivered this period |
-| Value Delivered | Value Delivered | Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention |
-| Protection Achieved | Protection Achieved | Measurable outcomes that exceed industry standards and reduce your breach risk |
-| Threat Landscape | Threat Landscape | Understanding the threats we're seeing and how we're adapting to protect your organization |
-| Insights | Insights & Continuous Improvement | How we're evolving our partnership to advance your security maturity |
-| Forward Direction | Forward Direction | Strategic recommendations to strengthen your security posture and maximize partnership value |
-
----
 
 ### Slide 1: Title Slide (Special Layout)
 
@@ -186,116 +211,124 @@ Section title cards use a distinctive gray background to visually separate prese
 - Client name (H5 - 18pt)
 - Period: "August 1-31, 2025 (31 days)" (Paragraph - 12pt)
 
-**Layout:**
-```
-┌─────────────────────────────────────────────────────────────┐
-│ [LOGO]                                                      │
-│                                                             │
-│ ESCALATION TO CLIENT                                        │  ← H1 (114pt)
-│ DETAILS REPORT                                              │
-│                                                             │
-│ Signature Tier                                              │  ← H4 (27pt)
-│ Lennar Corporation                                          │  ← H5 (18pt)
-│ August 1-31, 2025 (31 days)                                │  ← Paragraph (12pt)
-│                                                             │
-│ DECEMBER 2025       ©2025 CRITICAL START           EBR     │  ← Footer
-└─────────────────────────────────────────────────────────────┘
-```
+### Slide 3: Executive Dashboard
 
-### Slide 2: Key Metrics Overview
-
-**Header:** Transparent with title/CRITICAL START/slide#
-**Title:** "Executive Summary" (H3 - 48pt, navy)
+**Title:** "Executive Dashboard" (H3 - 48pt, navy)
 
 **Elements:**
-- Hero metric: Total incidents escalated (H2 - 72pt)
-- Subtext: Daily average context (H5 - 18pt)
-- Context: Alert triage summary (Paragraph - 12pt)
+- 2×3 grid of metric cards
+- Top row (blue border): Threats Contained, Response Advantage, **Closed E2E**
+- Bottom row (gray border): Alerts Triaged, After-Hours, False Positive Rate
+- Each card: Title (10pt) + Metric (42pt) + Detail (11pt)
+- **Insight bar at bottom:** "Your Security Posture at a Glance"
 
-### Slide 3: Period Highlights
+### Slide 5: Value Delivered (Hero + Breakdown)
 
-**Header:** Transparent with title/CRITICAL START/slide#
-**Title:** "Period Highlights" (H3 - 48pt, navy)
+**Title:** "Value Delivered" (H3 - 48pt, navy)
 
 **Elements:**
-- 2×2 grid of highlight cards
-- Each card: Title (H5) + value text (Paragraph)
+- Left panel: Hero cost avoidance (~$X.XM, 72pt) with label and subtitle
+- Right panel: 3 stacked breakdown cards (Ops, Coverage, Prevention)
+- Methodology note at bottom
 
-### Content Slides Pattern (Slides 4+)
+### Slide 6: Security Operations Pipeline (NEW Infographic)
 
-All content slides follow this consistent structure:
+**Title:** "Security Operations Pipeline" (H3 - 48pt, navy)
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ ESCALATION REPORT    CRITICAL START              N         │
-│                                                             │
-│ Slide Title (H3)                                  [Logo]   │
-│                                                             │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │                                                         │ │
-│ │              Main Content Area                          │ │
-│ │        (Cards, charts, tables, metrics)                 │ │
-│ │                                                         │ │
-│ └─────────────────────────────────────────────────────────┘ │
-│                                                             │
-│ DECEMBER 2025       ©2025 CRITICAL START           EBR     │
-└─────────────────────────────────────────────────────────────┘
-```
+**Elements:**
+- 3-column infographic flow with chevron arrows
+- INPUTS column (gray): Alerts Received, After-Hours, Coverage
+- ACTIONS column (blue): Escalated, Client-Touch, Closed E2E
+- OUTCOMES column (green): Threats Contained, Containment Rate, Avg Response
+- **Insight bar:** "From raw alerts to zero breaches—every threat contained"
 
----
+### Slide 9: Industry Comparison
 
-## Adding New Slides
+**Title:** "Industry Comparison" (H3 - 48pt, navy)
 
-### Step 1: Define Data Model
+**Elements:**
+- Comparison table: Metric, Your Performance, Industry Average, Difference
+- Blue badges for difference column
+- **Insight bar:** "Outperforming Industry Benchmarks"
 
-Add required fields to `ReportData` in `report_data.py`:
+### Slide 10: Response & Detection (Dual-Panel)
 
-```python
-# New Metric Category
-new_metric_value: int = 0
-new_metric_context: str = ""
-```
+**Title:** "Response & Detection Quality" (H3 - 48pt, navy)
 
-### Step 2: Create Slide Builder
+**Elements:**
+- Left half: Response Efficiency (3 vertical cards)
+  - Containment Rate, Playbook Automation, Analyst Escalation
+- Right half: Detection Quality (2×2 grid)
+  - True Threat, Signal Fidelity, False Positive, Client-Validated
+- Insight box at bottom
 
-Use the `setup_content_slide` helper for consistent branding:
+### Slide 12: Severity Alignment (Marquee Visualization)
 
-```python
-def build_new_slide(prs, data):
-    """Create the New Slide.
-    
-    Per CRITICALSTART branding guidelines:
-    - All slides have transparent header and footer
-    - Uses H1-H6 typography scale
-    
-    Args:
-        prs (Presentation): The presentation object.
-        data (ReportData): The report data object.
-    """
-    # Use helper for consistent header/footer/title
-    slide, content_top = setup_content_slide(prs, "New Slide Title")
-    
-    # Add content below content_top
-    # ...
-    
-    # Add insight callout (optional)
-    add_insight_callout(
-        slide, "What This Means", 
-        "Explanation text...",
-        top=prs.slide_height - FOOTER_HEIGHT - Inches(1.0),
-        height=Inches(0.8),
-        prs=prs
-    )
-```
+**Title:** "Severity Alignment Flow" (H3 - 48pt, navy)
 
-### Step 3: Integrate in Main
+**Elements:**
+- Subtitle with escalation count chip
+- 3 stat boxes: Upgraded, De-escalated, Aligned
+- Sankey chart placeholder
+- Insight bullets
 
-Add to the `main()` function:
+**Note:** This slide is kept standalone as a marquee visualization.
 
-```python
-logger.info("  Building new slide...")
-build_new_slide(prs, data)
-```
+### Slide 13: Threat & Detection Sources (Merged)
+
+**Title:** "Threat & Detection Sources" (H3 - 48pt, navy)
+
+**Elements:**
+- Left half: MITRE ATT&CK stacked bar chart placeholder + legend + insight
+- Right half: 3 detection source cards (compact) with FP rates
+- Summary insight at bottom
+
+### Slide 15: Prioritized Improvements
+
+**Title:** "Prioritized Improvement Plan" (H3 - 48pt, navy)
+
+**Elements:**
+- 3 improvement item cards with priority badges (HIGH/MEDIUM/LOW)
+- Each card: Priority badge, title, description, owner, target, expected impact
+- **Insight bar:** "Focus Areas for Continuous Improvement"
+
+### Slide 16: Operational Coverage (Merged)
+
+**Title:** "Operational Coverage" (H3 - 48pt, navy)
+
+**Elements:**
+- Left panel: After-Hours hero (64pt) + weeknight/weekend breakdown
+- Right panel: Collaboration metrics (3 rows with value + label)
+- Insight box at bottom
+
+### Slide 18: Key Takeaways
+
+**Title:** "Key Takeaways: This Period" (H3 - 48pt, navy)
+
+**Elements:**
+- 4 takeaway cards with checkmark icons
+- Each card: Checkmark + takeaway text (18pt)
+- **Note:** Cost figure replaced with "Millions in modeled cost exposure avoided"
+- **Insight bar:** "Bottom Line" summary
+
+### Slide 19: Looking Ahead
+
+**Title:** "Looking Ahead" (H3 - 48pt, navy)
+
+**Elements:**
+- Section 1: Next Period Targets (2 bullet items)
+- Section 2: Strategic Focus (2 bullet items)
+- Section 3: Your Partnership (contact CTA)
+- **Insight bar:** "Strategic Path Forward"
+
+### Slide 20: Contact (Closing)
+
+**Title:** "Thank You" (60pt, navy, centered)
+
+**Elements:**
+- Subtitle: "Questions? We're here to help." (24pt)
+- Contact card with CSM info, email, website
+- Report date footer
 
 ---
 
@@ -310,25 +343,24 @@ Creates a new content slide with standard branding:
 - Adds slide title using H3 typography
 - Returns `(slide, content_top)` tuple
 
+### `create_section_header_layout(prs, title_text, narrative_text)`
+
+Creates a gray section title card with:
+- Gray background (#F5F5F5)
+- Centered title (H2 - 72pt, Navy)
+- Narrative subtitle (18pt, Slate)
+- Footer only (no header)
+
+### `add_insight_callout(slide, prs, title_text, body_text, top, height)`
+
+Adds a standardized blue insight bar with:
+- Light blue background with blue border
+- Title text (bold, 14pt)
+- Body text (12pt)
+
 ### `add_master_slide_elements(slide, prs, slide_number, include_header, include_footer)`
 
 Adds header and footer elements to any slide.
-
-### `add_master_slide_header(slide, prs, slide_number, include_header)`
-
-Adds header elements only (title, CRITICAL START, slide #).
-
-### `add_master_slide_footer(slide, prs, date_text, include_footer)`
-
-Adds footer elements only (date, copyright, intent).
-
-### `add_insight_callout(slide, title_text, body_text, top, height, prs)`
-
-Creates "What This Means" insight box with consistent styling.
-
-### `create_gradient_background(prs, slide, gradient_type)`
-
-Applies gradient background to slide (used for title slide).
 
 ### `add_logo(slide, position, prs)`
 
@@ -341,5 +373,7 @@ Places Critical Start logo at specified position.
 | Date | Version | Author | Summary |
 |------|---------|--------|---------|
 | 2025-12-22 | 1.0 | AI (Claude) | Initial slide structure documentation |
-| 2025-12-22 | 2.0 | AI (Claude) | Updated for CRITICALSTART branding guidelines (transparent header/footer, typography scale) |
-| 2025-12-23 | 3.0 | AI (Claude) | Added gray section title cards with narrative subtitles for executive storytelling |
+| 2025-12-22 | 2.0 | AI (Claude) | Updated for CRITICALSTART branding guidelines |
+| 2025-12-23 | 3.0 | AI (Claude) | Added gray section title cards with narrative subtitles |
+| 2026-01-09 | 4.0 | AI (Claude) | Consolidated to 15-slide structure: Removed section cards, merged duplicate slides, added Contact slide |
+| 2026-01-09 | 5.0 | AI (Claude) | **Revised 20-slide structure**: Restored 6 section cards, removed content redundancy (cost avoided), converted Security Outcomes to pipeline infographic, added insight bars to all content slides |
