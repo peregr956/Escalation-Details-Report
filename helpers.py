@@ -18,7 +18,8 @@ from constants import (
     H5_FONT_SIZE, H6_FONT_SIZE, PARAGRAPH_FONT_SIZE, FOOTER_FONT_SIZE,
     TITLE_FONT_SIZE, BODY_FONT_SIZE,
     MARGIN_STANDARD, MARGIN_CONTENT, CARD_SPACING, HEADER_HEIGHT, FOOTER_HEIGHT,
-    PRESENTATION_TITLE, PRESENTATION_INTENT, COPYRIGHT_TEXT
+    PRESENTATION_TITLE, PRESENTATION_INTENT, COPYRIGHT_TEXT,
+    METRIC_THRESHOLDS
 )
 
 
@@ -626,3 +627,260 @@ def create_data_table(slide, left, top, width, height,
             paragraph.alignment = PP_ALIGN.CENTER
     
     return table
+
+
+# =============================================================================
+# METRIC STATUS & TREND INDICATORS
+# =============================================================================
+
+def get_metric_status(metric_name, value):
+    """Evaluate a metric value against defined thresholds.
+    
+    Args:
+        metric_name (str): The metric identifier (must match key in METRIC_THRESHOLDS).
+        value (float|int): The current value of the metric.
+    
+    Returns:
+        dict: Contains 'status' ("good", "warning", or "bad") and 
+              'direction' ("lower_is_better" or "higher_is_better").
+              Returns None if metric_name not found in thresholds.
+    
+    Example:
+        >>> get_metric_status("mttr", 126)
+        {'status': 'good', 'direction': 'lower_is_better'}
+        >>> get_metric_status("containment_rate", 85)
+        {'status': 'bad', 'direction': 'higher_is_better'}
+    """
+    if metric_name not in METRIC_THRESHOLDS:
+        return None
+    
+    config = METRIC_THRESHOLDS[metric_name]
+    direction = config["direction"]
+    good_threshold = config["good_threshold"]
+    warning_threshold = config["warning_threshold"]
+    
+    if direction == "lower_is_better":
+        # Lower values are better: good <= good_threshold, warning between, bad > warning_threshold
+        if value <= good_threshold:
+            status = "good"
+        elif value <= warning_threshold:
+            status = "warning"
+        else:
+            status = "bad"
+    else:  # higher_is_better
+        # Higher values are better: good >= good_threshold, warning between, bad < warning_threshold
+        if value >= good_threshold:
+            status = "good"
+        elif value >= warning_threshold:
+            status = "warning"
+        else:
+            status = "bad"
+    
+    return {
+        "status": status,
+        "direction": direction
+    }
+
+
+def get_status_indicator(status, direction):
+    """Get the appropriate arrow character and color based on status and direction.
+    
+    Uses outlined-style Unicode arrows per FA6 brand guidelines:
+    - ↑ (U+2191) for upward/elevated
+    - ↓ (U+2193) for downward/depreciated
+    - → (U+2192) for neutral/warning
+    
+    The arrow direction reflects whether the value is elevated (↑) or depreciated (↓),
+    while the color reflects whether that's good or bad.
+    
+    Args:
+        status (str): One of "good", "warning", or "bad".
+        direction (str): One of "lower_is_better" or "higher_is_better".
+    
+    Returns:
+        dict: Contains 'arrow' (Unicode character) and 'color' (RGBColor).
+    
+    Logic:
+        - higher_is_better + good = ↑ green (high is good)
+        - higher_is_better + bad = ↓ red (low is bad)
+        - lower_is_better + good = ↓ green (low is good)
+        - lower_is_better + bad = ↑ red (high is bad)
+        - warning = → orange (neutral)
+    """
+    if status == "warning":
+        return {"arrow": "→", "color": CS_ORANGE}
+    
+    if direction == "higher_is_better":
+        if status == "good":
+            return {"arrow": "↑", "color": CS_GREEN}
+        else:  # bad
+            return {"arrow": "↓", "color": CS_RED}
+    else:  # lower_is_better
+        if status == "good":
+            return {"arrow": "↓", "color": CS_GREEN}
+        else:  # bad
+            return {"arrow": "↑", "color": CS_RED}
+
+
+def add_trend_indicator(slide, left, top, status, direction, size=Pt(18)):
+    """Add a trend indicator arrow to a slide.
+    
+    Args:
+        slide: The slide object to add the indicator to.
+        left: Left position of the indicator.
+        top: Top position of the indicator.
+        status (str): One of "good", "warning", or "bad".
+        direction (str): One of "lower_is_better" or "higher_is_better".
+        size: Font size for the arrow (default Pt(18)).
+    
+    Returns:
+        The textbox shape containing the arrow.
+    """
+    indicator = get_status_indicator(status, direction)
+    
+    indicator_box = slide.shapes.add_textbox(left, top, Inches(0.3), Inches(0.3))
+    indicator_frame = indicator_box.text_frame
+    indicator_para = indicator_frame.paragraphs[0]
+    indicator_para.text = indicator["arrow"]
+    indicator_para.font.name = TITLE_FONT_NAME
+    indicator_para.font.size = size
+    indicator_para.font.bold = True
+    indicator_para.font.color.rgb = indicator["color"]
+    indicator_para.alignment = PP_ALIGN.CENTER
+    
+    return indicator_box
+
+
+def create_metric_card_with_indicator(slide, left, top, width, height,
+                                       value, label, metric_name,
+                                       context=None, border_color=None,
+                                       value_size=Pt(42), show_indicator=True):
+    """Create a metric card with an optional status indicator arrow.
+    
+    This is an enhanced version of create_metric_card() that evaluates the
+    metric against thresholds and displays an appropriate arrow indicator.
+    
+    Args:
+        slide: The slide object to add the card to.
+        left: Left position of the card.
+        top: Top position of the card.
+        width: Width of the card.
+        height: Height of the card.
+        value: The metric value to display (numeric).
+        label: The label for the metric.
+        metric_name (str): Key to look up in METRIC_THRESHOLDS.
+        context: Optional context text below the label.
+        border_color: Optional border color (defaults based on status or CS_BLUE).
+        value_size: Font size for the value (default Pt(42)).
+        show_indicator: Whether to show the trend indicator (default True).
+    
+    Returns:
+        tuple: (card_shape, status_info) where status_info is the result from
+               get_metric_status() or None if metric not found.
+    """
+    # Get metric status
+    status_info = get_metric_status(metric_name, value) if show_indicator else None
+    
+    # Determine border color based on status if not explicitly provided
+    if border_color is None:
+        if status_info:
+            indicator = get_status_indicator(status_info["status"], status_info["direction"])
+            border_color = indicator["color"]
+        else:
+            border_color = CS_BLUE
+    
+    # Card background
+    card_shape = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, left, top, width, height
+    )
+    fill = card_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(250, 250, 250)
+    line = card_shape.line
+    line.color.rgb = border_color
+    line.width = Pt(3)
+    
+    # Calculate layout
+    value_height = height * 0.45
+    indicator_width = Inches(0.35) if status_info and show_indicator else 0
+    
+    # Value text (with room for indicator)
+    value_box = slide.shapes.add_textbox(
+        left + Inches(0.1), top + Inches(0.15),
+        width - Inches(0.2) - indicator_width, value_height
+    )
+    value_frame = value_box.text_frame
+    value_para = value_frame.paragraphs[0]
+    value_para.text = str(value)
+    value_para.font.name = TITLE_FONT_NAME
+    value_para.font.size = value_size
+    value_para.font.bold = True
+    value_para.font.color.rgb = CS_NAVY
+    value_para.alignment = PP_ALIGN.CENTER
+    
+    # Add trend indicator if available
+    if status_info and show_indicator:
+        indicator_left = left + width - indicator_width - Inches(0.1)
+        indicator_top = top + Inches(0.2)
+        add_trend_indicator(
+            slide, indicator_left, indicator_top,
+            status_info["status"], status_info["direction"],
+            size=Pt(24)
+        )
+    
+    # Label
+    label_top = top + value_height + Inches(0.1)
+    label_box = slide.shapes.add_textbox(
+        left + Inches(0.1), label_top,
+        width - Inches(0.2), Inches(0.4)
+    )
+    label_frame = label_box.text_frame
+    label_para = label_frame.paragraphs[0]
+    label_para.text = label
+    label_para.font.name = TITLE_FONT_NAME
+    label_para.font.size = Pt(14)
+    label_para.font.bold = True
+    label_para.font.color.rgb = border_color
+    label_para.alignment = PP_ALIGN.CENTER
+    
+    # Context (if provided)
+    if context:
+        context_top = label_top + Inches(0.35)
+        context_box = slide.shapes.add_textbox(
+            left + Inches(0.1), context_top,
+            width - Inches(0.2), Inches(0.4)
+        )
+        context_frame = context_box.text_frame
+        context_para = context_frame.paragraphs[0]
+        context_para.text = context
+        context_para.font.name = BODY_FONT_NAME
+        context_para.font.size = Pt(11)
+        context_para.font.color.rgb = CS_SLATE
+        context_para.alignment = PP_ALIGN.CENTER
+    
+    return card_shape, status_info
+
+
+def get_status_text(status, direction, metric_label=None):
+    """Generate human-readable status text for narrative insight bars.
+    
+    Args:
+        status (str): One of "good", "warning", or "bad".
+        direction (str): One of "lower_is_better" or "higher_is_better".
+        metric_label (str, optional): The metric name for more specific messaging.
+    
+    Returns:
+        str: A brief status description like "above target" or "needs attention".
+    """
+    if status == "good":
+        if direction == "higher_is_better":
+            return "exceeding target"
+        else:
+            return "below target (optimal)"
+    elif status == "warning":
+        return "approaching threshold"
+    else:  # bad
+        if direction == "higher_is_better":
+            return "below target"
+        else:
+            return "elevated (needs attention)"

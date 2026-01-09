@@ -33,7 +33,9 @@ from helpers import (
     create_presentation, apply_branding, get_slide_number,
     add_master_slide_header, add_master_slide_footer, add_master_slide_elements,
     add_logo, setup_content_slide, create_gradient_background,
-    add_header_bar, add_insight_callout, create_metric_card, create_data_table
+    add_header_bar, add_insight_callout, create_metric_card, create_data_table,
+    get_metric_status, get_status_indicator, add_trend_indicator,
+    create_metric_card_with_indicator, get_status_text
 )
 
 
@@ -978,38 +980,51 @@ def build_executive_summary_slides(prs, data):
     after_hours_percent = int((data.after_hours_escalations / data.incidents_escalated) * 100) if data.incidents_escalated > 0 else 0
     
     # Consolidated 6 key metrics in 2 rows x 3 columns
+    # Each metric includes a metric_name for threshold lookup and raw_value for status evaluation
     dashboard_metrics = [
         # Row 1: Core Security Outcomes
         {
             "title": "THREATS CONTAINED",
             "metric": f"{data.true_threats_contained}",
-            "detail": "100% contained, zero breaches"
+            "detail": "100% contained, zero breaches",
+            "metric_name": "threats_contained",
+            "raw_value": data.true_threats_contained
         },
         {
             "title": "RESPONSE ADVANTAGE",
             "metric": f"{int(data.response_advantage_percent)}%",
-            "detail": f"Faster than industry ({data.mttr_minutes}m vs {data.industry_median_minutes}m)"
+            "detail": f"Faster than industry ({data.mttr_minutes}m vs {data.industry_median_minutes}m)",
+            "metric_name": "response_advantage_percent",
+            "raw_value": data.response_advantage_percent
         },
         {
             "title": "CLOSED E2E",
             "metric": f"{data.closed_end_to_end:,}",
-            "detail": "Incidents resolved without client action"
+            "detail": "Incidents resolved without client action",
+            "metric_name": "closed_end_to_end",
+            "raw_value": data.closed_end_to_end
         },
         # Row 2: Operations & Coverage
         {
             "title": "ALERTS TRIAGED",
             "metric": f"{data.alerts_triaged:,}",
-            "detail": f"{data.client_touch_decisions:,} guided decisions"
+            "detail": f"{data.client_touch_decisions:,} guided decisions",
+            "metric_name": None,  # Informational only, no threshold
+            "raw_value": None
         },
         {
             "title": "AFTER-HOURS",
             "metric": f"{data.after_hours_escalations}",
-            "detail": f"{after_hours_percent}% of escalations"
+            "detail": f"{after_hours_percent}% of escalations",
+            "metric_name": None,  # Informational only, no threshold
+            "raw_value": None
         },
         {
             "title": "FALSE POSITIVE RATE",
             "metric": f"{data.false_positive_rate}%",
-            "detail": f"{int(data.automation_percent)}% auto-routed"
+            "detail": f"{int(data.automation_percent)}% auto-routed",
+            "metric_name": "false_positive_rate",
+            "raw_value": data.false_positive_rate
         }
     ]
     
@@ -1021,12 +1036,29 @@ def build_executive_summary_slides(prs, data):
     card_spacing_h = Inches(0.2)
     card_spacing_v = Inches(0.15)
     
+    # Track status for insight bar summary
+    status_summary = {"good": 0, "warning": 0, "bad": 0}
+    
     # Draw 6 cards in 2x3 grid
     for idx, card in enumerate(dashboard_metrics):
         row = idx // 3
         col = idx % 3
         card_left = card_start_left + col * (card_width + card_spacing_h)
         card_top = card_start_top + row * (card_height + card_spacing_v)
+        
+        # Get metric status if threshold exists
+        status_info = None
+        if card.get("metric_name") and card.get("raw_value") is not None:
+            status_info = get_metric_status(card["metric_name"], card["raw_value"])
+            if status_info:
+                status_summary[status_info["status"]] += 1
+        
+        # Determine border color based on status
+        if status_info:
+            indicator = get_status_indicator(status_info["status"], status_info["direction"])
+            border_color = indicator["color"]
+        else:
+            border_color = CS_BLUE if row == 0 else CS_SLATE
         
         # Create card background
         card_shape = slide2.shapes.add_shape(
@@ -1037,7 +1069,7 @@ def build_executive_summary_slides(prs, data):
         fill.solid()
         fill.fore_color.rgb = RGBColor(240, 248, 255) if row == 0 else RGBColor(248, 250, 252)
         line = card_shape.line
-        line.color.rgb = CS_BLUE if row == 0 else CS_SLATE
+        line.color.rgb = border_color
         line.width = Pt(2) if row == 0 else Pt(1)
         
         # Add card title (small label)
@@ -1054,10 +1086,11 @@ def build_executive_summary_slides(prs, data):
         title_para.font.color.rgb = CS_SLATE
         title_para.alignment = PP_ALIGN.LEFT
         
-        # Add large metric
+        # Add large metric with indicator
+        indicator_width = Inches(0.4) if status_info else 0
         metric_box = slide2.shapes.add_textbox(
             card_left + Inches(0.12), card_top + Inches(0.28),
-            card_width - Inches(0.24), Inches(0.6)
+            card_width - Inches(0.24) - indicator_width, Inches(0.6)
         )
         metric_frame = metric_box.text_frame
         metric_para = metric_frame.paragraphs[0]
@@ -1067,6 +1100,16 @@ def build_executive_summary_slides(prs, data):
         metric_para.font.bold = True
         metric_para.font.color.rgb = CS_NAVY
         metric_para.alignment = PP_ALIGN.LEFT
+        
+        # Add trend indicator arrow if status exists
+        if status_info:
+            indicator_left = card_left + card_width - Inches(0.5)
+            indicator_top = card_top + Inches(0.35)
+            add_trend_indicator(
+                slide2, indicator_left, indicator_top,
+                status_info["status"], status_info["direction"],
+                size=Pt(28)
+            )
         
         # Add detail text
         detail_box = slide2.shapes.add_textbox(
@@ -1082,12 +1125,21 @@ def build_executive_summary_slides(prs, data):
         detail_para.font.color.rgb = CS_SLATE
         detail_para.alignment = PP_ALIGN.LEFT
     
-    # Add insight bar at bottom of dashboard
+    # Add insight bar at bottom of dashboard with dynamic status summary
     insight_top = card_start_top + 2 * (card_height + card_spacing_v) + Inches(0.2)
+    
+    # Generate dynamic insight text based on status summary
+    if status_summary["bad"] == 0 and status_summary["warning"] == 0:
+        insight_body = "All metrics meeting or exceeding targets—your organization is well-protected."
+    elif status_summary["bad"] == 0:
+        insight_body = f"{status_summary['good']} metrics exceeding targets, {status_summary['warning']} approaching thresholds—strong overall posture."
+    else:
+        insight_body = f"{status_summary['good']} metrics on target, {status_summary['warning'] + status_summary['bad']} needing attention—see details in following slides."
+    
     add_insight_callout(
         slide2, prs,
         "Your Security Posture at a Glance",
-        "Every metric meeting or exceeding targets—your organization is well-protected.",
+        insight_body,
         insight_top,
         height=Inches(0.7)
     )
@@ -1561,11 +1613,14 @@ def build_protection_achieved_slides(prs, data):
     header_tf.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
     header_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
     
-    # Metric cards within panel
+    # Metric cards within panel - now with threshold status indicators
     metrics = [
-        {"value": f"{data.critical_high_mttr} min", "label": "Critical/High", "color": CS_RED},
-        {"value": f"{data.medium_low_mttr} min", "label": "Medium/Low", "color": CS_ORANGE},
-        {"value": f"{data.p90_minutes} min", "label": "P90 Response", "color": CS_BLUE},
+        {"value": f"{data.critical_high_mttr} min", "label": "Critical/High", "default_color": CS_RED,
+         "metric_name": "critical_high_mttr", "raw_value": data.critical_high_mttr},
+        {"value": f"{data.medium_low_mttr} min", "label": "Medium/Low", "default_color": CS_ORANGE,
+         "metric_name": "medium_low_mttr", "raw_value": data.medium_low_mttr},
+        {"value": f"{data.p90_minutes} min", "label": "P90 Response", "default_color": CS_BLUE,
+         "metric_name": "p90_minutes", "raw_value": data.p90_minutes},
     ]
     
     card_top = panel_top + header_height + Inches(0.15)
@@ -1577,6 +1632,16 @@ def build_protection_achieved_slides(prs, data):
     for idx, metric in enumerate(metrics):
         current_top = card_top + idx * (card_height + card_spacing)
         
+        # Get metric status for threshold evaluation
+        status_info = get_metric_status(metric["metric_name"], metric["raw_value"])
+        
+        # Determine color based on status (override default color)
+        if status_info:
+            indicator = get_status_indicator(status_info["status"], status_info["direction"])
+            border_color = indicator["color"]
+        else:
+            border_color = metric["default_color"]
+        
         # Card background
         card_shape = slide7.shapes.add_shape(
             MSO_SHAPE.ROUNDED_RECTANGLE,
@@ -1585,21 +1650,32 @@ def build_protection_achieved_slides(prs, data):
         )
         card_shape.fill.solid()
         card_shape.fill.fore_color.rgb = RGBColor(255, 255, 255)
-        card_shape.line.color.rgb = metric["color"]
+        card_shape.line.color.rgb = border_color
         card_shape.line.width = Pt(2)
         
-        # Metric value (large)
+        # Metric value with indicator
+        indicator_width = Inches(0.35) if status_info else 0
         value_box = slide7.shapes.add_textbox(
-            panel_left + card_margin, current_top + Inches(0.1),
-            card_width, Inches(0.45)
+            panel_left + card_margin + Inches(0.05), current_top + Inches(0.1),
+            card_width - Inches(0.1) - indicator_width, Inches(0.45)
         )
         value_tf = value_box.text_frame
         value_tf.paragraphs[0].text = metric["value"]
         value_tf.paragraphs[0].font.name = TITLE_FONT_NAME
         value_tf.paragraphs[0].font.size = Pt(28)
         value_tf.paragraphs[0].font.bold = True
-        value_tf.paragraphs[0].font.color.rgb = metric["color"]
+        value_tf.paragraphs[0].font.color.rgb = border_color
         value_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+        
+        # Add trend indicator if status available
+        if status_info:
+            ind_left = panel_left + card_margin + card_width - Inches(0.4)
+            ind_top = current_top + Inches(0.15)
+            add_trend_indicator(
+                slide7, ind_left, ind_top,
+                status_info["status"], status_info["direction"],
+                size=Pt(20)
+            )
         
         # Metric label
         label_box = slide7.shapes.add_textbox(
@@ -1672,8 +1748,17 @@ def build_protection_achieved_slides(prs, data):
     line.color.rgb = CS_BLUE
     line.width = Pt(2)
     
+    # Generate dynamic insight text based on metric statuses
+    mttr_status = get_metric_status("critical_high_mttr", data.critical_high_mttr)
+    p90_status = get_metric_status("p90_minutes", data.p90_minutes)
+    
+    mttr_descriptor = "on target" if mttr_status and mttr_status["status"] == "good" else "needs attention"
+    p90_descriptor = "meeting SLA" if p90_status and p90_status["status"] == "good" else "approaching threshold"
+    
+    insight_message = f"Critical/High MTTR: {data.critical_high_mttr} min ({mttr_descriptor}) | P90: {data.p90_minutes} min ({p90_descriptor})"
+    
     insight_text = insight_shape.text_frame
-    insight_text.text = "MTTR decreased 25% to 126 min | MTTD improved 22% to 42 min"
+    insight_text.text = insight_message
     insight_text.paragraphs[0].font.name = BODY_FONT_NAME
     insight_text.paragraphs[0].font.size = Pt(13)
     insight_text.paragraphs[0].font.color.rgb = CS_NAVY
@@ -1785,25 +1870,56 @@ def build_protection_achieved_slides(prs, data):
         industry_cell_paragraph.font.color.rgb = CS_SLATE
         industry_cell_paragraph.alignment = PP_ALIGN.LEFT
         
-        # Difference (with blue badge)
+        # Difference (with colored badge and directional arrow)
         diff_cell_left = table_left + 3 * col_width + Inches(0.1)
         diff_cell_top = row_top + Inches(0.05)
         diff_cell_width = col_width - Inches(0.2)
         diff_cell_height = row_height - Inches(0.1)
         
-        # Create blue badge background
+        # Determine if we're performing better or worse than industry
+        # For MTTR, MTTD, Incidents/Day - lower is better
+        is_better = "Better" in comparison['difference']
+        is_lower_better = comparison['metric'] in ["MTTR", "MTTD", "Incidents/Day"]
+        
+        # Determine arrow and color based on performance
+        if is_better:
+            badge_color = CS_GREEN
+            # Lower is better metrics: if we're better, we're below industry (down arrow)
+            # Higher is better metrics: if we're better, we're above industry (up arrow)
+            arrow = "↓" if is_lower_better else "↑"
+        else:
+            badge_color = CS_RED
+            arrow = "↑" if is_lower_better else "↓"
+        
+        # Create colored badge background
         badge_shape = slide8.shapes.add_shape(
             MSO_SHAPE.RECTANGLE, diff_cell_left, diff_cell_top,
             diff_cell_width, diff_cell_height
         )
         fill = badge_shape.fill
         fill.solid()
-        fill.fore_color.rgb = CS_BLUE
+        fill.fore_color.rgb = badge_color
         badge_shape.line.fill.background()
         
+        # Add arrow indicator
+        arrow_box = slide8.shapes.add_textbox(
+            diff_cell_left + Inches(0.05), diff_cell_top,
+            Inches(0.3), diff_cell_height
+        )
+        arrow_frame = arrow_box.text_frame
+        arrow_paragraph = arrow_frame.paragraphs[0]
+        arrow_paragraph.text = arrow
+        arrow_paragraph.font.name = TITLE_FONT_NAME
+        arrow_paragraph.font.size = Pt(14)
+        arrow_paragraph.font.bold = True
+        arrow_paragraph.font.color.rgb = RGBColor(255, 255, 255)
+        arrow_paragraph.alignment = PP_ALIGN.CENTER
+        arrow_frame.vertical_anchor = 1  # Middle
+        
+        # Add difference text next to arrow
         diff_cell_box = slide8.shapes.add_textbox(
-            diff_cell_left, diff_cell_top,
-            diff_cell_width, diff_cell_height
+            diff_cell_left + Inches(0.3), diff_cell_top,
+            diff_cell_width - Inches(0.35), diff_cell_height
         )
         diff_cell_frame = diff_cell_box.text_frame
         diff_cell_frame.word_wrap = True
@@ -1813,7 +1929,7 @@ def build_protection_achieved_slides(prs, data):
         diff_cell_paragraph.font.size = Pt(13)
         diff_cell_paragraph.font.bold = True
         diff_cell_paragraph.font.color.rgb = RGBColor(255, 255, 255)
-        diff_cell_paragraph.alignment = PP_ALIGN.CENTER
+        diff_cell_paragraph.alignment = PP_ALIGN.LEFT
         diff_cell_frame.vertical_anchor = 1  # Middle
     
     # Add insight bar for Industry Comparison
@@ -1840,13 +1956,28 @@ def build_protection_achieved_slides(prs, data):
     containment_count = round((data.containment_rate / 100) * data.incidents_escalated)
     
     efficiency_cards = [
-        {"title": "Containment Rate", "value": f"{data.containment_rate}%", "detail": f"{containment_count} of {data.incidents_escalated}", "color": CS_BLUE},
-        {"title": "Playbook Automation", "value": f"{data.playbook_auto['percent']}%", "detail": f"{data.playbook_auto['count']} incidents", "color": CS_BLUE},
-        {"title": "Analyst Escalation", "value": f"{data.analyst_escalation['percent']}%", "detail": f"{data.analyst_escalation['count']} incidents", "color": CS_ORANGE}
+        {"title": "Containment Rate", "value": f"{data.containment_rate}%", "detail": f"{containment_count} of {data.incidents_escalated}", 
+         "default_color": CS_BLUE, "metric_name": "containment_rate", "raw_value": data.containment_rate},
+        {"title": "Playbook Automation", "value": f"{data.playbook_auto['percent']}%", "detail": f"{data.playbook_auto['count']} incidents", 
+         "default_color": CS_BLUE, "metric_name": "automation_percent", "raw_value": data.playbook_auto['percent']},
+        {"title": "Analyst Escalation", "value": f"{data.analyst_escalation['percent']}%", "detail": f"{data.analyst_escalation['count']} incidents", 
+         "default_color": CS_ORANGE, "metric_name": None, "raw_value": None}  # No threshold for analyst escalation
     ]
     
     for i, card in enumerate(efficiency_cards):
         card_top = cards_start_top + i * (card_height + card_spacing)
+        
+        # Get metric status if threshold exists
+        status_info = None
+        if card.get("metric_name") and card.get("raw_value") is not None:
+            status_info = get_metric_status(card["metric_name"], card["raw_value"])
+        
+        # Determine border color based on status
+        if status_info:
+            indicator = get_status_indicator(status_info["status"], status_info["direction"])
+            border_color = indicator["color"]
+        else:
+            border_color = card["default_color"]
         
         # Create card background
         card_shape = slide_resp_det.shapes.add_shape(
@@ -1857,7 +1988,7 @@ def build_protection_achieved_slides(prs, data):
         fill.solid()
         fill.fore_color.rgb = RGBColor(240, 248, 255)
         line = card_shape.line
-        line.color.rgb = card["color"]
+        line.color.rgb = border_color
         line.width = Pt(2)
         
         # Card title (left)
@@ -1887,9 +2018,10 @@ def build_protection_achieved_slides(prs, data):
         d_para.font.color.rgb = CS_SLATE
         d_para.alignment = PP_ALIGN.LEFT
         
-        # Value (right)
+        # Value with indicator (right)
+        indicator_width = Inches(0.35) if status_info else 0
         value_box = slide_resp_det.shapes.add_textbox(
-            left_panel_left + left_panel_width - Inches(1.5), card_top + Inches(0.15),
+            left_panel_left + left_panel_width - Inches(1.5) - indicator_width, card_top + Inches(0.15),
             Inches(1.3), Inches(0.6)
         )
         v_frame = value_box.text_frame
@@ -1898,8 +2030,18 @@ def build_protection_achieved_slides(prs, data):
         v_para.font.name = TITLE_FONT_NAME
         v_para.font.size = Pt(32)
         v_para.font.bold = True
-        v_para.font.color.rgb = card["color"]
+        v_para.font.color.rgb = border_color
         v_para.alignment = PP_ALIGN.RIGHT
+        
+        # Add trend indicator if status available
+        if status_info:
+            ind_left = left_panel_left + left_panel_width - Inches(0.45)
+            ind_top = card_top + Inches(0.2)
+            add_trend_indicator(
+                slide_resp_det, ind_left, ind_top,
+                status_info["status"], status_info["direction"],
+                size=Pt(22)
+            )
     
     # Right panel: Detection Quality (2x2 grid)
     right_panel_left = left_panel_left + left_panel_width + Inches(0.2)
@@ -1909,10 +2051,14 @@ def build_protection_achieved_slides(prs, data):
     grid_spacing = Inches(0.1)
     
     quality_cards = [
-        {"title": "True Threat", "value": f"{data.true_threat_precision}%", "color": CS_RED},
-        {"title": "Signal Fidelity", "value": f"{data.signal_fidelity}%", "color": CS_BLUE},
-        {"title": "False Positive", "value": f"{data.false_positive_rate}%", "color": CS_ORANGE},
-        {"title": "Client-Validated", "value": f"{data.client_validated}%", "color": CS_BLUE}
+        {"title": "True Threat", "value": f"{data.true_threat_precision}%", "default_color": CS_RED,
+         "metric_name": "true_threat_precision", "raw_value": data.true_threat_precision},
+        {"title": "Signal Fidelity", "value": f"{data.signal_fidelity}%", "default_color": CS_BLUE,
+         "metric_name": "signal_fidelity", "raw_value": data.signal_fidelity},
+        {"title": "False Positive", "value": f"{data.false_positive_rate}%", "default_color": CS_ORANGE,
+         "metric_name": "false_positive_rate", "raw_value": data.false_positive_rate},
+        {"title": "Client-Validated", "value": f"{data.client_validated}%", "default_color": CS_BLUE,
+         "metric_name": "client_validated", "raw_value": data.client_validated}
     ]
     
     for i, card in enumerate(quality_cards):
@@ -1920,6 +2066,18 @@ def build_protection_achieved_slides(prs, data):
         col = i % 2
         card_left = right_panel_left + col * (grid_card_width + grid_spacing)
         card_top = cards_start_top + row * (grid_card_height + grid_spacing)
+        
+        # Get metric status if threshold exists
+        status_info = None
+        if card.get("metric_name") and card.get("raw_value") is not None:
+            status_info = get_metric_status(card["metric_name"], card["raw_value"])
+        
+        # Determine border color based on status
+        if status_info:
+            indicator = get_status_indicator(status_info["status"], status_info["direction"])
+            border_color = indicator["color"]
+        else:
+            border_color = card["default_color"]
         
         # Create card background
         card_shape = slide_resp_det.shapes.add_shape(
@@ -1930,7 +2088,7 @@ def build_protection_achieved_slides(prs, data):
         fill.solid()
         fill.fore_color.rgb = RGBColor(248, 250, 252)
         line = card_shape.line
-        line.color.rgb = card["color"]
+        line.color.rgb = border_color
         line.width = Pt(2)
         
         # Title
@@ -1947,10 +2105,11 @@ def build_protection_achieved_slides(prs, data):
         t_para.font.color.rgb = CS_SLATE
         t_para.alignment = PP_ALIGN.LEFT
         
-        # Value
+        # Value with indicator
+        indicator_width = Inches(0.35) if status_info else 0
         value_box = slide_resp_det.shapes.add_textbox(
             card_left + Inches(0.1), card_top + Inches(0.5),
-            grid_card_width - Inches(0.2), Inches(0.7)
+            grid_card_width - Inches(0.2) - indicator_width, Inches(0.7)
         )
         v_frame = value_box.text_frame
         v_para = v_frame.paragraphs[0]
@@ -1958,10 +2117,20 @@ def build_protection_achieved_slides(prs, data):
         v_para.font.name = TITLE_FONT_NAME
         v_para.font.size = Pt(36)
         v_para.font.bold = True
-        v_para.font.color.rgb = card["color"]
+        v_para.font.color.rgb = border_color
         v_para.alignment = PP_ALIGN.LEFT
+        
+        # Add trend indicator if status available
+        if status_info:
+            ind_left = card_left + grid_card_width - Inches(0.4)
+            ind_top = card_top + Inches(0.55)
+            add_trend_indicator(
+                slide_resp_det, ind_left, ind_top,
+                status_info["status"], status_info["direction"],
+                size=Pt(20)
+            )
     
-    # Insight box at bottom
+    # Insight box at bottom with dynamic status messaging
     insight_top = cards_start_top + 3 * (card_height + card_spacing) + Inches(0.1)
     insight_shape = slide_resp_det.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, Inches(0.5), insight_top,
@@ -1974,8 +2143,15 @@ def build_protection_achieved_slides(prs, data):
     line.color.rgb = CS_BLUE
     line.width = Pt(2)
     
+    # Generate dynamic insight text based on metric statuses
+    fp_status = get_metric_status("false_positive_rate", data.false_positive_rate)
+    containment_status = get_metric_status("containment_rate", data.containment_rate)
+    
+    fp_desc = "below target ↓" if fp_status and fp_status["status"] == "good" else "above threshold ↑"
+    containment_desc = "exceeding target ↑" if containment_status and containment_status["status"] == "good" else "below target ↓"
+    
     insight_text = insight_shape.text_frame
-    insight_text.text = f"Signal quality improved: FP rate at {data.false_positive_rate}% with {data.containment_rate}% containment"
+    insight_text.text = f"FP rate: {data.false_positive_rate}% ({fp_desc}) | Containment: {data.containment_rate}% ({containment_desc})"
     insight_text.paragraphs[0].font.name = BODY_FONT_NAME
     insight_text.paragraphs[0].font.size = Pt(14)
     insight_text.paragraphs[0].font.color.rgb = CS_NAVY

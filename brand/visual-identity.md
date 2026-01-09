@@ -62,7 +62,8 @@ Use this guide alongside the narrative brand guidelines to ensure every touch-po
 ## 5. Iconography
 - Employ outlined icons with medium stroke weight; avoid filled shapes unless depicting critical states.
 - Color icons with Critical Start Blue or accent colors for emphasis.
-- In product experiences, rely on Font Awesome 7 React (fa7) icons for consistency and easy implementation.
+- In product experiences, rely on Font Awesome 6 React (fa6) icons for consistency and easy implementation.
+- For PowerPoint presentations, use Wingdings arrows or Unicode equivalents that approximate FA6 outlined arrows.
 
 ## 6. Data Visualization
 - Map positive states to Critical Start Blue/Deep Navy, warnings to Orange, critical alerts to Red.

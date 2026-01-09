@@ -151,7 +151,8 @@ To be the most effective service provider at delivering the greatest risk reduct
 ### 5.4 Iconography
 - Use outlined icons with medium stroke weight.
 - Apply primary blue or secondary accent colors for legibility.
-- Default to Font Awesome 7 React icons (fa7) in product surfaces to maintain consistency.
+- Default to Font Awesome 6 React icons (fa6) in product surfaces to maintain consistency.
+- For PowerPoint presentations (non-React), use Wingdings arrows or Unicode equivalents that match the FA6 outlined style.
 
 ## 6. Asset Governance
 1. **Source of Truth** – Store approved assets in `assets/` within the repo and in the corporate DAM for distribution.
