@@ -5,8 +5,8 @@ Use this guide alongside the narrative brand guidelines to ensure every touch-po
 ## 1. Logo System
 
 ### 1.1 Primary Logo
-- File: `assets/critical-start-logo.svg`
-- Orientation: Horizontal lockup with Critical Start logomark and wordmark.
+- File: `assets/Critical-Start-Stacked-Logo_0-2.png`
+- Orientation: Stacked lockup with Critical Start logomark and wordmark.
 - Usage: Default mark for digital, product, and print applications with ample contrast.
 
 ### 1.2 Alternate Marks
@@ -91,7 +91,7 @@ Use this guide alongside the narrative brand guidelines to ensure every touch-po
 ## 9. Asset Inventory
 | File | Path | Format | Notes |
 | --- | --- | --- | --- |
-| Primary Logo | `assets/critical-start-logo.svg` | `.svg` | Use for digital and scalable needs. |
+| Primary Logo | `assets/Critical-Start-Stacked-Logo_0-2.png` | `.png` | Stacked logo for all presentations. |
 | Gradient Background | (export via design system) | `.png` / `.svg` | Blue sweep default background. |
 | Typography Package | Request from Brand | `.ttf` / `.otf` | Includes Roboto weights + Arial guidance. |
 
@@ -103,7 +103,7 @@ Per the CRITICALSTART Slide Branding specifications, PowerPoint presentations fo
 
 | Element | Content | Typography |
 |---------|---------|------------|
-| **Header (Left)** | Short presentation title (e.g., "ESCALATION REPORT") | Footer (12px/9pt) |
+| **Header (Left)** | Short presentation title (e.g., "EXECUTIVE BUSINESS REVIEW") | Footer (12px/9pt) |
 | **Header (Center)** | "CRITICAL START" | Footer (12px/9pt) |
 | **Header (Right)** | Slide number | Footer (12px/9pt) |
 | **Footer (Left)** | Date (e.g., "DECEMBER 2025") | Footer (12px/9pt) |
@@ -114,16 +114,16 @@ Per the CRITICALSTART Slide Branding specifications, PowerPoint presentations fo
 
 ### 10.2 Typography Scale
 
-| Style | Size (px) | Size (pt) | Line Height | Usage |
-|-------|-----------|-----------|-------------|-------|
-| H1 | 152 | 114 | 152px | Hero/title slides only |
-| H2 | 96 | 72 | 104px | Section headers, large metrics |
-| H3 | 64 | 48 | 72px | Slide titles |
-| H4 | 36 | 27 | 38px | Subheadings |
-| H5 | 24 | 18 | 32px | Card titles |
-| H6 | 16 | 12 | 24px | Labels |
-| Paragraph | 16 | 12 | 24px | Body text |
-| Footer | 12 | 9 | 16px | Header/footer elements |
+| Style | Size (pt) | Usage |
+|-------|-----------|-------|
+| H1 | 48 | Hero/title slides only |
+| H2 | 28 | Section headers, large metrics |
+| H3 | 22 | Slide titles |
+| H4 | 18 | Subheadings |
+| H5 | 16 | Card titles |
+| H6 | 11 | Labels |
+| Paragraph | 12 | Body text |
+| Footer | 9 | Header/footer elements |
 
 ### 10.3 Slide Dimensions
 
@@ -135,7 +135,8 @@ Per the CRITICALSTART Slide Branding specifications, PowerPoint presentations fo
 
 - No header bar (footer only)
 - Blue sweep gradient background (#009CDE → #004C97)
-- Hero title using H1 typography (114pt)
+- Hero title using H1 typography (48pt)
+- All text on title slide must be white
 
 ## 11. Revision History
 
@@ -143,3 +144,4 @@ Per the CRITICALSTART Slide Branding specifications, PowerPoint presentations fo
 | --- | --- | --- | --- |
 | 2025-11-17 | v1.0 | AI (ChatGPT) | Converted brand visual guidelines to Markdown. |
 | 2025-12-22 | v1.1 | AI (Claude) | Added Section 10: Slide Branding Guidelines with typography scale and master slide layout. |
+| 2026-01-09 | v1.2 | AI (Claude) | Rebranded to Executive Business Review; updated logo to PNG; revised typography scale (H1=48pt, H2=28pt, Paragraph=12pt). |

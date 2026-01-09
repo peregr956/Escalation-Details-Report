@@ -375,8 +375,7 @@ CS_ORANGE = RGBColor(255, 106, 20) # #FF6A14 - Secondary 3
 
 | File | Purpose |
 |------|---------|
-| `assets/critical-start-logo.svg` | Primary logo (vector) |
-| `assets/critical-start-logo.png` | Primary logo (raster, preferred for PPTX) |
+| `assets/Critical-Start-Stacked-Logo_0-2.png` | Primary logo (PNG, used for all presentations) |
 
 ### Output
 

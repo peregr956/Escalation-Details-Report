@@ -30,7 +30,7 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
 | `scripts/` | Utility scripts (e.g., `convert_logo_to_png.py`). |
 | `brand/` | Brand guidelines (`brand-guidelines.md`, `visual-identity.md`). |
 | `docs/` | Technical documentation (`CURRENT_STATE.md`, `SLIDE_STRUCTURE.md`, `DEVELOPER_GUIDE.md`). |
-| `assets/` | Logo and image assets (`critical-start-logo.svg`). |
+| `assets/` | Logo and image assets (`Critical-Start-Stacked-Logo_0-2.png`). |
 | `output/` | Generated PowerPoint presentations (gitignored). |
 | `ROADMAP.md` | Phased improvement plan for the presentation system. |
 | `CHANGELOG.md` | Version history and release notes. |

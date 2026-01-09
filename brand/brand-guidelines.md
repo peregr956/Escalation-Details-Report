@@ -128,7 +128,7 @@ To be the most effective service provider at delivering the greatest risk reduct
 ## 5. Visual Identity Overview
 
 ### 5.1 Logo Usage
-- Use the primary horizontal logo from `assets/critical-start-logo.svg` on light or gradient backgrounds.
+- Use the primary stacked logo from `assets/Critical-Start-Stacked-Logo_0-2.png` on light or gradient backgrounds.
 - Maintain clear space equal to the height of the letter "C" on all sides.
 - Minimum size: 80 px wide on-screen, 1 inch wide in print.
 - Never stretch, recolor outside the approved palette, add effects, or place on busy backgrounds without a solid field.

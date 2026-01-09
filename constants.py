@@ -42,16 +42,16 @@ FALLBACK_BODY_FONT = "Arial Narrow"
 # TYPOGRAPHY SCALE (adjusted for slide readability)
 # =============================================================================
 
-# Reduced from brand guidelines to fit presentation layouts appropriately
+# Typography scale per Executive Business Review specifications
 # Note: H1-H3 are for content titles, NOT the header/footer elements
-H1_FONT_SIZE = Pt(72)        # Hero/title slides - reduced from 114pt
-H2_FONT_SIZE = Pt(48)        # Section headers, large metrics - reduced from 72pt
-H3_FONT_SIZE = Pt(36)        # Slide titles - reduced from 48pt
-H4_FONT_SIZE = Pt(20)        # Subheadings - reduced from 27pt
-H5_FONT_SIZE = Pt(14)        # Card titles, bullet text - reduced from 18pt
-H6_FONT_SIZE = Pt(10)        # Labels, small text - reduced from 12pt
-PARAGRAPH_FONT_SIZE = Pt(10) # Body text - reduced from 12pt
-FOOTER_FONT_SIZE = Pt(9)     # Footer AND header elements - unchanged
+H1_FONT_SIZE = Pt(48)        # Hero/title slides
+H2_FONT_SIZE = Pt(28)        # Section headers, large metrics
+H3_FONT_SIZE = Pt(22)        # Slide titles
+H4_FONT_SIZE = Pt(18)        # Subheadings
+H5_FONT_SIZE = Pt(16)        # Card titles, bullet text
+H6_FONT_SIZE = Pt(11)        # Labels, small text
+PARAGRAPH_FONT_SIZE = Pt(12) # Body text
+FOOTER_FONT_SIZE = Pt(9)     # Footer AND header elements
 
 # Legacy aliases for backward compatibility
 TITLE_FONT_SIZE = H3_FONT_SIZE       # Slide titles use H3
@@ -78,7 +78,7 @@ FOOTER_HEIGHT = Inches(0.35)  # Footer area height
 # MASTER SLIDE CONSTANTS
 # =============================================================================
 
-PRESENTATION_TITLE = "ESCALATION REPORT"
+PRESENTATION_TITLE = "EXECUTIVE BUSINESS REVIEW"
 PRESENTATION_INTENT = "EBR"  # Executive Business Review
 COPYRIGHT_TEXT = "©2025 CRITICAL START"
 

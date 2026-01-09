@@ -229,8 +229,7 @@ def add_master_slide_elements(slide, prs, slide_number=None,
 def add_logo(slide, position='top_right', prs=None):
     """Add Critical Start logo to slides.
     
-    Uses the approved PNG logo file (assets/critical-start-logo.png) if available,
-    otherwise falls back to SVG format.
+    Uses the approved PNG logo file (assets/Critical-Start-Stacked-Logo_0-2.png).
     
     Args:
         slide: The slide object to add the logo to.
@@ -244,17 +243,13 @@ def add_logo(slide, position='top_right', prs=None):
     Returns:
         Picture: The picture shape object, or None if logo file not found.
     """
-    # Use approved PNG logo (preferred)
-    logo_path = Path("assets/critical-start-logo.png")
+    # Use approved PNG logo
+    logo_path = Path("assets/Critical-Start-Stacked-Logo_0-2.png")
     
-    # Fallback to SVG if PNG doesn't exist
     if not logo_path.exists():
-        logo_path = Path("assets/critical-start-logo.svg")
-        if not logo_path.exists():
-            print(f"Warning: Logo file not found.")
-            print(f"  Expected: assets/critical-start-logo.png (preferred)")
-            print(f"  Fallback: assets/critical-start-logo.svg")
-            return None
+        print(f"Warning: Logo file not found.")
+        print(f"  Expected: assets/Critical-Start-Stacked-Logo_0-2.png")
+        return None
     
     # Define logo size (maintain aspect ratio)
     logo_width = Inches(1.6)

@@ -863,32 +863,16 @@ def build_executive_summary_slides(prs, data):
     title_frame = title_box.text_frame
     title_frame.word_wrap = True
     title_paragraph = title_frame.paragraphs[0]
-    title_paragraph.text = "ESCALATION TO CLIENT\nDETAILS REPORT"
+    title_paragraph.text = "EXECUTIVE BUSINESS\nREVIEW"
     title_paragraph.font.name = TITLE_FONT_NAME
     title_paragraph.font.size = H1_FONT_SIZE  # 114pt per branding guide
     title_paragraph.font.bold = True
     title_paragraph.font.color.rgb = RGBColor(255, 255, 255)
     title_paragraph.alignment = PP_ALIGN.LEFT
     
-    # Add tier using H4 typography
-    subtitle_left = Inches(1)
-    subtitle_top = Inches(3.2)
-    subtitle_width = prs.slide_width - Inches(2)
-    subtitle_height = Inches(0.5)
-    
-    subtitle_box = slide1.shapes.add_textbox(subtitle_left, subtitle_top, subtitle_width, subtitle_height)
-    subtitle_frame = subtitle_box.text_frame
-    subtitle_frame.word_wrap = True
-    subtitle_paragraph = subtitle_frame.paragraphs[0]
-    subtitle_paragraph.text = data.tier
-    subtitle_paragraph.font.name = BODY_FONT_NAME
-    subtitle_paragraph.font.size = H4_FONT_SIZE  # 27pt
-    subtitle_paragraph.font.color.rgb = RGBColor(255, 255, 255)
-    subtitle_paragraph.alignment = PP_ALIGN.LEFT
-    
     # Add client name using H5 typography
     client_left = Inches(1)
-    client_top = Inches(3.7)
+    client_top = Inches(3.2)
     client_width = prs.slide_width - Inches(2)
     client_height = Inches(0.5)
     
@@ -898,7 +882,7 @@ def build_executive_summary_slides(prs, data):
     client_paragraph = client_frame.paragraphs[0]
     client_paragraph.text = data.client_name
     client_paragraph.font.name = BODY_FONT_NAME
-    client_paragraph.font.size = H5_FONT_SIZE  # 18pt
+    client_paragraph.font.size = H5_FONT_SIZE  # 16pt
     client_paragraph.font.color.rgb = RGBColor(255, 255, 255)
     client_paragraph.alignment = PP_ALIGN.LEFT
     
@@ -919,7 +903,7 @@ def build_executive_summary_slides(prs, data):
         # Different months, use full format
         period_text = f"{start_month_day} - {end_month_day}, {year} ({data.period_days} days)"
     period_left = Inches(1)
-    period_top = Inches(4.2)
+    period_top = Inches(3.7)
     period_width = prs.slide_width - Inches(2)
     period_height = Inches(0.5)
     
