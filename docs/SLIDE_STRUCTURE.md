@@ -296,11 +296,35 @@ This matrix ensures each key metric appears only once (or in carefully controlle
 
 **Title:** "Severity Alignment Flow" (H3 - 48pt, navy)
 
+**Layout:** Split panel design with narrative cards on left, Sankey diagram on right
+
+```
+┌───────────┬─────────────────────────────────────────────────┐
+│  UPGRADED │                                                 │
+│   12.3%   │                                                 │
+│  (value+) │                                                 │
+├───────────┤             SANKEY DIAGRAM                      │
+│ DE-ESCAL. │              (Enlarged)                         │
+│   24.7%   │                                                 │
+│  (time+)  │                                                 │
+├───────────┤                                                 │
+│  ALIGNED  │                                                 │
+│   63.0%   │                                                 │
+└───────────┴─────────────────────────────────────────────────┘
+```
+
 **Elements:**
-- Subtitle with escalation count chip
-- 3 stat boxes: Upgraded, De-escalated, Aligned
-- Sankey chart placeholder
-- Insight bullets
+- Subtitle with escalation count chip (top right)
+- Left column: 3 stacked narrative cards (~2" wide)
+  - **Upgraded** (X.X%) - "Added Value Beyond Vendor Detection" (red border)
+  - **De-escalated** (X.X%) - "Analyst Time Returned to Client" (blue border)
+  - **Aligned** (X.X%) - "Vendor Assessment Confirmed" (navy border)
+- Right area: Larger Sankey chart placeholder (~7" wide, 3.3" tall)
+
+**Narrative Storytelling:**
+- Upgraded alerts = CS provided more value than the vendor's original detection
+- De-escalated alerts = CS returned analyst time back to the client
+- Aligned alerts = Vendor assessment confirmed by CS analysis
 
 **Note:** This slide is kept standalone as a marquee visualization.
 

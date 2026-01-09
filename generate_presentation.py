@@ -2204,7 +2204,7 @@ def build_threat_landscape_slides(prs, data, include=True):
     
     total_escalations = upgraded_count + de_escalated_count + aligned_count
     
-    # Slide 11 - Severity Alignment Flow
+    # Slide 11 - Severity Alignment Flow (Redesigned with narrative storytelling)
     slide11, content_top_11 = setup_content_slide(prs, "Severity Alignment Flow")
     
     # Add subtitle using H6 typography
@@ -2247,69 +2247,106 @@ def build_threat_landscape_slides(prs, data, include=True):
     chip_text.paragraphs[0].alignment = PP_ALIGN.CENTER
     chip_text.vertical_anchor = 1  # Middle
     
-    # Add 3 stat boxes
-    stat_box_width = (prs.slide_width - Inches(2.2)) / 3
-    stat_box_height = Inches(1.2)
-    stat_spacing = Inches(0.2)
-    stat_start_left = Inches(0.5)
-    stat_start_top = subtitle_top + subtitle_height + Inches(0.3)
+    # Calculate percentages for narrative cards
+    upgrade_pct = (upgraded_count / total_escalations * 100) if total_escalations > 0 else 0
+    downgrade_pct = (de_escalated_count / total_escalations * 100) if total_escalations > 0 else 0
+    aligned_pct = (aligned_count / total_escalations * 100) if total_escalations > 0 else 0
     
-    stat_boxes = [
-        {"label": "Upgraded", "value": str(upgraded_count), "color": CS_RED},
-        {"label": "De-escalated", "value": str(de_escalated_count), "color": CS_BLUE},
-        {"label": "Aligned", "value": str(aligned_count), "color": CS_NAVY}
+    # Layout: Left stacked cards + Right larger Sankey
+    # Left column: 3 stacked narrative cards
+    card_left = Inches(0.5)
+    card_width = Inches(2.0)
+    card_height = Inches(1.0)
+    card_spacing = Inches(0.15)
+    cards_start_top = subtitle_top + subtitle_height + Inches(0.25)
+    
+    # Narrative-driven stat cards with storytelling
+    narrative_cards = [
+        {
+            "label": "Upgraded",
+            "value": f"{upgrade_pct:.1f}%",
+            "narrative": "Added Value Beyond\nVendor Detection",
+            "color": CS_RED
+        },
+        {
+            "label": "De-escalated",
+            "value": f"{downgrade_pct:.1f}%",
+            "narrative": "Analyst Time Returned\nto Client",
+            "color": CS_BLUE
+        },
+        {
+            "label": "Aligned",
+            "value": f"{aligned_pct:.1f}%",
+            "narrative": "Vendor Assessment\nConfirmed",
+            "color": CS_NAVY
+        }
     ]
     
-    for i, stat in enumerate(stat_boxes):
-        stat_left = stat_start_left + i * (stat_box_width + stat_spacing)
-        stat_top = stat_start_top
+    for i, card in enumerate(narrative_cards):
+        card_top = cards_start_top + i * (card_height + card_spacing)
         
-        # Create stat box background
-        stat_shape = slide11.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, stat_left, stat_top,
-            stat_box_width, stat_box_height
+        # Create card background
+        card_shape = slide11.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, card_left, card_top,
+            card_width, card_height
         )
-        fill = stat_shape.fill
+        fill = card_shape.fill
         fill.solid()
-        fill.fore_color.rgb = RGBColor(240, 248, 255)  # Light blue background
-        line = stat_shape.line
-        line.color.rgb = stat["color"]
+        fill.fore_color.rgb = RGBColor(250, 250, 252)  # Very light gray background
+        line = card_shape.line
+        line.color.rgb = card["color"]
         line.width = Pt(3)
         
-        # Add stat value
-        stat_value_box = slide11.shapes.add_textbox(
-            stat_left + Inches(0.1), stat_top + Inches(0.2),
-            stat_box_width - Inches(0.2), Inches(0.5)
+        # Add card label (top)
+        label_box = slide11.shapes.add_textbox(
+            card_left + Inches(0.1), card_top + Inches(0.05),
+            card_width - Inches(0.2), Inches(0.2)
         )
-        stat_value_frame = stat_value_box.text_frame
-        stat_value_frame.word_wrap = True
-        stat_value_paragraph = stat_value_frame.paragraphs[0]
-        stat_value_paragraph.text = stat["value"]
-        stat_value_paragraph.font.name = TITLE_FONT_NAME
-        stat_value_paragraph.font.size = Pt(36)
-        stat_value_paragraph.font.bold = True
-        stat_value_paragraph.font.color.rgb = stat["color"]
-        stat_value_paragraph.alignment = PP_ALIGN.CENTER
+        label_frame = label_box.text_frame
+        label_frame.word_wrap = True
+        label_para = label_frame.paragraphs[0]
+        label_para.text = card["label"].upper()
+        label_para.font.name = BODY_FONT_NAME
+        label_para.font.size = Pt(9)
+        label_para.font.bold = True
+        label_para.font.color.rgb = card["color"]
+        label_para.alignment = PP_ALIGN.CENTER
         
-        # Add stat label
-        stat_label_box = slide11.shapes.add_textbox(
-            stat_left + Inches(0.1), stat_top + Inches(0.7),
-            stat_box_width - Inches(0.2), Inches(0.4)
+        # Add percentage value (middle, prominent)
+        value_box = slide11.shapes.add_textbox(
+            card_left + Inches(0.1), card_top + Inches(0.22),
+            card_width - Inches(0.2), Inches(0.35)
         )
-        stat_label_frame = stat_label_box.text_frame
-        stat_label_frame.word_wrap = True
-        stat_label_paragraph = stat_label_frame.paragraphs[0]
-        stat_label_paragraph.text = stat["label"]
-        stat_label_paragraph.font.name = BODY_FONT_NAME
-        stat_label_paragraph.font.size = Pt(14)
-        stat_label_paragraph.font.color.rgb = CS_SLATE
-        stat_label_paragraph.alignment = PP_ALIGN.CENTER
+        value_frame = value_box.text_frame
+        value_frame.word_wrap = True
+        value_para = value_frame.paragraphs[0]
+        value_para.text = card["value"]
+        value_para.font.name = TITLE_FONT_NAME
+        value_para.font.size = Pt(28)
+        value_para.font.bold = True
+        value_para.font.color.rgb = card["color"]
+        value_para.alignment = PP_ALIGN.CENTER
+        
+        # Add narrative subtitle (bottom)
+        narrative_box = slide11.shapes.add_textbox(
+            card_left + Inches(0.08), card_top + Inches(0.58),
+            card_width - Inches(0.16), Inches(0.4)
+        )
+        narrative_frame = narrative_box.text_frame
+        narrative_frame.word_wrap = True
+        narrative_para = narrative_frame.paragraphs[0]
+        narrative_para.text = card["narrative"]
+        narrative_para.font.name = BODY_FONT_NAME
+        narrative_para.font.size = Pt(8)
+        narrative_para.font.color.rgb = CS_SLATE
+        narrative_para.alignment = PP_ALIGN.CENTER
+        narrative_para.line_spacing = 0.9
     
-    # Add Sankey chart placeholder
-    chart_left = Inches(0.8)
-    chart_top = stat_start_top + stat_box_height + Inches(0.3)
-    chart_width = prs.slide_width - Inches(1.6)
-    chart_height = Inches(2.0)
+    # Right side: Larger Sankey chart placeholder
+    chart_left = card_left + card_width + Inches(0.3)
+    chart_top = cards_start_top
+    chart_width = prs.slide_width - chart_left - Inches(0.5)
+    chart_height = Inches(3.3)  # Larger height for the Sankey
     
     chart_placeholder = slide11.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, chart_left, chart_top,
@@ -2330,49 +2367,6 @@ def build_threat_landscape_slides(prs, data, include=True):
     placeholder_text.paragraphs[0].font.color.rgb = CS_SLATE
     placeholder_text.paragraphs[0].alignment = PP_ALIGN.CENTER
     placeholder_text.vertical_anchor = 1  # Middle
-    
-    # Add key insight bullets
-    insight_left = Inches(0.8)
-    insight_top = chart_top + chart_height + Inches(0.2)
-    insight_width = chart_width
-    insight_height = Inches(0.8)
-    
-    insight_box = slide11.shapes.add_textbox(insight_left, insight_top, insight_width, insight_height)
-    insight_frame = insight_box.text_frame
-    insight_frame.word_wrap = True
-    insight_frame.margin_left = Inches(0.2)
-    insight_frame.margin_right = Inches(0.2)
-    
-    # Calculate percentages
-    upgrade_pct = (upgraded_count / total_escalations * 100) if total_escalations > 0 else 0
-    downgrade_pct = (de_escalated_count / total_escalations * 100) if total_escalations > 0 else 0
-    
-    insight_text = f"• {upgraded_count} escalations upgraded ({upgrade_pct:.1f}%) - CS raised severity based on business impact\n"
-    insight_text += f"• {de_escalated_count} escalations de-escalated ({downgrade_pct:.1f}%) - CS reduced noise from vendor over-classification"
-    
-    insight_paragraph = insight_frame.paragraphs[0]
-    insight_paragraph.text = insight_text
-    insight_paragraph.font.name = BODY_FONT_NAME
-    insight_paragraph.font.size = Pt(13)
-    insight_paragraph.font.color.rgb = CS_SLATE
-    insight_paragraph.alignment = PP_ALIGN.LEFT
-    
-    # Add footnote
-    footnote_left = Inches(0.5)
-    footnote_top = prs.slide_height - Inches(0.5)
-    footnote_width = prs.slide_width - Inches(1)
-    footnote_height = Inches(0.3)
-    
-    footnote_box = slide11.shapes.add_textbox(footnote_left, footnote_top, footnote_width, footnote_height)
-    footnote_frame = footnote_box.text_frame
-    footnote_frame.word_wrap = True
-    footnote_paragraph = footnote_frame.paragraphs[0]
-    footnote_paragraph.text = "Source: Vendor Severity (col 45) vs. Current Priority (col 13)"
-    footnote_paragraph.font.name = BODY_FONT_NAME
-    footnote_paragraph.font.size = Pt(10)
-    footnote_paragraph.font.color.rgb = CS_SLATE
-    footnote_paragraph.alignment = PP_ALIGN.LEFT
-    footnote_paragraph.font.italic = True
     
     # Slide 9 - Threat & Detection Sources (Merged: MITRE Tactics + Detection Sources)
     slide_threats, content_top_threats = setup_content_slide(prs, "Threat & Detection Sources")
