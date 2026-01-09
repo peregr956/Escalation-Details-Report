@@ -150,8 +150,7 @@ def create_title_slide_layout(prs, title_text, subtitle_text=None):
     fill.fore_color.rgb = CS_NAVY  # Use navy as base
     background_shape.line.fill.background()  # No border
     
-    # Add logo at top
-    add_logo(slide, position='top_left', prs=prs)
+    # Note: Logo removed from title slide per branding guidelines
     
     # Add title
     title_left = Inches(1)
@@ -227,8 +226,7 @@ def create_section_header_layout(prs, section_title, narrative_subtitle=None):
                                include_header=True, include_footer=True,
                                text_color=RGBColor(255, 255, 255))
     
-    # Add logo
-    add_logo(slide, position='top_right', prs=prs)
+    # Note: Logo removed from section cards per branding guidelines
     
     # Calculate vertical positioning
     # If we have a subtitle, move title up slightly to accommodate both
@@ -850,8 +848,7 @@ def build_executive_summary_slides(prs, data):
     # Add gradient background (blue sweep: #009CDE → #004C97)
     create_gradient_background(prs, slide1, 'blue_sweep')
     
-    # Add logo at top left
-    add_logo(slide1, position='top_left', prs=prs)
+    # Note: Logo removed from title slide per branding guidelines
     
     # Add main title using H1 typography (114pt per branding guide)
     title_left = Inches(1)
@@ -2710,23 +2707,6 @@ def build_forward_direction_slide(prs, data):
         insight_top,
         height=Inches(0.7)
     )
-    
-    # Footer - Report generated date and data sources
-    footer_top = prs.slide_height - Inches(0.5)
-    footer_left = Inches(0.5)
-    footer_width = prs.slide_width - Inches(1.0)
-    footer_height = Inches(0.3)
-    
-    footer_box = slide16.shapes.add_textbox(footer_left, footer_top, footer_width, footer_height)
-    footer_frame = footer_box.text_frame
-    footer_frame.word_wrap = True
-    footer_paragraph = footer_frame.paragraphs[0]
-    footer_paragraph.text = f"Report generated: {data.report_date} | Data sources: Escalation Details Report"
-    footer_paragraph.font.name = BODY_FONT_NAME
-    footer_paragraph.font.size = Pt(10)
-    footer_paragraph.font.color.rgb = CS_SLATE
-    footer_paragraph.alignment = PP_ALIGN.LEFT
-    footer_paragraph.font.italic = True
 
 
 def build_contact_slide(prs, data):

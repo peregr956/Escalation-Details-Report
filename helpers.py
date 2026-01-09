@@ -251,9 +251,15 @@ def add_logo(slide, position='top_right', prs=None):
         print(f"  Expected: assets/Critical-Start-Stacked-Logo_0-2.png")
         return None
     
-    # Define logo size (maintain aspect ratio)
-    logo_width = Inches(1.6)
-    logo_height = Inches(0.35)
+    # Get original image dimensions to preserve aspect ratio
+    from PIL import Image
+    with Image.open(logo_path) as img:
+        orig_width, orig_height = img.size
+        aspect_ratio = orig_width / orig_height
+    
+    # Define logo width - height is calculated to preserve aspect ratio
+    logo_width = Inches(0.7)
+    logo_height = logo_width / aspect_ratio
     
     # Get slide dimensions
     if prs:
@@ -280,8 +286,8 @@ def add_logo(slide, position='top_right', prs=None):
         top = Inches(0.3)
     
     try:
-        picture = slide.shapes.add_picture(str(logo_path), left, top,
-                                          width=logo_width, height=logo_height)
+        # Only specify width to let python-pptx preserve the original aspect ratio
+        picture = slide.shapes.add_picture(str(logo_path), left, top, width=logo_width)
         return picture
     except Exception as e:
         print(f"Error adding logo: {e}")
