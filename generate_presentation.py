@@ -1091,11 +1091,240 @@ def build_executive_summary_slides(prs, data):
         insight_top,
         height=Inches(0.7)
     )
+    
+    # Slide 4 - CORR Platform Funnel (AI Accelerated Security)
+    build_corr_funnel_slide(prs)
 
 
 def create_executive_summary_slide(prs, report_data):
     """Create the Executive Summary slide."""
     pass
+
+
+def build_corr_funnel_slide(prs):
+    """Create the CORR Platform funnel slide showing security event flow.
+    
+    This slide visualizes the AI-accelerated security pipeline with 4 stages:
+    Security Events → Potential Threats → Alerts → Response Actions
+    
+    The funnel uses overlapping rounded rectangles of decreasing height to show
+    how the CORR platform filters and processes security events.
+    
+    Args:
+        prs (Presentation): The presentation object.
+    
+    Returns:
+        Slide: The created slide object.
+    """
+    # Create slide with standard branding
+    slide, content_top = setup_content_slide(prs, "AI Accelerated, Human Validated Security")
+    
+    # Add subtitle
+    subtitle_box = slide.shapes.add_textbox(
+        MARGIN_STANDARD, content_top,
+        prs.slide_width - Inches(2), Inches(0.4)
+    )
+    subtitle_frame = subtitle_box.text_frame
+    subtitle_para = subtitle_frame.paragraphs[0]
+    subtitle_para.text = "CORR Is Our Superpower to Finding the Right Alerts to Prevent Incidents"
+    subtitle_para.font.name = BODY_FONT_NAME
+    subtitle_para.font.size = Pt(14)
+    subtitle_para.font.color.rgb = CS_SLATE
+    subtitle_para.alignment = PP_ALIGN.LEFT
+    
+    # =========================================================================
+    # Funnel Visualization Parameters
+    # =========================================================================
+    funnel_top = content_top + Inches(0.6)
+    funnel_left = Inches(0.4)
+    funnel_width = prs.slide_width - Inches(0.8)
+    
+    # Define the 4 funnel stages with decreasing heights
+    # Heights decrease to create the funnel effect (tallest on left, shortest on right)
+    funnel_stages = [
+        {
+            "value": "1.2B",
+            "label": "Security Events",
+            "color": CS_ORANGE,
+            "height": Inches(2.8),
+            "width": Inches(1.8),
+            "has_shield": True,
+            "shield_label": "Security Event\nIn-Flow CORR\nPlatform"
+        },
+        {
+            "value": "2m",
+            "label": "Potential Threats",
+            "color": CS_BLUE,
+            "height": Inches(2.3),
+            "width": Inches(1.6),
+            "agent_label": "TBR Agent",
+            "agent_metric": "99% Resolution"
+        },
+        {
+            "value": "150k",
+            "label": "Alerts",
+            "color": CS_VIOLET,
+            "height": Inches(1.9),
+            "width": Inches(1.4),
+            "agent_label": "Case Agent",
+            "agent_metric": "92% Consolidation"
+        },
+        {
+            "value": "72k",
+            "label": "Response\nActions",
+            "color": CS_RED,
+            "height": Inches(1.5),
+            "width": Inches(1.2),
+            "agent_label": "SOC / AI",
+            "agent_metric": "Investigation"
+        }
+    ]
+    
+    # Calculate positions for overlapping effect
+    # Each stage overlaps the previous one slightly
+    overlap = Inches(0.15)
+    total_width = sum(stage["width"] for stage in funnel_stages) - overlap * (len(funnel_stages) - 1)
+    start_left = funnel_left + (funnel_width - total_width - Inches(1.0)) / 2  # Center with room for arrow
+    
+    # Maximum height for vertical alignment (align bottoms)
+    max_height = max(stage["height"] for stage in funnel_stages)
+    funnel_bottom = funnel_top + max_height
+    
+    # Draw gray background arrow (the flow indicator)
+    arrow_left = start_left - Inches(0.3)
+    arrow_width = total_width + Inches(1.5)
+    arrow_height = Inches(1.8)
+    arrow_top = funnel_bottom - arrow_height / 2 - Inches(0.3)
+    
+    # Create arrow shape using pentagon/chevron
+    arrow_shape = slide.shapes.add_shape(
+        MSO_SHAPE.CHEVRON, 
+        start_left + total_width + Inches(0.2),
+        funnel_bottom - Inches(0.9),
+        Inches(0.8), Inches(0.8)
+    )
+    arrow_shape.fill.solid()
+    arrow_shape.fill.fore_color.rgb = RGBColor(180, 180, 180)  # Gray arrow
+    arrow_shape.line.fill.background()
+    
+    # Draw each funnel stage
+    current_left = start_left
+    
+    for idx, stage in enumerate(funnel_stages):
+        stage_height = stage["height"]
+        stage_width = stage["width"]
+        stage_top = funnel_bottom - stage_height  # Align bottoms
+        
+        # Draw agent label above the stage (if present)
+        if "agent_label" in stage:
+            label_top = stage_top - Inches(0.55)
+            
+            # Agent label (bold)
+            agent_label_box = slide.shapes.add_textbox(
+                current_left, label_top,
+                stage_width, Inches(0.25)
+            )
+            agent_tf = agent_label_box.text_frame
+            agent_para = agent_tf.paragraphs[0]
+            agent_para.text = stage["agent_label"]
+            agent_para.font.name = TITLE_FONT_NAME
+            agent_para.font.size = Pt(11)
+            agent_para.font.bold = True
+            agent_para.font.color.rgb = CS_NAVY
+            agent_para.alignment = PP_ALIGN.CENTER
+            
+            # Agent metric (smaller, below)
+            metric_label_box = slide.shapes.add_textbox(
+                current_left, label_top + Inches(0.2),
+                stage_width, Inches(0.2)
+            )
+            metric_tf = metric_label_box.text_frame
+            metric_para = metric_tf.paragraphs[0]
+            metric_para.text = stage["agent_metric"]
+            metric_para.font.name = BODY_FONT_NAME
+            metric_para.font.size = Pt(9)
+            metric_para.font.color.rgb = CS_SLATE
+            metric_para.alignment = PP_ALIGN.CENTER
+        
+        # Draw the rounded rectangle for this stage
+        rect_shape = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            current_left, stage_top,
+            stage_width, stage_height
+        )
+        rect_shape.fill.solid()
+        rect_shape.fill.fore_color.rgb = stage["color"]
+        rect_shape.line.fill.background()
+        
+        # Adjust corner radius (adjustments property)
+        if hasattr(rect_shape, 'adjustments') and len(rect_shape.adjustments) > 0:
+            rect_shape.adjustments[0] = 0.15  # Rounded corners
+        
+        # Add shield icon and label for first stage
+        if stage.get("has_shield"):
+            # Shield icon (using text-based shield character)
+            shield_box = slide.shapes.add_textbox(
+                current_left + Inches(0.3), stage_top + Inches(0.3),
+                stage_width - Inches(0.6), Inches(0.6)
+            )
+            shield_tf = shield_box.text_frame
+            shield_para = shield_tf.paragraphs[0]
+            shield_para.text = "🛡"
+            shield_para.font.size = Pt(32)
+            shield_para.alignment = PP_ALIGN.CENTER
+            
+            # Shield label text
+            shield_label_box = slide.shapes.add_textbox(
+                current_left + Inches(0.1), stage_top + Inches(0.85),
+                stage_width - Inches(0.2), Inches(0.8)
+            )
+            shield_label_tf = shield_label_box.text_frame
+            shield_label_tf.word_wrap = True
+            shield_label_para = shield_label_tf.paragraphs[0]
+            shield_label_para.text = stage["shield_label"]
+            shield_label_para.font.name = TITLE_FONT_NAME
+            shield_label_para.font.size = Pt(12)
+            shield_label_para.font.bold = True
+            shield_label_para.font.color.rgb = RGBColor(255, 255, 255)
+            shield_label_para.alignment = PP_ALIGN.CENTER
+        
+        # Add value (large number) - positioned in center of shape
+        value_top = stage_top + stage_height * 0.35
+        if stage.get("has_shield"):
+            value_top = stage_top + stage_height * 0.55
+            
+        value_box = slide.shapes.add_textbox(
+            current_left, value_top,
+            stage_width, Inches(0.6)
+        )
+        value_tf = value_box.text_frame
+        value_para = value_tf.paragraphs[0]
+        value_para.text = stage["value"]
+        value_para.font.name = TITLE_FONT_NAME
+        value_para.font.size = Pt(36)
+        value_para.font.bold = True
+        value_para.font.color.rgb = RGBColor(255, 255, 255)
+        value_para.alignment = PP_ALIGN.CENTER
+        
+        # Add label below value
+        label_box = slide.shapes.add_textbox(
+            current_left, value_top + Inches(0.45),
+            stage_width, Inches(0.5)
+        )
+        label_tf = label_box.text_frame
+        label_tf.word_wrap = True
+        label_para = label_tf.paragraphs[0]
+        label_para.text = stage["label"]
+        label_para.font.name = BODY_FONT_NAME
+        label_para.font.size = Pt(11)
+        label_para.font.bold = True
+        label_para.font.color.rgb = RGBColor(255, 255, 255)
+        label_para.alignment = PP_ALIGN.CENTER
+        
+        # Move to next position with overlap
+        current_left += stage_width - overlap
+    
+    return slide
 
 
 def build_value_delivered_slides(prs, data):
@@ -1283,167 +1512,6 @@ def build_value_delivered_slides(prs, data):
     note_para.font.color.rgb = CS_SLATE
     note_para.font.italic = True
     note_para.alignment = PP_ALIGN.CENTER
-    
-    # Slide 4 - Security Outcomes Infographic (Pipeline Flow)
-    slide_outcomes = prs.slides.add_slide(blank_slide_layout)
-    slide_outcomes_number = get_slide_number(prs)
-    
-    # Add master slide elements
-    add_master_slide_elements(slide_outcomes, prs, slide_number=slide_outcomes_number,
-                               include_header=True, include_footer=True)
-    
-    # Add logo at top right
-    add_logo(slide_outcomes, position='top_right', prs=prs)
-    
-    # Add title using H3 typography
-    outcomes_title_box = slide_outcomes.shapes.add_textbox(MARGIN_STANDARD, content_top, 
-                                                  prs.slide_width - Inches(2), Inches(0.7))
-    outcomes_title_frame = outcomes_title_box.text_frame
-    outcomes_title_frame.word_wrap = True
-    outcomes_title_paragraph = outcomes_title_frame.paragraphs[0]
-    outcomes_title_paragraph.text = "Security Operations Pipeline"
-    outcomes_title_paragraph.font.name = TITLE_FONT_NAME
-    outcomes_title_paragraph.font.size = H3_FONT_SIZE  # 48pt
-    outcomes_title_paragraph.font.bold = True
-    outcomes_title_paragraph.font.color.rgb = CS_NAVY
-    outcomes_title_paragraph.alignment = PP_ALIGN.LEFT
-    
-    # =========================================================================
-    # Infographic Flow: INPUTS → ACTIONS → OUTCOMES
-    # =========================================================================
-    infographic_top = content_top + Inches(0.8)
-    infographic_left = Inches(0.5)
-    infographic_width = prs.slide_width - Inches(1.0)
-    
-    # Card dimensions for 3-column flow
-    card_width = (infographic_width - Inches(1.2)) / 3  # Space for arrows
-    card_height = Inches(2.0)
-    arrow_width = Inches(0.4)
-    
-    # Define the three pipeline stages
-    pipeline_stages = [
-        {
-            "title": "INPUTS",
-            "color": CS_SLATE,  # Neutral for inputs
-            "metrics": [
-                {"value": f"{data.alerts_triaged:,}", "label": "Alerts Received"},
-                {"value": f"{data.after_hours_escalations}", "label": "After-Hours"},
-                {"value": f"{data.coverage_hours}h", "label": "Coverage"}
-            ]
-        },
-        {
-            "title": "ACTIONS", 
-            "color": CS_BLUE,  # Active blue for actions
-            "metrics": [
-                {"value": f"{data.incidents_escalated:,}", "label": "Escalated"},
-                {"value": f"{data.client_touch_decisions:,}", "label": "Client-Touch"},
-                {"value": f"{data.closed_end_to_end:,}", "label": "Closed E2E"}
-            ]
-        },
-        {
-            "title": "OUTCOMES",
-            "color": CS_GREEN,  # Green for positive outcomes
-            "metrics": [
-                {"value": f"{data.true_threats_contained}", "label": "Threats Contained"},
-                {"value": "100%", "label": "Containment Rate"},
-                {"value": f"{data.mttr_minutes}m", "label": "Avg Response"}
-            ]
-        }
-    ]
-    
-    # Draw the three pipeline stage cards
-    for idx, stage in enumerate(pipeline_stages):
-        card_left = infographic_left + idx * (card_width + Inches(0.6))
-        
-        # Card background
-        card_shape = slide_outcomes.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, card_left, infographic_top,
-            card_width, card_height
-        )
-        fill = card_shape.fill
-        fill.solid()
-        fill.fore_color.rgb = RGBColor(250, 250, 255)
-        line = card_shape.line
-        line.color.rgb = stage["color"]
-        line.width = Pt(3)
-        
-        # Stage title (header bar)
-        title_bar_height = Inches(0.4)
-        title_bar = slide_outcomes.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, card_left, infographic_top,
-            card_width, title_bar_height
-        )
-        title_bar.fill.solid()
-        title_bar.fill.fore_color.rgb = stage["color"]
-        title_bar.line.fill.background()
-        
-        # Title text
-        title_box = slide_outcomes.shapes.add_textbox(
-            card_left, infographic_top, card_width, title_bar_height
-        )
-        title_tf = title_box.text_frame
-        title_tf.paragraphs[0].text = stage["title"]
-        title_tf.paragraphs[0].font.name = TITLE_FONT_NAME
-        title_tf.paragraphs[0].font.size = Pt(14)
-        title_tf.paragraphs[0].font.bold = True
-        title_tf.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
-        title_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
-        
-        # Draw metrics within the card
-        metric_top = infographic_top + title_bar_height + Inches(0.15)
-        metric_height = (card_height - title_bar_height - Inches(0.2)) / 3
-        
-        for m_idx, metric in enumerate(stage["metrics"]):
-            m_top = metric_top + m_idx * metric_height
-            
-            # Metric value
-            val_box = slide_outcomes.shapes.add_textbox(
-                card_left + Inches(0.1), m_top,
-                card_width - Inches(0.2), Inches(0.4)
-            )
-            val_tf = val_box.text_frame
-            val_tf.paragraphs[0].text = metric["value"]
-            val_tf.paragraphs[0].font.name = TITLE_FONT_NAME
-            val_tf.paragraphs[0].font.size = Pt(22)
-            val_tf.paragraphs[0].font.bold = True
-            val_tf.paragraphs[0].font.color.rgb = CS_NAVY
-            val_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
-            
-            # Metric label
-            label_box = slide_outcomes.shapes.add_textbox(
-                card_left + Inches(0.1), m_top + Inches(0.35),
-                card_width - Inches(0.2), Inches(0.3)
-            )
-            label_tf = label_box.text_frame
-            label_tf.paragraphs[0].text = metric["label"]
-            label_tf.paragraphs[0].font.name = BODY_FONT_NAME
-            label_tf.paragraphs[0].font.size = Pt(11)
-            label_tf.paragraphs[0].font.color.rgb = CS_SLATE
-            label_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
-        
-        # Draw arrow between cards (except after last card)
-        if idx < 2:
-            arrow_left = card_left + card_width + Inches(0.1)
-            arrow_top = infographic_top + card_height / 2 - Inches(0.15)
-            
-            # Simple arrow using chevron shape
-            arrow = slide_outcomes.shapes.add_shape(
-                MSO_SHAPE.CHEVRON, arrow_left, arrow_top,
-                Inches(0.4), Inches(0.3)
-            )
-            arrow.fill.solid()
-            arrow.fill.fore_color.rgb = CS_BLUE
-            arrow.line.fill.background()
-    
-    # Add insight bar at bottom
-    insight_top = infographic_top + card_height + Inches(0.3)
-    add_insight_callout(
-        slide_outcomes, prs,
-        "The Pipeline in Action",
-        "From raw alerts to zero breaches—every threat contained, every risk mitigated.",
-        insight_top,
-        height=Inches(0.8)
-    )
 
 
 def build_protection_achieved_slides(prs, data):
@@ -1453,14 +1521,105 @@ def build_protection_achieved_slides(prs, data):
         prs (Presentation): The presentation object.
         data (ReportData): The report data object containing all metrics.
     """
-    # Slide 7 - Performance Trends
-    slide7, content_top_7 = setup_content_slide(prs, "Getting Better Every Period")
+    # Slide 7 - Critical Start's Performance (Split Layout)
+    slide7, content_top_7 = setup_content_slide(prs, "Critical Start's Performance")
     
-    # Add chart placeholder (rectangle with border)
-    chart_left = Inches(0.8)
+    # =========================================================================
+    # LEFT PANEL: Response Metrics (MTTR by Severity)
+    # =========================================================================
+    panel_left = Inches(0.5)
+    panel_top = content_top_7 + Inches(0.1)
+    panel_width = Inches(2.3)
+    panel_height = Inches(3.2)
+    
+    # Panel background
+    panel_bg = slide7.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, panel_left, panel_top,
+        panel_width, panel_height
+    )
+    panel_bg.fill.solid()
+    panel_bg.fill.fore_color.rgb = RGBColor(248, 250, 252)  # Very light gray
+    panel_bg.line.color.rgb = CS_SLATE
+    panel_bg.line.width = Pt(1)
+    
+    # Panel header
+    header_height = Inches(0.4)
+    header_shape = slide7.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, panel_left, panel_top,
+        panel_width, header_height
+    )
+    header_shape.fill.solid()
+    header_shape.fill.fore_color.rgb = CS_NAVY
+    header_shape.line.fill.background()
+    
+    header_text = slide7.shapes.add_textbox(panel_left, panel_top, panel_width, header_height)
+    header_tf = header_text.text_frame
+    header_tf.paragraphs[0].text = "RESPONSE METRICS"
+    header_tf.paragraphs[0].font.name = TITLE_FONT_NAME
+    header_tf.paragraphs[0].font.size = Pt(12)
+    header_tf.paragraphs[0].font.bold = True
+    header_tf.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
+    header_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+    
+    # Metric cards within panel
+    metrics = [
+        {"value": f"{data.critical_high_mttr} min", "label": "Critical/High", "color": CS_RED},
+        {"value": f"{data.medium_low_mttr} min", "label": "Medium/Low", "color": CS_ORANGE},
+        {"value": f"{data.p90_minutes} min", "label": "P90 Response", "color": CS_BLUE},
+    ]
+    
+    card_top = panel_top + header_height + Inches(0.15)
+    card_height = Inches(0.85)
+    card_spacing = Inches(0.1)
+    card_margin = Inches(0.1)
+    card_width = panel_width - card_margin * 2
+    
+    for idx, metric in enumerate(metrics):
+        current_top = card_top + idx * (card_height + card_spacing)
+        
+        # Card background
+        card_shape = slide7.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            panel_left + card_margin, current_top,
+            card_width, card_height
+        )
+        card_shape.fill.solid()
+        card_shape.fill.fore_color.rgb = RGBColor(255, 255, 255)
+        card_shape.line.color.rgb = metric["color"]
+        card_shape.line.width = Pt(2)
+        
+        # Metric value (large)
+        value_box = slide7.shapes.add_textbox(
+            panel_left + card_margin, current_top + Inches(0.1),
+            card_width, Inches(0.45)
+        )
+        value_tf = value_box.text_frame
+        value_tf.paragraphs[0].text = metric["value"]
+        value_tf.paragraphs[0].font.name = TITLE_FONT_NAME
+        value_tf.paragraphs[0].font.size = Pt(28)
+        value_tf.paragraphs[0].font.bold = True
+        value_tf.paragraphs[0].font.color.rgb = metric["color"]
+        value_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+        
+        # Metric label
+        label_box = slide7.shapes.add_textbox(
+            panel_left + card_margin, current_top + Inches(0.5),
+            card_width, Inches(0.3)
+        )
+        label_tf = label_box.text_frame
+        label_tf.paragraphs[0].text = metric["label"]
+        label_tf.paragraphs[0].font.name = BODY_FONT_NAME
+        label_tf.paragraphs[0].font.size = Pt(11)
+        label_tf.paragraphs[0].font.color.rgb = CS_SLATE
+        label_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+    
+    # =========================================================================
+    # RIGHT PANEL: Trend Chart
+    # =========================================================================
+    chart_left = panel_left + panel_width + Inches(0.2)
     chart_top = content_top_7 + Inches(0.1)
-    chart_width = prs.slide_width - Inches(1.6)
-    chart_height = Inches(2.5)  # Reduced for new layout
+    chart_width = prs.slide_width - chart_left - Inches(0.5)
+    chart_height = Inches(2.3)
     
     chart_placeholder = slide7.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, chart_left, chart_top,
@@ -1483,10 +1642,10 @@ def build_protection_achieved_slides(prs, data):
     placeholder_text.vertical_anchor = 1  # Middle
     
     # Add legend below chart
-    legend_top = chart_top + chart_height + Inches(0.2)
+    legend_top = chart_top + chart_height + Inches(0.15)
     legend_left = chart_left
     legend_width = chart_width
-    legend_height = Inches(0.5)
+    legend_height = Inches(0.35)
     
     legend_box = slide7.shapes.add_textbox(legend_left, legend_top, legend_width, legend_height)
     legend_frame = legend_box.text_frame
@@ -1494,19 +1653,17 @@ def build_protection_achieved_slides(prs, data):
     legend_paragraph = legend_frame.paragraphs[0]
     legend_paragraph.text = "MTTR (blue) | MTTD (navy) | FP% (red dashed)"
     legend_paragraph.font.name = BODY_FONT_NAME
-    legend_paragraph.font.size = Pt(14)
+    legend_paragraph.font.size = Pt(11)
     legend_paragraph.font.color.rgb = CS_SLATE
     legend_paragraph.alignment = PP_ALIGN.CENTER
     
-    # Add insight box
-    insight_left = Inches(0.8)
-    insight_top = legend_top + legend_height + Inches(0.2)
-    insight_width = chart_width
-    insight_height = Inches(0.8)
+    # Add insight box below legend (spanning full width of right panel)
+    insight_top = legend_top + legend_height + Inches(0.1)
+    insight_height = Inches(0.65)
     
     insight_shape = slide7.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE, insight_left, insight_top,
-        insight_width, insight_height
+        MSO_SHAPE.RECTANGLE, chart_left, insight_top,
+        chart_width, insight_height
     )
     fill = insight_shape.fill
     fill.solid()
@@ -1516,9 +1673,9 @@ def build_protection_achieved_slides(prs, data):
     line.width = Pt(2)
     
     insight_text = insight_shape.text_frame
-    insight_text.text = "MTTR decreased 25% to 126 minutes, MTTD improved 22% to 42 minutes"
+    insight_text.text = "MTTR decreased 25% to 126 min | MTTD improved 22% to 42 min"
     insight_text.paragraphs[0].font.name = BODY_FONT_NAME
-    insight_text.paragraphs[0].font.size = Pt(16)
+    insight_text.paragraphs[0].font.size = Pt(13)
     insight_text.paragraphs[0].font.color.rgb = CS_NAVY
     insight_text.paragraphs[0].font.bold = True
     insight_text.paragraphs[0].alignment = PP_ALIGN.CENTER

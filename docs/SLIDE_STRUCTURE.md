@@ -17,11 +17,11 @@ The presentation uses **6 section title cards** to guide the narrative and **14 
 | 1 | Content | Opening | Title Slide | Client name, tier, period, report date |
 | 2 | **Section Card** | | Executive Summary | "A comprehensive view of your security posture and the value delivered this period" |
 | 3 | Content | Executive Summary | Executive Dashboard | 6 key metrics in 2×3 grid (threats, response, closed E2E, alerts, after-hours, FP rate) |
-| 4 | **Section Card** | | Value Delivered | "Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention" |
-| 5 | Content | Value | Value Delivered | Hero cost avoidance + 3 breakdown cards (ops, coverage, prevention) |
-| 6 | Content | Value | Security Operations Pipeline | Infographic flow: Inputs → Actions → Outcomes |
+| 4 | Content | Executive Summary | AI Accelerated Security | CORR Platform funnel: Security Events → Potential Threats → Alerts → Response Actions |
+| 5 | **Section Card** | | Value Delivered | "Quantifying the business impact: cost avoidance, operational efficiency, and breach prevention" |
+| 6 | Content | Value | Value Delivered | Hero cost avoidance + 3 breakdown cards (ops, coverage, prevention) |
 | 7 | **Section Card** | | Protection Achieved | "Measurable outcomes that exceed industry standards and reduce your breach risk" |
-| 8 | Content | Performance | Performance Trends | MTTR/MTTD/FP% trend chart with insight |
+| 8 | Content | Performance | Critical Start's Performance | Split layout: MTTR by severity cards (left) + trend chart (right) |
 | 9 | Content | Performance | Industry Comparison | Comparison table (Your Performance vs Industry) + insight bar |
 | 10 | Content | Performance | Response & Detection | Dual-panel: Response Efficiency (3 cards) + Detection Quality (2×2 grid) |
 | 11 | **Section Card** | | Threat Landscape | "Understanding the threats we're seeing and how we're adapting to protect your organization" |
@@ -66,7 +66,7 @@ Every content slide now has a "blue bar" insight callout providing the "bottom l
 |-------|--------------|---------|
 | Executive Dashboard | "Your Security Posture at a Glance" | Summary of dashboard metrics |
 | Security Operations Pipeline | "The Pipeline in Action" | Raw alerts → zero breaches message |
-| Performance Trends | (existing) | Trend interpretation |
+| Critical Start's Performance | (existing) | Trend interpretation |
 | Industry Comparison | "Outperforming Industry Benchmarks" | Competitive advantage message |
 | Response & Detection | (existing) | Detection quality insight |
 | Severity Alignment | (existing) | Severity flow interpretation |
@@ -222,7 +222,30 @@ This matrix ensures each key metric appears only once (or in carefully controlle
 - Each card: Title (10pt) + Metric (42pt) + Detail (11pt)
 - **Insight bar at bottom:** "Your Security Posture at a Glance"
 
-### Slide 5: Value Delivered (Hero + Breakdown)
+### Slide 4: AI Accelerated Security (CORR Funnel)
+
+**Title:** "AI Accelerated, Human Validated Security" (H3 - 48pt, navy)
+
+**Subtitle:** "CORR Is Our Superpower to Finding the Right Alerts to Prevent Incidents" (14pt, slate)
+
+**Elements:**
+- Horizontal funnel visualization with 4 overlapping rounded rectangles (decreasing height left-to-right)
+- Stage 1 (Orange): 1.2B Security Events - includes shield icon and "Security Event In-Flow CORR Platform" label
+- Stage 2 (Blue): 2m Potential Threats - with "TBR Agent / 99% Resolution" label above
+- Stage 3 (Violet): 150k Alerts - with "Case Agent / 92% Consolidation" label above
+- Stage 4 (Red): 72k Response Actions - with "SOC / AI Investigation" label above
+- Gray chevron arrow at end indicating flow direction
+- Funnel stages aligned at bottom, creating cascading visual effect
+
+**Colors:**
+| Stage | Color | Hex |
+|-------|-------|-----|
+| Security Events | CS_ORANGE | #FF6A14 |
+| Potential Threats | CS_BLUE | #009CDE |
+| Alerts | CS_VIOLET | #702F8A |
+| Response Actions | CS_RED | #EF3340 |
+
+### Slide 6: Value Delivered (Hero + Breakdown)
 
 **Title:** "Value Delivered" (H3 - 48pt, navy)
 
@@ -231,16 +254,23 @@ This matrix ensures each key metric appears only once (or in carefully controlle
 - Right panel: 3 stacked breakdown cards (Ops, Coverage, Prevention)
 - Methodology note at bottom
 
-### Slide 6: Security Operations Pipeline (NEW Infographic)
+### Slide 8: Critical Start's Performance (Split Layout)
 
-**Title:** "Security Operations Pipeline" (H3 - 48pt, navy)
+**Title:** "Critical Start's Performance" (H3 - 48pt, navy)
 
-**Elements:**
-- 3-column infographic flow with chevron arrows
-- INPUTS column (gray): Alerts Received, After-Hours, Coverage
-- ACTIONS column (blue): Escalated, Client-Touch, Closed E2E
-- OUTCOMES column (green): Threats Contained, Containment Rate, Avg Response
-- **Insight bar:** "From raw alerts to zero breaches—every threat contained"
+**Layout:** Split panel design with metrics on left, trend chart on right
+
+**Left Panel - Response Metrics:**
+- Panel header: "RESPONSE METRICS" (navy background, white text)
+- 3 stacked metric cards:
+  - Critical/High MTTR: 67 min (red border)
+  - Medium/Low MTTR: 52 min (orange border)
+  - P90 Response: 87 min (blue border)
+
+**Right Panel - Trend Chart:**
+- Performance trends chart placeholder (MTTR/MTTD/FP% over 3 periods)
+- Legend: "MTTR (blue) | MTTD (navy) | FP% (red dashed)"
+- **Insight bar:** "MTTR decreased 25% to 126 min | MTTD improved 22% to 42 min"
 
 ### Slide 9: Industry Comparison
 
@@ -377,3 +407,6 @@ Places Critical Start logo at specified position.
 | 2025-12-23 | 3.0 | AI (Claude) | Added gray section title cards with narrative subtitles |
 | 2026-01-09 | 4.0 | AI (Claude) | Consolidated to 15-slide structure: Removed section cards, merged duplicate slides, added Contact slide |
 | 2026-01-09 | 5.0 | AI (Claude) | **Revised 20-slide structure**: Restored 6 section cards, removed content redundancy (cost avoided), converted Security Outcomes to pipeline infographic, added insight bars to all content slides |
+| 2026-01-09 | 6.0 | AI (Claude) | **21-slide structure**: Added CORR Platform funnel slide (AI Accelerated Security) after Executive Dashboard in Executive Summary section |
+| 2026-01-09 | 7.0 | AI (Claude) | **20-slide structure**: Removed redundant Security Operations Pipeline slide (now covered by CORR Funnel) |
+| 2026-01-09 | 8.0 | AI (Claude) | Redesigned slide 8: Renamed to "Critical Start's Performance", added split layout with MTTR by severity metrics panel |
