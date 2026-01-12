@@ -321,32 +321,41 @@ def validate_report_data(data: ReportData) -> List[str]:
 **Timeline:** Long-term (Future)  
 **Goal:** Add sophisticated features for enhanced presentations
 
-### 5.1 Dynamic Content
+### 5.1 Dynamic Content (PARTIALLY COMPLETE)
 
-- Conditional slides based on data availability
-- Automatic slide ordering by content importance
-- Smart content summarization for dense slides
-- Auto-generated executive summary narrative
+- [x] **Data-driven generation from Excel files** (Completed Jan 2026)
+  - Load 1-3 Excel files for multi-period trend analysis
+  - Compute all 120+ ReportData fields from raw incident data
+  - Auto-generate improvement items based on threshold rules
+  - Generate executive summary narrative with dynamic values
+- [ ] Conditional slides based on data availability
+- [ ] Automatic slide ordering by content importance
+- [ ] Smart content summarization for dense slides
 
 ### 5.2 Customization Options
 
-- Multiple presentation templates (executive, technical, summary)
-- Configurable slide sets via command-line
-- Per-client branding support
-- Custom date range handling
+- [x] **Client configuration via YAML** (Completed Jan 2026)
+  - Industry benchmarks (MTTR, MTTD, incidents/day)
+  - SLA targets by priority
+  - Client tier and name override
+- [ ] Multiple presentation templates (executive, technical, summary)
+- [x] Configurable slide sets via command-line (`--no-threat-landscape`)
+- [ ] Per-client branding support
+- [x] Custom date range handling (derived from data or config)
 
 ### 5.3 Quality Assurance
 
-- Automated slide validation (content, formatting)
-- Visual regression testing
-- Brand compliance checker
-- Content completeness verification
+- [x] **Data validation mode** (`--validate` flag) (Completed Jan 2026)
+- [ ] Automated slide validation (content, formatting)
+- [ ] Visual regression testing
+- [ ] Brand compliance checker
+- [ ] Content completeness verification
 
 ### 5.4 Success Criteria
 
 - [ ] At least 2 presentation templates available
 - [ ] Automated QA catches 95%+ of issues
-- [ ] Dynamic content reduces manual editing by 50%
+- [x] Dynamic content reduces manual editing by 50%+
 
 ---
 
@@ -386,8 +395,9 @@ def validate_report_data(data: ReportData) -> List[str]:
 | Content coverage | ~70% | 100% | 1 |
 | Executive-friendly slides | ~40% | 100% | 2 |
 | Brand compliance | ~60% | 100% | 3 |
-| Code maintainability | Low | High | 4 |
-| Automation level | Basic | Advanced | 5 |
+| Code maintainability | Medium | High | 4 |
+| Automation level | **High** | Advanced | 5 |
+| Data-driven generation | **Complete** | Complete | 5 |
 
 ---
 
@@ -420,6 +430,7 @@ Future enhancements that could leverage AI capabilities:
 
 | Date | Version | Author | Summary |
 |------|---------|--------|---------|
+| 2026-01-12 | 1.2 | AI (Claude) | Marked Phase 5 data-driven generation complete |
 | 2026-01-09 | 1.1 | AI (Claude) | Added Phase 0 (Repository Cleanup), AI Opportunities |
 | 2025-12-22 | 1.0 | AI (Claude) | Initial roadmap creation |
 
