@@ -571,12 +571,39 @@ def main():
     
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description='Generate Escalation Details Report PowerPoint presentation'
+        description='Generate Escalation Details Report PowerPoint presentation',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  # Use static sample data (default behavior)
+  python generate_presentation.py
+  
+  # Load from single Excel file with config
+  python generate_presentation.py --data report.xlsx --config client.yaml
+  
+  # Load multiple periods for trend charts
+  python generate_presentation.py --data aug.xlsx sep.xlsx oct.xlsx --config client.yaml
+  
+  # Validate data without generating presentation
+  python generate_presentation.py --data report.xlsx --validate
+'''
+    )
+    parser.add_argument(
+        '--data',
+        type=str,
+        nargs='+',
+        help='Path(s) to Excel data file(s). Provide 1-3 files for period comparison. '
+             'Last file is treated as current period.'
+    )
+    parser.add_argument(
+        '--config',
+        type=str,
+        help='Path to client configuration YAML file'
     )
     parser.add_argument(
         '--client-name',
         type=str,
-        help='Client name to use in the report (overrides data default)'
+        help='Client name to use in the report (overrides data/config)'
     )
     parser.add_argument(
         '--no-threat-landscape',
@@ -594,6 +621,11 @@ def main():
         action='store_true',
         help='Keep temporary chart images after generation (default: delete)'
     )
+    parser.add_argument(
+        '--validate',
+        action='store_true',
+        help='Validate data only without generating presentation'
+    )
     
     args = parser.parse_args()
     
@@ -604,19 +636,56 @@ def main():
     # Step 1: Import and load data
     logger.info("Step 1: Loading report data...")
     try:
-        from report_data import get_report_data, ReportData
-        data = get_report_data()
+        from report_data import get_report_data, load_report_data, validate_report_data, ReportData
         
-        # Override client name if provided
-        if args.client_name:
-            data.client_name = args.client_name
-            logger.info(f"Using client name: {args.client_name}")
+        if args.data:
+            # Dynamic data loading from Excel files
+            logger.info(f"Loading data from {len(args.data)} Excel file(s)...")
+            for i, path in enumerate(args.data):
+                period_label = "current" if i == len(args.data) - 1 else f"period -{len(args.data) - 1 - i}"
+                logger.info(f"  - {path} ({period_label})")
+            
+            data = load_report_data(
+                excel_paths=args.data,
+                config_path=args.config,
+                client_name_override=args.client_name
+            )
+            logger.info("✓ Data loaded from Excel files")
         else:
-            logger.info(f"Using client name from data: {data.client_name}")
+            # Use static sample data (backward compatibility)
+            logger.info("No --data provided, using static sample data")
+            data = get_report_data()
+            
+            # Override client name if provided
+            if args.client_name:
+                data.client_name = args.client_name
         
         logger.info(f"✓ Loaded data for {data.client_name}")
         logger.info(f"  Period: {data.period_start} to {data.period_end}")
         logger.info(f"  Incidents escalated: {data.incidents_escalated}")
+        
+        # Validate data
+        warnings = validate_report_data(data)
+        if warnings:
+            for warning in warnings:
+                logger.warning(f"  ⚠ {warning}")
+        
+        # If validate-only mode, stop here
+        if args.validate:
+            logger.info("=" * 60)
+            logger.info("Validation complete. No presentation generated.")
+            if warnings:
+                logger.info(f"Found {len(warnings)} warning(s)")
+            else:
+                logger.info("Data validation passed with no warnings")
+            return 0
+            
+    except FileNotFoundError as e:
+        logger.error(f"File not found: {e}")
+        return 1
+    except ValueError as e:
+        logger.error(f"Data validation error: {e}")
+        return 1
     except Exception as e:
         logger.error(f"Failed to load report data: {e}")
         return 1

@@ -1,0 +1,67 @@
+# Client Configuration Template for Escalation Details Report
+# ==========================================================
+#
+# This file contains client-specific settings and industry benchmarks
+# used to generate the Executive Business Review presentation.
+#
+# Copy this file and customize for each client.
+
+# Client Information
+# ------------------
+# tier: Service tier level (e.g., "Signature Tier", "Standard Tier", "Essential Tier")
+# client_name_override: Optional override for client name (if null, derived from Excel data)
+tier: "Signature Tier"
+client_name_override: null  # Set to override the Organization name from Excel
+
+# Industry Benchmarks
+# -------------------
+# These values are used for comparison metrics.
+# Source: Industry reports and Critical Start internal benchmarks
+industry_benchmarks:
+  mttr_minutes: 192        # Industry median Mean Time to Respond (minutes)
+  mttd_minutes: 66         # Industry median Mean Time to Detect (minutes)
+  incidents_per_day: 11.4  # Industry average incidents escalated per day
+
+# Report Period (Optional)
+# ------------------------
+# If specified, these override the auto-detected date range from the data.
+# Format: YYYY-MM-DD
+# report_period:
+#   start: "2025-08-01"
+#   end: "2025-08-31"
+
+# Cost Modeling Parameters
+# ------------------------
+# Used to calculate cost avoidance metrics
+cost_modeling:
+  analyst_hourly_rate: 85        # $/hour for security analyst time
+  coverage_hourly_rate: 220      # $/hour equivalent for 24x7 SOC coverage
+  breach_cost_estimate: 4200000  # Average breach cost for exposure calculation
+
+# SLA Targets
+# -----------
+# Response time targets by priority level (in minutes)
+sla_targets:
+  Critical: 30
+  High: 60
+  Medium: 180
+  Low: 240
+
+# Business Hours Definition
+# -------------------------
+# Used for after-hours escalation calculations
+# 24-hour format (0-23)
+business_hours:
+  start: 8   # 8:00 AM
+  end: 18    # 6:00 PM
+
+# Threshold Settings
+# ------------------
+# Used for generating recommendations and status indicators
+thresholds:
+  fp_rate_good: 10.0          # False positive rate below this is "good"
+  fp_rate_warning: 15.0       # FP rate above this triggers high-priority action
+  automation_target: 88.0     # Target automation percentage
+  manual_escalation_max: 12.0 # Manual escalation threshold for recommendations
+  mttr_good: 150              # MTTR below this is "good" (minutes)
+  mttr_warning: 200           # MTTR above this triggers action (minutes)

@@ -1,5 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Dict, Any, Optional, List
+"""Report data module for the Escalation Details Report.
+
+This module contains the ReportData dataclass and functions for loading
+report data either from static sample data or dynamically from Excel files.
+"""
+from dataclasses import dataclass, field, fields
+from pathlib import Path
+from typing import Dict, Any, Optional, List, Union
 
 
 @dataclass
@@ -351,3 +357,119 @@ def get_report_data() -> ReportData:
         ],
         executive_summary_narrative="Your security posture remained strong this reporting period. CS SOC triaged 2,110 alerts, partnering with your team on 1,690 decisions and closing 420 end-to-end. Response speed landed 34% faster than sector medians (126-minute MTTR, 87-minute P90), while 158 escalations were absorbed after hours without gaps in coverage. Of the 267 incidents escalated, we identified 11 true positive threats and contained each before business impact, keeping false positives at 9.0%."
     )
+
+
+def load_report_data(
+    excel_paths: Union[List[Path], List[str]],
+    config_path: Optional[Union[Path, str]] = None,
+    client_name_override: Optional[str] = None
+) -> ReportData:
+    """Load and compute report data from Excel files.
+    
+    This function orchestrates the data loading pipeline:
+    1. Parse Excel files into Incident records
+    2. Calculate aggregated metrics
+    3. Generate insights and recommendations
+    4. Return populated ReportData instance
+    
+    Args:
+        excel_paths: List of paths to Excel files (1-3 files, chronological order).
+                     The last file is treated as the current period.
+        config_path: Optional path to client configuration YAML file.
+        client_name_override: Optional override for client name.
+        
+    Returns:
+        ReportData instance with all metrics computed from the input data.
+        
+    Raises:
+        FileNotFoundError: If Excel or config files don't exist.
+        ValueError: If required columns are missing or data is invalid.
+        
+    Example:
+        >>> data = load_report_data(
+        ...     ["aug.xlsx", "sep.xlsx", "oct.xlsx"],
+        ...     config_path="client.yaml"
+        ... )
+        >>> print(data.client_name, data.mttr_minutes)
+    """
+    # Import here to avoid circular imports and allow optional dependencies
+    from data_parser import load_multiple_periods
+    from metrics_calculator import calculate_all_metrics
+    from config_loader import load_config
+    from insight_generator import generate_all_insights
+    
+    # Convert paths to Path objects
+    excel_paths = [Path(p) for p in excel_paths]
+    if config_path:
+        config_path = Path(config_path)
+    
+    # Validate input files exist
+    for path in excel_paths:
+        if not path.exists():
+            raise FileNotFoundError(f"Excel file not found: {path}")
+    
+    # Load configuration
+    config = load_config(config_path)
+    
+    # Apply client name override if provided
+    if client_name_override:
+        config.client_name_override = client_name_override
+    
+    # Parse Excel files
+    all_periods, derived_client_name = load_multiple_periods(excel_paths)
+    
+    # Calculate all metrics
+    metrics = calculate_all_metrics(all_periods, derived_client_name, config)
+    
+    # Generate insights
+    insights = generate_all_insights(metrics, config)
+    
+    # Merge insights into metrics
+    metrics.update(insights)
+    
+    # Get valid field names from ReportData dataclass
+    valid_fields = {f.name for f in fields(ReportData)}
+    
+    # Create and return ReportData instance
+    return ReportData(**{
+        k: v for k, v in metrics.items()
+        if k in valid_fields
+    })
+
+
+def validate_report_data(data: ReportData) -> List[str]:
+    """Validate a ReportData instance for completeness.
+    
+    Args:
+        data: ReportData instance to validate.
+        
+    Returns:
+        List of warning messages (empty if valid).
+    """
+    warnings = []
+    
+    # Check required fields
+    if not data.client_name:
+        warnings.append("Client name is empty")
+    
+    if data.incidents_escalated == 0:
+        warnings.append("No incidents found in data")
+    
+    if data.mttr_minutes == 0:
+        warnings.append("MTTR is zero - no response time data")
+    
+    # Check for reasonable values
+    if data.false_positive_rate > 50:
+        warnings.append(f"False positive rate ({data.false_positive_rate}%) seems unusually high")
+    
+    if data.response_advantage_percent < -50:
+        warnings.append(f"Response advantage ({data.response_advantage_percent}%) indicates much slower than industry")
+    
+    # Check list fields
+    if not data.detection_sources:
+        warnings.append("No detection sources found")
+    
+    if not data.tactics:
+        warnings.append("No MITRE tactics data found")
+    
+    return warnings
