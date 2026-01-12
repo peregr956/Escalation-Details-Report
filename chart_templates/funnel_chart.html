@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORR Platform Funnel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', system-ui, sans-serif;
+            background-color: white;
+        }
+        .funnel-container {
+            width: 900px;
+            height: 320px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 20px 30px;
+        }
+        
+        /* Left anchor - gray rounded rectangle */
+        .left-anchor {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 110px;
+            height: 200px;
+            background: #E8E8E8;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 15px 10px;
+            z-index: 1;
+        }
+        .left-anchor-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #004C97;
+            line-height: 1.4;
+        }
+        
+        /* Funnel SVG area */
+        .funnel-svg {
+            position: absolute;
+            left: 120px;
+            top: 0;
+            width: 760px;
+            height: 320px;
+        }
+        
+        /* Agent label badges */
+        .agent-badge {
+            position: absolute;
+            background: #F0F0F0;
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 500;
+            color: #343741;
+            white-space: nowrap;
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        /* Right arrow */
+        .right-arrow {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        
+        /* Drop shadow filter for cards */
+        .card-shadow {
+            filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.25));
+        }
+        
+        /* Text on cards */
+        .card-number {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            fill: white;
+            text-anchor: middle;
+        }
+        .card-label {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            fill: white;
+            text-anchor: middle;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="funnel-container" id="funnelContainer">
+        <!-- Left Anchor -->
+        <div class="left-anchor">
+            <div class="left-anchor-text">
+                Security Event<br>In-Flow<br>CORR Platform
+            </div>
+        </div>
+        
+        <!-- Agent badges positioned above cards -->
+        <div class="agent-badge" id="badge2" style="left: 340px; top: 32px;">
+            TBR Agent<br>99% Resolution
+        </div>
+        <div class="agent-badge" id="badge3" style="left: 510px; top: 52px;">
+            Case Agent<br>92% Consolidation
+        </div>
+        <div class="agent-badge" id="badge4" style="left: 665px; top: 72px;">
+            SOC / AI<br>Investigation
+        </div>
+        
+        <!-- Funnel SVG -->
+        <svg class="funnel-svg" viewBox="0 0 760 320" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <!-- Shadow filter -->
+                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="3" dy="3" stdDeviation="4" flood-opacity="0.3"/>
+                </filter>
+                
+                <!-- Rounded corners clip paths with trapezoid shapes -->
+                <!-- Card 1: Orange - tallest, leftmost -->
+                <clipPath id="clip1">
+                    <path d="M 20,30 L 170,50 L 170,270 L 20,290 Q 0,290 0,270 L 0,50 Q 0,30 20,30 Z"/>
+                </clipPath>
+                
+                <!-- Card 2: Blue -->
+                <clipPath id="clip2">
+                    <path d="M 150,60 L 300,80 L 300,260 L 150,280 Q 130,280 130,260 L 130,80 Q 130,60 150,60 Z"/>
+                </clipPath>
+                
+                <!-- Card 3: Purple -->
+                <clipPath id="clip3">
+                    <path d="M 280,85 L 420,105 L 420,250 L 280,270 Q 260,270 260,250 L 260,105 Q 260,85 280,85 Z"/>
+                </clipPath>
+                
+                <!-- Card 4: Red -->
+                <clipPath id="clip4">
+                    <path d="M 400,110 L 530,125 L 530,240 L 400,255 Q 380,255 380,235 L 380,130 Q 380,110 400,110 Z"/>
+                </clipPath>
+            </defs>
+            
+            <!-- Card 1: Orange - Security Events -->
+            <g class="card-shadow" filter="url(#shadow)">
+                <path d="M 20,30 
+                         L 180,55 
+                         L 180,265 
+                         L 20,290 
+                         Q 0,290 0,270 
+                         L 0,50 
+                         Q 0,30 20,30 Z" 
+                      fill="#F7941D"/>
+                <text x="90" y="145" class="card-number" style="font-size: 42px;">1.2B</text>
+                <text x="90" y="180" class="card-label">Security Events</text>
+            </g>
+            
+            <!-- Card 2: Blue - Potential Threats -->
+            <g class="card-shadow" filter="url(#shadow)">
+                <path d="M 160,60 
+                         L 320,85 
+                         L 320,255 
+                         L 160,280 
+                         Q 140,280 140,260 
+                         L 140,80 
+                         Q 140,60 160,60 Z" 
+                      fill="#0077C8"/>
+                <text x="230" y="155" class="card-number" style="font-size: 40px;">2m</text>
+                <text x="230" y="190" class="card-label">Potential Threats</text>
+            </g>
+            
+            <!-- Card 3: Purple - Alerts -->
+            <g class="card-shadow" filter="url(#shadow)">
+                <path d="M 300,90 
+                         L 450,115 
+                         L 450,245 
+                         L 300,270 
+                         Q 280,270 280,250 
+                         L 280,110 
+                         Q 280,90 300,90 Z" 
+                      fill="#6B2D7B"/>
+                <text x="365" y="168" class="card-number" style="font-size: 36px;">150k</text>
+                <text x="365" y="200" class="card-label">Alerts</text>
+            </g>
+            
+            <!-- Card 4: Red - Response Actions -->
+            <g class="card-shadow" filter="url(#shadow)">
+                <path d="M 430,115 
+                         L 570,138 
+                         L 570,235 
+                         L 430,258 
+                         Q 410,258 410,238 
+                         L 410,135 
+                         Q 410,115 430,115 Z" 
+                      fill="#E63946"/>
+                <text x="490" y="172" class="card-number" style="font-size: 32px;">72k</text>
+                <text x="490" y="200" class="card-label" style="font-size: 11px;">Response</text>
+                <text x="490" y="215" class="card-label" style="font-size: 11px;">Actions</text>
+            </g>
+            
+            <!-- Right arrow (chevron) -->
+            <g transform="translate(590, 160)">
+                <path d="M 0,-40 
+                         L 50,0 
+                         L 0,40 
+                         L 0,20 
+                         L 30,0 
+                         L 0,-20 Z" 
+                      fill="#B4B4B4"/>
+            </g>
+        </svg>
+    </div>
+
+    <script>
+        // Get data from window.CHART_DATA if provided
+        let chartData = window.CHART_DATA || {};
+        
+        // Parse URL query params if no embedded data
+        if (!chartData || Object.keys(chartData).length === 0) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('data')) {
+                try {
+                    chartData = JSON.parse(decodeURIComponent(params.get('data')));
+                } catch (e) {
+                    console.error('Failed to parse URL data:', e);
+                }
+            }
+        }
+        
+        // Apply dynamic data if provided
+        document.addEventListener('DOMContentLoaded', function() {
+            if (chartData.stages) {
+                // Dynamic data can override the default values
+                // This allows for customization if needed in the future
+                console.log('Chart data loaded:', chartData);
+            }
+        });
+    </script>
+</body>
+</html>

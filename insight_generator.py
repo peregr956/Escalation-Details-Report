@@ -91,7 +91,7 @@ def generate_improvement_items(metrics: Dict[str, Any],
             "target": "Next 60 days",
             "description": (
                 f"Manual escalations at {manual_percent}% exceed our {thresholds.manual_escalation_threshold}% target. "
-                f"{manual_count} incidents required analyst judgment. "
+                f"{manual_count} alerts required analyst judgment. "
                 "Expanding playbook coverage will improve consistency."
             ),
         })
@@ -115,7 +115,7 @@ def generate_improvement_items(metrics: Dict[str, Any],
                     "owner": f"Joint - CS Threat Intel + {client_name}",
                     "target": "Ongoing",
                     "description": (
-                        f"{top_tactics} account for {top_two_high} of the {total_high} high-severity incidents "
+                        f"{top_tactics} account for {top_two_high} of the {total_high} high-severity alerts "
                         f"({round(concentration)}%) in the MITRE dataset, signaling concentrated foothold attempts "
                         "that should drive proactive hunts and new detections."
                     ),
@@ -145,7 +145,7 @@ def generate_improvement_items(metrics: Dict[str, Any],
             "target": "Next 30 days",
             "description": (
                 f"SLA compliance at {sla_compliance}% is below the 95% target. "
-                "Focus on high-priority incident response workflows."
+                "Focus on high-priority alert response workflows."
             ),
         })
     
@@ -242,7 +242,7 @@ def generate_areas_of_focus(metrics: Dict[str, Any],
                 areas.append(f"Proactive threat hunting for {tactics[0]} tactics")
         
         elif title == "Response Time Optimization":
-            areas.append("Improve incident response workflows")
+            areas.append("Improve alert response workflows")
         
         elif title == "SLA Performance":
             areas.append("Focus on high-priority SLA compliance")
@@ -373,8 +373,8 @@ def generate_executive_summary_narrative(metrics: Dict[str, Any]) -> str:
         narrative += "with consistent coverage throughout the period. "
     
     narrative += (
-        f"Of the {incidents_escalated:,} incidents escalated, we identified "
-        f"{true_threats} true positive threats and contained each before business impact, "
+        f"Of the {incidents_escalated:,} alerts escalated, we identified "
+        f"{true_threats} true positives and contained each before business impact, "
         f"keeping false positives at {fp_rate}%."
     )
     

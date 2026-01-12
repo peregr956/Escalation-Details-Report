@@ -127,6 +127,22 @@ class ReportData:
     areas_of_focus: List[str] = field(default_factory=list)
     next_period_goals: List[str] = field(default_factory=list)
     executive_summary_narrative: str = ""
+    
+    # New fields added per Jan 2026 stakeholder feedback
+    # Customer Success Manager info (for dynamic contact slide)
+    csm_name: str = ""
+    csm_email: str = ""
+    
+    # Business hours definition (for Operational Coverage slide clarity)
+    business_hours_definition: str = ""  # e.g., "9AM-5PM EST, Mon-Fri"
+    
+    # Cost calculation methodology (for Value Delivered slide transparency)
+    cost_calculation_methodology: str = ""
+    cost_calculation_source: str = ""
+    
+    # Industry benchmarks for comparative visualizations
+    mttr_industry_benchmark: float = 0.0
+    mttd_industry_benchmark: float = 0.0
 
 
 def get_report_data() -> ReportData:
@@ -355,7 +371,16 @@ def get_report_data() -> ReportData:
             "Reduce manual escalations to 12% or below",
             "Implement enhanced detection for Defense Evasion"
         ],
-        executive_summary_narrative="Your security posture remained strong this reporting period. CS SOC triaged 2,110 alerts, partnering with your team on 1,690 decisions and closing 420 end-to-end. Response speed landed 34% faster than sector medians (126-minute MTTR, 87-minute P90), while 158 escalations were absorbed after hours without gaps in coverage. Of the 267 incidents escalated, we identified 11 true positive threats and contained each before business impact, keeping false positives at 9.0%."
+        executive_summary_narrative="Your security posture remained strong this reporting period. CS SOC triaged 2,110 alerts, partnering with your team on 1,690 decisions and closing 420 end-to-end. Response speed landed 34% faster than sector medians (126-minute MTTR, 87-minute P90), while 158 escalations were absorbed after hours without gaps in coverage. Of the 267 alerts escalated, we identified 11 true positives and contained each before business impact, keeping false positives at 9.0%.",
+        
+        # New fields per Jan 2026 stakeholder feedback
+        csm_name="Sarah Chen",
+        csm_email="sarah.chen@criticalstart.com",
+        business_hours_definition="9AM-5PM EST, Mon-Fri",
+        cost_calculation_methodology="Ponemon Cost of a Data Breach 2025",
+        cost_calculation_source="IBM Security / Ponemon Institute",
+        mttr_industry_benchmark=192.0,
+        mttd_industry_benchmark=66.0
     )
 
 

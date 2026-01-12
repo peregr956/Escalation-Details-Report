@@ -42,7 +42,7 @@
             }
         }
 
-        // Default data structure
+        // Default data structure with industry benchmark lines
         const defaultData = {
             labels: ['Period -2', 'Period -1', 'Current'],
             datasets: [
@@ -77,6 +77,30 @@
                     pointRadius: 4,
                     pointHoverRadius: 6,
                     yAxisID: 'y1'
+                },
+                {
+                    label: 'Industry MTTR',
+                    data: [192, 192, 192],
+                    borderColor: 'rgba(0, 156, 222, 0.5)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [12, 6],
+                    tension: 0,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'Industry MTTD',
+                    data: [66, 66, 66],
+                    borderColor: 'rgba(0, 76, 151, 0.5)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [12, 6],
+                    tension: 0,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false
                 }
             ]
         };

@@ -754,11 +754,16 @@ def add_trend_indicator(slide, left, top, status, direction, size=Pt(18)):
 def create_metric_card_with_indicator(slide, left, top, width, height,
                                        value, label, metric_name,
                                        context=None, border_color=None,
-                                       value_size=Pt(42), show_indicator=True):
+                                       value_size=Pt(42), show_indicator=False):
     """Create a metric card with an optional status indicator arrow.
     
     This is an enhanced version of create_metric_card() that evaluates the
     metric against thresholds and displays an appropriate arrow indicator.
+    
+    Note: As of Jan 2026 stakeholder feedback, show_indicator defaults to False.
+    Arrows on static metric cards were confusing (implied trends, not threshold
+    comparisons). The colored border alone indicates status. Reserve arrows
+    for actual trend visualizations only.
     
     Args:
         slide: The slide object to add the card to.
@@ -772,14 +777,14 @@ def create_metric_card_with_indicator(slide, left, top, width, height,
         context: Optional context text below the label.
         border_color: Optional border color (defaults based on status or CS_BLUE).
         value_size: Font size for the value (default Pt(42)).
-        show_indicator: Whether to show the trend indicator (default True).
+        show_indicator: Whether to show the trend indicator arrow (default False).
     
     Returns:
         tuple: (card_shape, status_info) where status_info is the result from
                get_metric_status() or None if metric not found.
     """
-    # Get metric status
-    status_info = get_metric_status(metric_name, value) if show_indicator else None
+    # Get metric status - always calculate for border color, even if not showing arrow
+    status_info = get_metric_status(metric_name, value) if metric_name else None
     
     # Determine border color based on status if not explicitly provided
     if border_color is None:

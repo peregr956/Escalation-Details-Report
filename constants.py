@@ -262,6 +262,78 @@ SECTION_NARRATIVES = {
 }
 
 
+# =============================================================================
+# TERMINOLOGY STANDARDIZATION (per Jan 2026 stakeholder feedback)
+# =============================================================================
+
+# Standardized terminology mapping to ensure consistency across the presentation.
+# Apply using normalize_terminology() function to all user-facing text.
+#
+# Rationale:
+# - "incident" -> "alert": Company standard terminology
+# - "true threat" -> "true positive": SOC industry standard verdict
+# - "deescalated/de-escalated" -> "downgraded": Avoids overloading "escalation" term
+# - "E2E" -> "end-to-end": Spell out for clarity
+
+TERMINOLOGY = {
+    # Case-sensitive mappings (processed in order)
+    "incidents": "alerts",
+    "incident": "alert",
+    "Incidents": "Alerts",
+    "Incident": "Alert",
+    "INCIDENTS": "ALERTS",
+    "INCIDENT": "ALERT",
+    "true threats": "true positives",
+    "true threat": "true positive",
+    "True Threats": "True Positives",
+    "True Threat": "True Positive",
+    "TRUE THREATS": "TRUE POSITIVES",
+    "TRUE THREAT": "TRUE POSITIVE",
+    "de-escalated": "downgraded",
+    "De-escalated": "Downgraded",
+    "DE-ESCALATED": "DOWNGRADED",
+    "deescalated": "downgraded",
+    "Deescalated": "Downgraded",
+    "DEESCALATED": "DOWNGRADED",
+    "de-escalation": "downgrade",
+    "De-escalation": "Downgrade",
+    "DE-ESCALATION": "DOWNGRADE",
+    "deescalation": "downgrade",
+    "Deescalation": "Downgrade",
+    "DEESCALATION": "DOWNGRADE",
+    "E2E": "end-to-end",
+    "e2e": "end-to-end",
+}
+
+
+def normalize_terminology(text: str) -> str:
+    """Apply standard terminology to any text string.
+    
+    Replaces non-standard terms with their approved equivalents per
+    the TERMINOLOGY mapping. This should be applied to all user-facing
+    text in the presentation.
+    
+    Args:
+        text: The input text to normalize.
+        
+    Returns:
+        The text with all terminology standardized.
+        
+    Example:
+        >>> normalize_terminology("267 incidents escalated")
+        '267 alerts escalated'
+        >>> normalize_terminology("Closed E2E without action")
+        'Closed end-to-end without action'
+    """
+    if not text:
+        return text
+    
+    result = text
+    for old_term, new_term in TERMINOLOGY.items():
+        result = result.replace(old_term, new_term)
+    return result
+
+
 def get_brand_colors():
     """Return dict of RGBColor objects for brand colors.
     

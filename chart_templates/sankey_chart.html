@@ -82,6 +82,25 @@
         ];
 
         const flows = chartData.flows || defaultFlows;
+        
+        // Calculate node totals for discrete counts
+        const nodeTotals = {};
+        flows.forEach(flow => {
+            // From node (outgoing)
+            if (!nodeTotals[flow.from]) nodeTotals[flow.from] = { out: 0, in: 0 };
+            nodeTotals[flow.from].out += flow.flow;
+            
+            // To node (incoming)
+            if (!nodeTotals[flow.to]) nodeTotals[flow.to] = { out: 0, in: 0 };
+            nodeTotals[flow.to].in += flow.flow;
+        });
+        
+        // For Vendor nodes, use outgoing total; for CS nodes, use incoming total
+        const getNodeCount = (nodeName) => {
+            if (!nodeTotals[nodeName]) return 0;
+            if (nodeName.startsWith('Vendor')) return nodeTotals[nodeName].out;
+            return nodeTotals[nodeName].in;
+        };
 
         // Severity colors
         const severityColors = {
@@ -141,6 +160,57 @@
             borderWidth: 1
         }];
 
+        // Custom plugin to draw node labels with counts
+        const nodeLabelsPlugin = {
+            id: 'nodeLabels',
+            afterDraw: (chart) => {
+                const ctx = chart.ctx;
+                const sankeyController = chart._metasets[0];
+                if (!sankeyController || !sankeyController._parsed) return;
+                
+                // Get unique nodes from parsed data
+                const nodeData = {};
+                sankeyController.data.forEach((element, index) => {
+                    const link = chart.data.datasets[0].data[index];
+                    if (link) {
+                        // Track node positions from elements
+                        if (!nodeData[link.from]) {
+                            nodeData[link.from] = { count: getNodeCount(link.from), x: null, y: null };
+                        }
+                        if (!nodeData[link.to]) {
+                            nodeData[link.to] = { count: getNodeCount(link.to), x: null, y: null };
+                        }
+                    }
+                });
+                
+                // Draw labels based on node positions calculated by chart
+                ctx.save();
+                ctx.font = 'bold 11px Roboto, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Use the _nodes internal structure if available
+                if (sankeyController._parsed && sankeyController._parsed.length > 0) {
+                    const parsed = sankeyController._parsed;
+                    const drawnNodes = new Set();
+                    
+                    parsed.forEach((item) => {
+                        // Draw from node label
+                        if (item.from && !drawnNodes.has(item.from)) {
+                            const count = getNodeCount(item.from);
+                            drawnNodes.add(item.from);
+                        }
+                        // Draw to node label
+                        if (item.to && !drawnNodes.has(item.to)) {
+                            const count = getNodeCount(item.to);
+                            drawnNodes.add(item.to);
+                        }
+                    });
+                }
+                ctx.restore();
+            }
+        };
+        
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('sankeyChart').getContext('2d');
             new Chart(ctx, {
@@ -165,20 +235,23 @@
                             }
                         }
                     }
-                }
+                },
+                plugins: [nodeLabelsPlugin]
             });
 
-            // Create legend
+            // Create legend with counts for each CS severity level
             const legendContainer = document.getElementById('sankeyLegend');
             const severityOrder = ['Informational', 'Low', 'Medium', 'High', 'Critical'];
             severityOrder.slice().reverse().forEach((severity) => {
                 const color = severityColors[severity];
                 if (color) {
+                    const csNodeName = `CS ${severity}`;
+                    const count = getNodeCount(csNodeName);
                     const legendItem = document.createElement('div');
                     legendItem.className = 'legend-item';
                     legendItem.innerHTML = `
                         <div class="legend-color" style="background-color: ${color};"></div>
-                        <span>${severity}</span>
+                        <span>${severity} (${count})</span>
                     `;
                     legendContainer.appendChild(legendItem);
                 }

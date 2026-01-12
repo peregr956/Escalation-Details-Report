@@ -25,7 +25,7 @@ from constants import (
     BODY_FONT_SIZE, CAPTION_FONT_SIZE, METRIC_FONT_SIZE, HERO_METRIC_FONT_SIZE,
     MARGIN_STANDARD, MARGIN_CONTENT, CARD_SPACING, HEADER_HEIGHT, FOOTER_HEIGHT,
     PRESENTATION_TITLE, PRESENTATION_INTENT, COPYRIGHT_TEXT,
-    SECTION_NARRATIVES, get_brand_colors
+    SECTION_NARRATIVES, get_brand_colors, normalize_terminology
 )
 
 # Import helper functions from dedicated module
@@ -62,10 +62,10 @@ def build_key_takeaways_slide(prs, section_title, takeaways, data=None):
     # Use setup_content_slide helper for consistent branding
     slide, content_top = setup_content_slide(prs, f"Key Takeaways: {section_title}")
     
-    # Create takeaway cards
-    card_top = content_top + Inches(0.1)
-    card_height = Inches(0.9)
-    card_spacing = Inches(0.15)
+    # Create takeaway cards (further reduced heights to prevent footer overlap per Jan 2026 feedback)
+    card_top = content_top + Inches(0.05)
+    card_height = Inches(0.65)  # Further reduced from 0.72"
+    card_spacing = Inches(0.08)  # Further reduced from 0.1"
     card_width = prs.slide_width - MARGIN_STANDARD * 2
     card_left = MARGIN_STANDARD
     
@@ -86,40 +86,40 @@ def build_key_takeaways_slide(prs, section_title, takeaways, data=None):
         
         # Checkmark icon (using text)
         check_box = slide.shapes.add_textbox(
-            card_left + Inches(0.15), current_top + Inches(0.25),
-            Inches(0.5), Inches(0.5)
+            card_left + Inches(0.12), current_top + Inches(0.18),
+            Inches(0.4), Inches(0.4)
         )
         check_frame = check_box.text_frame
         check_para = check_frame.paragraphs[0]
         check_para.text = "✓"
         check_para.font.name = TITLE_FONT_NAME
-        check_para.font.size = Pt(28)
+        check_para.font.size = Pt(22)  # Further reduced from 24
         check_para.font.bold = True
         check_para.font.color.rgb = CS_BLUE
         check_para.alignment = PP_ALIGN.CENTER
         
         # Takeaway text
         text_box = slide.shapes.add_textbox(
-            card_left + Inches(0.7), current_top + Inches(0.2),
-            card_width - Inches(0.9), card_height - Inches(0.3)
+            card_left + Inches(0.55), current_top + Inches(0.15),
+            card_width - Inches(0.7), card_height - Inches(0.25)
         )
         text_frame = text_box.text_frame
         text_frame.word_wrap = True
         text_para = text_frame.paragraphs[0]
         text_para.text = takeaway
         text_para.font.name = BODY_FONT_NAME
-        text_para.font.size = Pt(18)
+        text_para.font.size = Pt(14)  # Further reduced from 15
         text_para.font.color.rgb = CS_NAVY
         text_para.alignment = PP_ALIGN.LEFT
     
-    # Add insight bar at bottom
-    insight_top = card_top + len(takeaways) * (card_height + card_spacing) + Inches(0.1)
+    # Add insight bar at bottom (further reduced height)
+    insight_top = card_top + len(takeaways) * (card_height + card_spacing) + Inches(0.05)
     add_insight_callout(
         slide, prs,
         "Bottom Line",
         "Faster response, complete containment, measurable value—your security investment is delivering.",
         insight_top,
-        height=Inches(0.7)
+        height=Inches(0.5)  # Further reduced from 0.55"
     )
     
     return slide
@@ -364,7 +364,12 @@ def prepare_chart_data(data) -> Dict:
     """
     chart_data = {}
     
-    # Trend chart data (MTTR, MTTD, FP% trends)
+    # Trend chart data (MTTR, MTTD, FP% trends) with industry benchmarks
+    # Industry benchmarks shown as horizontal dashed lines for comparison
+    num_periods = len(data.period_labels)
+    mttr_benchmark = data.mttr_industry_benchmark if data.mttr_industry_benchmark > 0 else 192.0
+    mttd_benchmark = data.mttd_industry_benchmark if data.mttd_industry_benchmark > 0 else 66.0
+    
     chart_data['trend'] = {
         'labels': data.period_labels,
         'datasets': [
@@ -399,6 +404,30 @@ def prepare_chart_data(data) -> Dict:
                 'pointRadius': 4,
                 'pointHoverRadius': 6,
                 'yAxisID': 'y1'
+            },
+            {
+                'label': f'Industry MTTR ({int(mttr_benchmark)} min)',
+                'data': [mttr_benchmark] * num_periods,
+                'borderColor': 'rgba(0, 156, 222, 0.5)',
+                'backgroundColor': 'transparent',
+                'borderWidth': 2,
+                'borderDash': [12, 6],
+                'tension': 0,
+                'pointRadius': 0,
+                'pointHoverRadius': 0,
+                'fill': False
+            },
+            {
+                'label': f'Industry MTTD ({int(mttd_benchmark)} min)',
+                'data': [mttd_benchmark] * num_periods,
+                'borderColor': 'rgba(0, 76, 151, 0.5)',
+                'backgroundColor': 'transparent',
+                'borderWidth': 2,
+                'borderDash': [12, 6],
+                'tension': 0,
+                'pointRadius': 0,
+                'pointHoverRadius': 0,
+                'fill': False
             }
         ]
     }
@@ -703,19 +732,29 @@ Examples:
     # Step 3: Render charts
     logger.info("Step 3: Rendering charts...")
     try:
-        from chart_renderer import render_charts_sync
+        from chart_renderer import render_charts_sync, render_funnel_sync
         
         temp_charts_dir = "temp_charts"
         chart_images = render_charts_sync(chart_data, output_dir=temp_charts_dir)
+        
+        # Also render the funnel chart separately (it's SVG-based, not in chart_data)
+        try:
+            funnel_path = str(Path(temp_charts_dir) / "funnel_chart.png")
+            chart_images['funnel'] = render_funnel_sync({}, funnel_path)
+            logger.info(f"  - funnel: {chart_images['funnel']}")
+        except Exception as e:
+            logger.warning(f"  - funnel: FAILED ({e})")
+            chart_images['funnel'] = None
         
         # Log rendered charts
         rendered_count = sum(1 for v in chart_images.values() if v is not None)
         logger.info(f"✓ Rendered {rendered_count}/{len(chart_images)} charts")
         for chart_name, path in chart_images.items():
-            if path:
-                logger.info(f"  - {chart_name}: {path}")
-            else:
-                logger.warning(f"  - {chart_name}: FAILED")
+            if chart_name != 'funnel':  # Already logged above
+                if path:
+                    logger.info(f"  - {chart_name}: {path}")
+                else:
+                    logger.warning(f"  - {chart_name}: FAILED")
     except Exception as e:
         logger.error(f"Failed to render charts: {e}")
         return 1
@@ -802,7 +841,7 @@ Examples:
         # Build executive summary key takeaways
         takeaways = [
             f"{data.response_advantage_percent}% faster response than industry peers—threats are contained before spreading",
-            f"100% threat containment with zero breaches this period across {data.true_threats_contained} true positive incidents",
+            f"100% threat containment with zero breaches this period across {data.true_threats_contained} true positive alerts",
             "Millions in modeled cost exposure avoided through proactive security operations",
             f"{data.after_hours_escalations} after-hours escalations handled seamlessly with {int(data.automation_percent)}% automation"
         ]
@@ -852,6 +891,13 @@ Examples:
                         if insert_chart_image(slide, 'mitre_stacked_bar', chart_images['stacked_bar']):
                             charts_inserted += 1
                             logger.info(f"  Inserted stacked bar chart into slide {slide_idx + 1}")
+                            break  # Move to next slide
+                    
+                    # Funnel chart - "CORR Funnel"
+                    if chart_images.get('funnel') and 'corr_funnel' in text:
+                        if insert_chart_image(slide, 'corr_funnel', chart_images['funnel']):
+                            charts_inserted += 1
+                            logger.info(f"  Inserted funnel chart into slide {slide_idx + 1}")
                             break  # Move to next slide
         
         logger.info(f"✓ Inserted {charts_inserted} chart images")
@@ -1060,16 +1106,16 @@ def build_executive_summary_slides(prs, data):
             "raw_value": data.true_threats_contained
         },
         {
-            "title": "RESPONSE ADVANTAGE",
-            "metric": f"{int(data.response_advantage_percent)}%",
-            "detail": f"Faster than industry ({data.mttr_minutes}m vs {data.industry_median_minutes}m)",
-            "metric_name": "response_advantage_percent",
-            "raw_value": data.response_advantage_percent
+            "title": "MTTR",
+            "metric": f"{data.mttr_minutes} min",
+            "detail": f"{int(data.response_advantage_percent)}% faster than industry ({data.industry_median_minutes}m)",
+            "metric_name": "mttr",
+            "raw_value": data.mttr_minutes
         },
         {
-            "title": "CLOSED E2E",
+            "title": "CLOSED END-TO-END",
             "metric": f"{data.closed_end_to_end:,}",
-            "detail": "Incidents resolved without client action",
+            "detail": "Alerts resolved without client action",
             "metric_name": "closed_end_to_end",
             "raw_value": data.closed_end_to_end
         },
@@ -1077,7 +1123,7 @@ def build_executive_summary_slides(prs, data):
         {
             "title": "ALERTS TRIAGED",
             "metric": f"{data.alerts_triaged:,}",
-            "detail": f"{data.client_touch_decisions:,} guided decisions",
+            "detail": f"{data.client_touch_decisions:,} required client input",
             "metric_name": None,  # Informational only, no threshold
             "raw_value": None
         },
@@ -1091,7 +1137,7 @@ def build_executive_summary_slides(prs, data):
         {
             "title": "FALSE POSITIVE RATE",
             "metric": f"{data.false_positive_rate}%",
-            "detail": f"{int(data.automation_percent)}% auto-routed",
+            "detail": "Below 10% target threshold",
             "metric_name": "false_positive_rate",
             "raw_value": data.false_positive_rate
         }
@@ -1170,15 +1216,9 @@ def build_executive_summary_slides(prs, data):
         metric_para.font.color.rgb = CS_NAVY
         metric_para.alignment = PP_ALIGN.LEFT
         
-        # Add trend indicator arrow if status exists
-        if status_info:
-            indicator_left = card_left + card_width - Inches(0.5)
-            indicator_top = card_top + Inches(0.35)
-            add_trend_indicator(
-                slide2, indicator_left, indicator_top,
-                status_info["status"], status_info["direction"],
-                size=Pt(28)
-            )
+        # Note: Trend indicator arrows removed per Jan 2026 stakeholder feedback.
+        # Arrows on static cards confused users (implied trends, not threshold status).
+        # The colored border alone now indicates good/warning/bad status.
         
         # Add detail text
         detail_box = slide2.shapes.add_textbox(
@@ -1222,17 +1262,20 @@ def create_executive_summary_slide(prs, report_data):
     pass
 
 
-def build_corr_funnel_slide(prs):
+def build_corr_funnel_slide(prs, funnel_image_path: Optional[str] = None):
     """Create the CORR Platform funnel slide showing security event flow.
     
     This slide visualizes the AI-accelerated security pipeline with 4 stages:
     Security Events → Potential Threats → Alerts → Response Actions
     
-    The funnel uses overlapping rounded rectangles of decreasing height to show
-    how the CORR platform filters and processes security events.
+    The funnel uses overlapping trapezoid-shaped cards with proper z-index stacking
+    to create a horizontal funnel visualization that shows how the CORR platform
+    filters and processes security events.
     
     Args:
         prs (Presentation): The presentation object.
+        funnel_image_path (str, optional): Path to pre-rendered funnel chart image.
+            If provided, uses the image. If None, creates a placeholder.
     
     Returns:
         Slide: The created slide object.
@@ -1240,7 +1283,7 @@ def build_corr_funnel_slide(prs):
     # Create slide with standard branding
     slide, content_top = setup_content_slide(prs, "AI Accelerated, Human Validated Security")
     
-    # Add subtitle
+    # Add subtitle (updated per plan: "Prevent Incidents" instead of "Prevent Breaches")
     subtitle_box = slide.shapes.add_textbox(
         MARGIN_STANDARD, content_top,
         prs.slide_width - Inches(2), Inches(0.4)
@@ -1254,198 +1297,80 @@ def build_corr_funnel_slide(prs):
     subtitle_para.alignment = PP_ALIGN.LEFT
     
     # =========================================================================
-    # Funnel Visualization Parameters
+    # Funnel Visualization - Rendered Image Approach
     # =========================================================================
-    funnel_top = content_top + Inches(0.6)
-    funnel_left = Inches(0.4)
-    funnel_width = prs.slide_width - Inches(0.8)
+    # The funnel is rendered as an SVG-based HTML template and converted to PNG
+    # This allows for proper trapezoid shapes, overlap, shadows, and z-index
     
-    # Define the 4 funnel stages with decreasing heights
-    # Heights decrease to create the funnel effect (tallest on left, shortest on right)
-    funnel_stages = [
-        {
-            "value": "1.2B",
-            "label": "Security Events",
-            "color": CS_ORANGE,
-            "height": Inches(2.8),
-            "width": Inches(1.8),
-            "has_shield": True,
-            "shield_label": "Security Event\nIn-Flow CORR\nPlatform"
-        },
-        {
-            "value": "2m",
-            "label": "Potential Threats",
-            "color": CS_BLUE,
-            "height": Inches(2.3),
-            "width": Inches(1.6),
-            "agent_label": "TBR Agent",
-            "agent_metric": "99% Resolution"
-        },
-        {
-            "value": "150k",
-            "label": "Alerts",
-            "color": CS_VIOLET,
-            "height": Inches(1.9),
-            "width": Inches(1.4),
-            "agent_label": "Case Agent",
-            "agent_metric": "92% Consolidation"
-        },
-        {
-            "value": "72k",
-            "label": "Response\nActions",
-            "color": CS_RED,
-            "height": Inches(1.5),
-            "width": Inches(1.2),
-            "agent_label": "SOC / AI",
-            "agent_metric": "Investigation"
-        }
-    ]
+    funnel_top = content_top + Inches(0.55)
+    funnel_left = Inches(0.25)
+    funnel_width = prs.slide_width - Inches(0.5)
+    funnel_height = Inches(3.2)
     
-    # Calculate positions for overlapping effect
-    # Each stage overlaps the previous one slightly
-    overlap = Inches(0.15)
-    total_width = sum(stage["width"] for stage in funnel_stages) - overlap * (len(funnel_stages) - 1)
-    start_left = funnel_left + (funnel_width - total_width - Inches(1.0)) / 2  # Center with room for arrow
-    
-    # Maximum height for vertical alignment (align bottoms)
-    max_height = max(stage["height"] for stage in funnel_stages)
-    funnel_bottom = funnel_top + max_height
-    
-    # Draw gray background arrow (the flow indicator)
-    arrow_left = start_left - Inches(0.3)
-    arrow_width = total_width + Inches(1.5)
-    arrow_height = Inches(1.8)
-    arrow_top = funnel_bottom - arrow_height / 2 - Inches(0.3)
-    
-    # Create arrow shape using pentagon/chevron
-    arrow_shape = slide.shapes.add_shape(
-        MSO_SHAPE.CHEVRON, 
-        start_left + total_width + Inches(0.2),
-        funnel_bottom - Inches(0.9),
-        Inches(0.8), Inches(0.8)
-    )
-    arrow_shape.fill.solid()
-    arrow_shape.fill.fore_color.rgb = RGBColor(180, 180, 180)  # Gray arrow
-    arrow_shape.line.fill.background()
-    
-    # Draw each funnel stage
-    current_left = start_left
-    
-    for idx, stage in enumerate(funnel_stages):
-        stage_height = stage["height"]
-        stage_width = stage["width"]
-        stage_top = funnel_bottom - stage_height  # Align bottoms
-        
-        # Draw agent label above the stage (if present)
-        if "agent_label" in stage:
-            label_top = stage_top - Inches(0.55)
+    if funnel_image_path and Path(funnel_image_path).exists():
+        # Insert the pre-rendered funnel image
+        try:
+            # Get image dimensions for aspect ratio preservation
+            with Image.open(funnel_image_path) as img:
+                img_width_px, img_height_px = img.size
+                img_aspect_ratio = img_width_px / img_height_px
             
-            # Agent label (bold)
-            agent_label_box = slide.shapes.add_textbox(
-                current_left, label_top,
-                stage_width, Inches(0.25)
-            )
-            agent_tf = agent_label_box.text_frame
-            agent_para = agent_tf.paragraphs[0]
-            agent_para.text = stage["agent_label"]
-            agent_para.font.name = TITLE_FONT_NAME
-            agent_para.font.size = Pt(11)
-            agent_para.font.bold = True
-            agent_para.font.color.rgb = CS_NAVY
-            agent_para.alignment = PP_ALIGN.CENTER
+            # Calculate dimensions preserving aspect ratio
+            placeholder_aspect_ratio = funnel_width / funnel_height
             
-            # Agent metric (smaller, below)
-            metric_label_box = slide.shapes.add_textbox(
-                current_left, label_top + Inches(0.2),
-                stage_width, Inches(0.2)
-            )
-            metric_tf = metric_label_box.text_frame
-            metric_para = metric_tf.paragraphs[0]
-            metric_para.text = stage["agent_metric"]
-            metric_para.font.name = BODY_FONT_NAME
-            metric_para.font.size = Pt(9)
-            metric_para.font.color.rgb = CS_SLATE
-            metric_para.alignment = PP_ALIGN.CENTER
-        
-        # Draw the rounded rectangle for this stage
-        rect_shape = slide.shapes.add_shape(
-            MSO_SHAPE.ROUNDED_RECTANGLE,
-            current_left, stage_top,
-            stage_width, stage_height
-        )
-        rect_shape.fill.solid()
-        rect_shape.fill.fore_color.rgb = stage["color"]
-        rect_shape.line.fill.background()
-        
-        # Adjust corner radius (adjustments property)
-        if hasattr(rect_shape, 'adjustments') and len(rect_shape.adjustments) > 0:
-            rect_shape.adjustments[0] = 0.15  # Rounded corners
-        
-        # Add shield icon and label for first stage
-        if stage.get("has_shield"):
-            # Shield icon (using text-based shield character)
-            shield_box = slide.shapes.add_textbox(
-                current_left + Inches(0.3), stage_top + Inches(0.3),
-                stage_width - Inches(0.6), Inches(0.6)
-            )
-            shield_tf = shield_box.text_frame
-            shield_para = shield_tf.paragraphs[0]
-            shield_para.text = "🛡"
-            shield_para.font.size = Pt(32)
-            shield_para.alignment = PP_ALIGN.CENTER
+            if img_aspect_ratio > placeholder_aspect_ratio:
+                # Image is wider - fit to width
+                width = funnel_width
+                height = funnel_width / img_aspect_ratio
+                top = funnel_top + (funnel_height - height) / 2
+                left = funnel_left
+            else:
+                # Image is taller - fit to height
+                height = funnel_height
+                width = funnel_height * img_aspect_ratio
+                left = funnel_left + (funnel_width - width) / 2
+                top = funnel_top
             
-            # Shield label text
-            shield_label_box = slide.shapes.add_textbox(
-                current_left + Inches(0.1), stage_top + Inches(0.85),
-                stage_width - Inches(0.2), Inches(0.8)
-            )
-            shield_label_tf = shield_label_box.text_frame
-            shield_label_tf.word_wrap = True
-            shield_label_para = shield_label_tf.paragraphs[0]
-            shield_label_para.text = stage["shield_label"]
-            shield_label_para.font.name = TITLE_FONT_NAME
-            shield_label_para.font.size = Pt(12)
-            shield_label_para.font.bold = True
-            shield_label_para.font.color.rgb = RGBColor(255, 255, 255)
-            shield_label_para.alignment = PP_ALIGN.CENTER
-        
-        # Add value (large number) - positioned in center of shape
-        value_top = stage_top + stage_height * 0.35
-        if stage.get("has_shield"):
-            value_top = stage_top + stage_height * 0.55
+            slide.shapes.add_picture(str(funnel_image_path), left, top, width, height)
+            logging.info(f"Inserted funnel chart image: {funnel_image_path}")
             
-        value_box = slide.shapes.add_textbox(
-            current_left, value_top,
-            stage_width, Inches(0.6)
-        )
-        value_tf = value_box.text_frame
-        value_para = value_tf.paragraphs[0]
-        value_para.text = stage["value"]
-        value_para.font.name = TITLE_FONT_NAME
-        value_para.font.size = Pt(36)
-        value_para.font.bold = True
-        value_para.font.color.rgb = RGBColor(255, 255, 255)
-        value_para.alignment = PP_ALIGN.CENTER
-        
-        # Add label below value
-        label_box = slide.shapes.add_textbox(
-            current_left, value_top + Inches(0.45),
-            stage_width, Inches(0.5)
-        )
-        label_tf = label_box.text_frame
-        label_tf.word_wrap = True
-        label_para = label_tf.paragraphs[0]
-        label_para.text = stage["label"]
-        label_para.font.name = BODY_FONT_NAME
-        label_para.font.size = Pt(11)
-        label_para.font.bold = True
-        label_para.font.color.rgb = RGBColor(255, 255, 255)
-        label_para.alignment = PP_ALIGN.CENTER
-        
-        # Move to next position with overlap
-        current_left += stage_width - overlap
+        except Exception as e:
+            logging.error(f"Failed to insert funnel image: {e}")
+            # Fall back to placeholder
+            _add_funnel_placeholder(slide, funnel_left, funnel_top, funnel_width, funnel_height)
+    else:
+        # Add placeholder for funnel chart (will be replaced in post-processing)
+        _add_funnel_placeholder(slide, funnel_left, funnel_top, funnel_width, funnel_height)
     
     return slide
+
+
+def _add_funnel_placeholder(slide, left, top, width, height):
+    """Add a placeholder shape for the funnel chart.
+    
+    This placeholder will be replaced with the rendered funnel image
+    during the chart insertion phase.
+    
+    Args:
+        slide: The slide object
+        left: Left position
+        top: Top position  
+        width: Width of placeholder
+        height: Height of placeholder
+    """
+    placeholder = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, left, top, width, height
+    )
+    placeholder.fill.solid()
+    placeholder.fill.fore_color.rgb = RGBColor(245, 245, 245)
+    placeholder.line.color.rgb = RGBColor(200, 200, 200)
+    placeholder.line.width = Pt(1)
+    
+    # Add placeholder text
+    placeholder.text_frame.text = "[Chart: CORR Funnel | ID: corr_funnel]"
+    placeholder.text_frame.paragraphs[0].font.size = Pt(12)
+    placeholder.text_frame.paragraphs[0].font.color.rgb = RGBColor(150, 150, 150)
+    placeholder.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
 
 def build_value_delivered_slides(prs, data):
@@ -1621,18 +1546,25 @@ def build_value_delivered_slides(prs, data):
         m_para.font.color.rgb = CS_NAVY
         m_para.alignment = PP_ALIGN.RIGHT
     
-    # Methodology note at bottom
-    note_top = hero_top + hero_height + Inches(0.15)
+    # Methodology note at bottom (expanded per Jan 2026 stakeholder feedback)
+    note_top = hero_top + hero_height + Inches(0.1)
     note_box = slide_value.shapes.add_textbox(Inches(0.5), note_top, 
-                                               prs.slide_width - Inches(1), Inches(0.3))
+                                               prs.slide_width - Inches(1), Inches(0.45))
     note_frame = note_box.text_frame
+    note_frame.word_wrap = True
     note_para = note_frame.paragraphs[0]
-    note_para.text = "Illustrative impact only; not redeployable budget. Based on industry-standard rates."
+    # Expanded methodology explanation per stakeholder request
+    note_para.text = (
+        "* Cost methodology: Operations = analyst hours × $85/hr avg. rate; "
+        "Coverage = 24/7 monitoring × market SOC rates; "
+        "Prevention = contained threats × Ponemon breach cost model ($4.45M avg. breach, adjusted for threat severity). "
+        "Illustrative impact only; not redeployable budget."
+    )
     note_para.font.name = BODY_FONT_NAME
-    note_para.font.size = Pt(10)
+    note_para.font.size = Pt(9)
     note_para.font.color.rgb = CS_SLATE
     note_para.font.italic = True
-    note_para.alignment = PP_ALIGN.CENTER
+    note_para.alignment = PP_ALIGN.LEFT
 
 
 def build_protection_achieved_slides(prs, data):
@@ -1675,7 +1607,7 @@ def build_protection_achieved_slides(prs, data):
     
     header_text = slide7.shapes.add_textbox(panel_left, panel_top, panel_width, header_height)
     header_tf = header_text.text_frame
-    header_tf.paragraphs[0].text = "RESPONSE METRICS"
+    header_tf.paragraphs[0].text = "MTTR BY SEVERITY"  # Updated per Jan 2026 feedback
     header_tf.paragraphs[0].font.name = TITLE_FONT_NAME
     header_tf.paragraphs[0].font.size = Pt(12)
     header_tf.paragraphs[0].font.bold = True
@@ -1683,12 +1615,13 @@ def build_protection_achieved_slides(prs, data):
     header_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
     
     # Metric cards within panel - now with threshold status indicators
+    # Labels clarified per Jan 2026 stakeholder feedback to indicate vendor severities
     metrics = [
-        {"value": f"{data.critical_high_mttr} min", "label": "Critical/High", "default_color": CS_RED,
+        {"value": f"{data.critical_high_mttr} min", "label": "Critical & High (Vendor)", "default_color": CS_RED,
          "metric_name": "critical_high_mttr", "raw_value": data.critical_high_mttr},
-        {"value": f"{data.medium_low_mttr} min", "label": "Medium/Low", "default_color": CS_ORANGE,
+        {"value": f"{data.medium_low_mttr} min", "label": "Medium & Low (Vendor)", "default_color": CS_ORANGE,
          "metric_name": "medium_low_mttr", "raw_value": data.medium_low_mttr},
-        {"value": f"{data.p90_minutes} min", "label": "P90 Response", "default_color": CS_BLUE,
+        {"value": f"{data.p90_minutes} min", "label": "P90 All Severities", "default_color": CS_BLUE,
          "metric_name": "p90_minutes", "raw_value": data.p90_minutes},
     ]
     
@@ -1736,15 +1669,8 @@ def build_protection_achieved_slides(prs, data):
         value_tf.paragraphs[0].font.color.rgb = border_color
         value_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
         
-        # Add trend indicator if status available
-        if status_info:
-            ind_left = panel_left + card_margin + card_width - Inches(0.4)
-            ind_top = current_top + Inches(0.15)
-            add_trend_indicator(
-                slide7, ind_left, ind_top,
-                status_info["status"], status_info["direction"],
-                size=Pt(20)
-            )
+        # Note: Trend indicator arrows removed per Jan 2026 stakeholder feedback.
+        # Colored border alone indicates status.
         
         # Metric label
         label_box = slide7.shapes.add_textbox(
@@ -1759,12 +1685,12 @@ def build_protection_achieved_slides(prs, data):
         label_tf.paragraphs[0].alignment = PP_ALIGN.CENTER
     
     # =========================================================================
-    # RIGHT PANEL: Trend Chart
+    # RIGHT PANEL: Trend Chart (enlarged per Jan 2026 feedback)
     # =========================================================================
     chart_left = panel_left + panel_width + Inches(0.2)
     chart_top = content_top_7 + Inches(0.1)
     chart_width = prs.slide_width - chart_left - Inches(0.5)
-    chart_height = Inches(2.3)
+    chart_height = Inches(2.65)  # Increased from 2.3"
     
     chart_placeholder = slide7.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, chart_left, chart_top,
@@ -1796,9 +1722,10 @@ def build_protection_achieved_slides(prs, data):
     legend_frame = legend_box.text_frame
     legend_frame.word_wrap = True
     legend_paragraph = legend_frame.paragraphs[0]
-    legend_paragraph.text = "MTTR (blue) | MTTD (navy) | FP% (red dashed)"
+    # Updated legend to include industry benchmarks (dashed lines on chart)
+    legend_paragraph.text = "MTTR (blue) | MTTD (navy) | FP% (red) | Industry benchmarks (dashed)"
     legend_paragraph.font.name = BODY_FONT_NAME
-    legend_paragraph.font.size = Pt(11)
+    legend_paragraph.font.size = Pt(10)
     legend_paragraph.font.color.rgb = CS_SLATE
     legend_paragraph.alignment = PP_ALIGN.CENTER
     
@@ -1817,14 +1744,13 @@ def build_protection_achieved_slides(prs, data):
     line.color.rgb = CS_BLUE
     line.width = Pt(2)
     
-    # Generate dynamic insight text based on metric statuses
-    mttr_status = get_metric_status("critical_high_mttr", data.critical_high_mttr)
-    p90_status = get_metric_status("p90_minutes", data.p90_minutes)
-    
-    mttr_descriptor = "on target" if mttr_status and mttr_status["status"] == "good" else "needs attention"
-    p90_descriptor = "meeting SLA" if p90_status and p90_status["status"] == "good" else "approaching threshold"
-    
-    insight_message = f"Critical/High MTTR: {data.critical_high_mttr} min ({mttr_descriptor}) | P90: {data.p90_minutes} min ({p90_descriptor})"
+    # Generate dynamic insight text - explain P90 significance and industry comparison
+    # Industry benchmarks now shown on chart; insight explains why this matters
+    response_advantage = int(data.response_advantage_percent)
+    insight_message = (
+        f"Your MTTR outperforms industry benchmarks by {response_advantage}%—"
+        "faster response means smaller blast radius when threats emerge."
+    )
     
     insight_text = insight_shape.text_frame
     insight_text.text = insight_message
@@ -1835,181 +1761,8 @@ def build_protection_achieved_slides(prs, data):
     insight_text.paragraphs[0].alignment = PP_ALIGN.CENTER
     insight_text.vertical_anchor = 1  # Middle
     
-    # Slide 8 - Industry Comparison
-    slide8, content_top_8 = setup_content_slide(prs, "Industry Comparison")
-    
-    # Create table for comparison
-    table_top = content_top_8 + Inches(0.1)
-    table_left = Inches(1)
-    table_width = prs.slide_width - Inches(2)
-    table_height = Inches(2.5)
-    
-    # Calculate row and column dimensions
-    num_rows = len(data.industry_comparison) + 1  # +1 for header
-    num_cols = 4
-    row_height = table_height / num_rows
-    col_width = table_width / num_cols
-    
-    # Create table using shapes (python-pptx doesn't have native table support)
-    # Create header row background
-    header_row_shape = slide8.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE, table_left, table_top,
-        table_width, row_height
-    )
-    fill = header_row_shape.fill
-    fill.solid()
-    fill.fore_color.rgb = CS_NAVY
-    header_row_shape.line.fill.background()
-    
-    # Add header text
-    headers = ["Metric", "Your Performance", "Industry Average", "Difference"]
-    for col_idx, header_text in enumerate(headers):
-        header_cell_left = table_left + col_idx * col_width
-        header_cell_width = col_width
-        header_cell_top = table_top
-        
-        header_cell_box = slide8.shapes.add_textbox(
-            header_cell_left + Inches(0.1), header_cell_top + Inches(0.05),
-            header_cell_width - Inches(0.2), row_height - Inches(0.1)
-        )
-        header_cell_frame = header_cell_box.text_frame
-        header_cell_frame.word_wrap = True
-        header_cell_paragraph = header_cell_frame.paragraphs[0]
-        header_cell_paragraph.text = header_text
-        header_cell_paragraph.font.name = BODY_FONT_NAME
-        header_cell_paragraph.font.size = Pt(14)
-        header_cell_paragraph.font.bold = True
-        header_cell_paragraph.font.color.rgb = RGBColor(255, 255, 255)
-        header_cell_paragraph.alignment = PP_ALIGN.LEFT
-    
-    # Add data rows
-    for row_idx, comparison in enumerate(data.industry_comparison):
-        row_top = table_top + (row_idx + 1) * row_height
-        
-        # Alternate row background color
-        if row_idx % 2 == 0:
-            row_bg = slide8.shapes.add_shape(
-                MSO_SHAPE.RECTANGLE, table_left, row_top,
-                table_width, row_height
-            )
-            fill = row_bg.fill
-            fill.solid()
-            fill.fore_color.rgb = RGBColor(250, 250, 250)  # Light gray
-            row_bg.line.fill.background()
-        
-        # Metric name
-        metric_cell_box = slide8.shapes.add_textbox(
-            table_left + Inches(0.1), row_top + Inches(0.05),
-            col_width - Inches(0.2), row_height - Inches(0.1)
-        )
-        metric_cell_frame = metric_cell_box.text_frame
-        metric_cell_frame.word_wrap = True
-        metric_cell_paragraph = metric_cell_frame.paragraphs[0]
-        metric_cell_paragraph.text = f"{comparison['metric']} (minutes)" if comparison['metric'] != "Incidents/Day" else comparison['metric']
-        metric_cell_paragraph.font.name = BODY_FONT_NAME
-        metric_cell_paragraph.font.size = Pt(13)
-        metric_cell_paragraph.font.color.rgb = CS_SLATE
-        metric_cell_paragraph.alignment = PP_ALIGN.LEFT
-        
-        # Your Performance
-        your_cell_box = slide8.shapes.add_textbox(
-            table_left + col_width + Inches(0.1), row_top + Inches(0.05),
-            col_width - Inches(0.2), row_height - Inches(0.1)
-        )
-        your_cell_frame = your_cell_box.text_frame
-        your_cell_frame.word_wrap = True
-        your_cell_paragraph = your_cell_frame.paragraphs[0]
-        your_cell_paragraph.text = str(comparison['yours'])
-        your_cell_paragraph.font.name = BODY_FONT_NAME
-        your_cell_paragraph.font.size = Pt(13)
-        your_cell_paragraph.font.color.rgb = CS_SLATE
-        your_cell_paragraph.alignment = PP_ALIGN.LEFT
-        
-        # Industry Average
-        industry_cell_box = slide8.shapes.add_textbox(
-            table_left + 2 * col_width + Inches(0.1), row_top + Inches(0.05),
-            col_width - Inches(0.2), row_height - Inches(0.1)
-        )
-        industry_cell_frame = industry_cell_box.text_frame
-        industry_cell_frame.word_wrap = True
-        industry_cell_paragraph = industry_cell_frame.paragraphs[0]
-        industry_cell_paragraph.text = str(comparison['industry'])
-        industry_cell_paragraph.font.name = BODY_FONT_NAME
-        industry_cell_paragraph.font.size = Pt(13)
-        industry_cell_paragraph.font.color.rgb = CS_SLATE
-        industry_cell_paragraph.alignment = PP_ALIGN.LEFT
-        
-        # Difference (with colored badge and directional arrow)
-        diff_cell_left = table_left + 3 * col_width + Inches(0.1)
-        diff_cell_top = row_top + Inches(0.05)
-        diff_cell_width = col_width - Inches(0.2)
-        diff_cell_height = row_height - Inches(0.1)
-        
-        # Determine if we're performing better or worse than industry
-        # For MTTR, MTTD, Incidents/Day - lower is better
-        is_better = "Better" in comparison['difference']
-        is_lower_better = comparison['metric'] in ["MTTR", "MTTD", "Incidents/Day"]
-        
-        # Determine arrow and color based on performance
-        if is_better:
-            badge_color = CS_GREEN
-            # Lower is better metrics: if we're better, we're below industry (down arrow)
-            # Higher is better metrics: if we're better, we're above industry (up arrow)
-            arrow = "↓" if is_lower_better else "↑"
-        else:
-            badge_color = CS_RED
-            arrow = "↑" if is_lower_better else "↓"
-        
-        # Create colored badge background
-        badge_shape = slide8.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, diff_cell_left, diff_cell_top,
-            diff_cell_width, diff_cell_height
-        )
-        fill = badge_shape.fill
-        fill.solid()
-        fill.fore_color.rgb = badge_color
-        badge_shape.line.fill.background()
-        
-        # Add arrow indicator
-        arrow_box = slide8.shapes.add_textbox(
-            diff_cell_left + Inches(0.05), diff_cell_top,
-            Inches(0.3), diff_cell_height
-        )
-        arrow_frame = arrow_box.text_frame
-        arrow_paragraph = arrow_frame.paragraphs[0]
-        arrow_paragraph.text = arrow
-        arrow_paragraph.font.name = TITLE_FONT_NAME
-        arrow_paragraph.font.size = Pt(14)
-        arrow_paragraph.font.bold = True
-        arrow_paragraph.font.color.rgb = RGBColor(255, 255, 255)
-        arrow_paragraph.alignment = PP_ALIGN.CENTER
-        arrow_frame.vertical_anchor = 1  # Middle
-        
-        # Add difference text next to arrow
-        diff_cell_box = slide8.shapes.add_textbox(
-            diff_cell_left + Inches(0.3), diff_cell_top,
-            diff_cell_width - Inches(0.35), diff_cell_height
-        )
-        diff_cell_frame = diff_cell_box.text_frame
-        diff_cell_frame.word_wrap = True
-        diff_cell_paragraph = diff_cell_frame.paragraphs[0]
-        diff_cell_paragraph.text = comparison['difference']
-        diff_cell_paragraph.font.name = BODY_FONT_NAME
-        diff_cell_paragraph.font.size = Pt(13)
-        diff_cell_paragraph.font.bold = True
-        diff_cell_paragraph.font.color.rgb = RGBColor(255, 255, 255)
-        diff_cell_paragraph.alignment = PP_ALIGN.LEFT
-        diff_cell_frame.vertical_anchor = 1  # Middle
-    
-    # Add insight bar for Industry Comparison
-    industry_insight_top = table_top + table_height + Inches(0.3)
-    add_insight_callout(
-        slide8, prs,
-        "Outperforming Industry Benchmarks",
-        "Faster response, better detection, and lower risk—exceeding standards across all metrics.",
-        industry_insight_top,
-        height=Inches(0.7)
-    )
+    # NOTE: Industry Comparison slide removed per Jan 2026 stakeholder feedback.
+    # Industry benchmarks are now shown as dashed lines on the trend chart above.
     
     # Slide 7 - Response & Detection Quality (Merged dual-panel)
     slide_resp_det, content_top_rd = setup_content_slide(prs, "Response & Detection Quality")
@@ -2021,16 +1774,17 @@ def build_protection_achieved_slides(prs, data):
     card_spacing = Inches(0.1)
     cards_start_top = content_top_rd + Inches(0.1)
     
-    # Calculate containment count (round to nearest integer)
-    containment_count = round((data.containment_rate / 100) * data.incidents_escalated)
+    # Calculate remediation count (round to nearest integer)
+    # Renamed from Containment Rate → Remediation Rate per Jan 2026 feedback
+    remediation_count = round((data.containment_rate / 100) * data.incidents_escalated)
     
     efficiency_cards = [
-        {"title": "Containment Rate", "value": f"{data.containment_rate}%", "detail": f"{containment_count} of {data.incidents_escalated}", 
+        {"title": "Remediation Rate", "value": f"{data.containment_rate}%", "detail": f"{remediation_count} alerts with remediation actions", 
          "default_color": CS_BLUE, "metric_name": "containment_rate", "raw_value": data.containment_rate},
-        {"title": "Playbook Automation", "value": f"{data.playbook_auto['percent']}%", "detail": f"{data.playbook_auto['count']} incidents", 
+        {"title": "Playbook Automation", "value": f"{data.playbook_auto['percent']}%", "detail": f"{data.playbook_auto['count']} alerts", 
          "default_color": CS_BLUE, "metric_name": "automation_percent", "raw_value": data.playbook_auto['percent']},
-        {"title": "Analyst Escalation", "value": f"{data.analyst_escalation['percent']}%", "detail": f"{data.analyst_escalation['count']} incidents", 
-         "default_color": CS_ORANGE, "metric_name": None, "raw_value": None}  # No threshold for analyst escalation
+        {"title": "Human Review Rate", "value": f"{data.analyst_escalation['percent']}%", "detail": f"{data.analyst_escalation['count']} required manual review", 
+         "default_color": CS_ORANGE, "metric_name": None, "raw_value": None}  # Renamed from Analyst Escalation
     ]
     
     for i, card in enumerate(efficiency_cards):
@@ -2102,39 +1856,35 @@ def build_protection_achieved_slides(prs, data):
         v_para.font.color.rgb = border_color
         v_para.alignment = PP_ALIGN.RIGHT
         
-        # Add trend indicator if status available
-        if status_info:
-            ind_left = left_panel_left + left_panel_width - Inches(0.45)
-            ind_top = card_top + Inches(0.2)
-            add_trend_indicator(
-                slide_resp_det, ind_left, ind_top,
-                status_info["status"], status_info["direction"],
-                size=Pt(22)
-            )
+        # Note: Trend indicator arrows removed per Jan 2026 stakeholder feedback.
+        # Colored border alone indicates status.
     
-    # Right panel: Detection Quality (2x2 grid)
+    # Right panel: Detection Quality (2-over-1 layout)
+    # Per Jan 2026 feedback: 2 cards on top row, 1 spanning bottom
+    # Renamed Threat Reduction → Alert Reduction
     right_panel_left = left_panel_left + left_panel_width + Inches(0.2)
     right_panel_width = left_panel_width
-    grid_card_width = (right_panel_width - Inches(0.1)) / 2
-    grid_card_height = Inches(1.35)
+    top_card_width = (right_panel_width - Inches(0.1)) / 2  # 2 cards across on top row
+    top_card_height = Inches(1.2)
+    bottom_card_height = Inches(1.0)
     grid_spacing = Inches(0.1)
     
-    quality_cards = [
-        {"title": "True Threat", "value": f"{data.true_threat_precision}%", "default_color": CS_RED,
+    # Calculate alert reduction percentage (2M potential threats → 267 escalated)
+    potential_threats = 2000000  # From CORR funnel
+    escalated = data.incidents_escalated
+    reduction_percent = ((potential_threats - escalated) / potential_threats) * 100
+    
+    # Top row: True Positive Rate and False Positive Rate (side by side)
+    top_row_cards = [
+        {"title": "True Positive Rate", "value": f"{data.true_threat_precision}%", "default_color": CS_RED,
          "metric_name": "true_threat_precision", "raw_value": data.true_threat_precision},
-        {"title": "Signal Fidelity", "value": f"{data.signal_fidelity}%", "default_color": CS_BLUE,
-         "metric_name": "signal_fidelity", "raw_value": data.signal_fidelity},
-        {"title": "False Positive", "value": f"{data.false_positive_rate}%", "default_color": CS_ORANGE,
-         "metric_name": "false_positive_rate", "raw_value": data.false_positive_rate},
-        {"title": "Client-Validated", "value": f"{data.client_validated}%", "default_color": CS_BLUE,
-         "metric_name": "client_validated", "raw_value": data.client_validated}
+        {"title": "False Positive Rate", "value": f"{data.false_positive_rate}%", "default_color": CS_ORANGE,
+         "metric_name": "false_positive_rate", "raw_value": data.false_positive_rate}
     ]
     
-    for i, card in enumerate(quality_cards):
-        row = i // 2
-        col = i % 2
-        card_left = right_panel_left + col * (grid_card_width + grid_spacing)
-        card_top = cards_start_top + row * (grid_card_height + grid_spacing)
+    for i, card in enumerate(top_row_cards):
+        card_left = right_panel_left + i * (top_card_width + grid_spacing)
+        card_top = cards_start_top
         
         # Get metric status if threshold exists
         status_info = None
@@ -2151,7 +1901,7 @@ def build_protection_achieved_slides(prs, data):
         # Create card background
         card_shape = slide_resp_det.shapes.add_shape(
             MSO_SHAPE.RECTANGLE, card_left, card_top,
-            grid_card_width, grid_card_height
+            top_card_width, top_card_height
         )
         fill = card_shape.fill
         fill.solid()
@@ -2162,8 +1912,8 @@ def build_protection_achieved_slides(prs, data):
         
         # Title
         title_box = slide_resp_det.shapes.add_textbox(
-            card_left + Inches(0.1), card_top + Inches(0.12),
-            grid_card_width - Inches(0.2), Inches(0.3)
+            card_left + Inches(0.1), card_top + Inches(0.1),
+            top_card_width - Inches(0.2), Inches(0.3)
         )
         t_frame = title_box.text_frame
         t_para = t_frame.paragraphs[0]
@@ -2172,38 +1922,85 @@ def build_protection_achieved_slides(prs, data):
         t_para.font.size = Pt(12)
         t_para.font.bold = True
         t_para.font.color.rgb = CS_SLATE
-        t_para.alignment = PP_ALIGN.LEFT
+        t_para.alignment = PP_ALIGN.CENTER
         
-        # Value with indicator
-        indicator_width = Inches(0.35) if status_info else 0
+        # Value (centered)
         value_box = slide_resp_det.shapes.add_textbox(
-            card_left + Inches(0.1), card_top + Inches(0.5),
-            grid_card_width - Inches(0.2) - indicator_width, Inches(0.7)
+            card_left + Inches(0.05), card_top + Inches(0.45),
+            top_card_width - Inches(0.1), Inches(0.6)
         )
         v_frame = value_box.text_frame
         v_para = v_frame.paragraphs[0]
         v_para.text = card["value"]
         v_para.font.name = TITLE_FONT_NAME
-        v_para.font.size = Pt(36)
+        v_para.font.size = Pt(32)
         v_para.font.bold = True
         v_para.font.color.rgb = border_color
-        v_para.alignment = PP_ALIGN.LEFT
-        
-        # Add trend indicator if status available
-        if status_info:
-            ind_left = card_left + grid_card_width - Inches(0.4)
-            ind_top = card_top + Inches(0.55)
-            add_trend_indicator(
-                slide_resp_det, ind_left, ind_top,
-                status_info["status"], status_info["direction"],
-                size=Pt(20)
-            )
+        v_para.alignment = PP_ALIGN.CENTER
     
-    # Insight box at bottom with dynamic status messaging
-    insight_top = cards_start_top + 3 * (card_height + card_spacing) + Inches(0.1)
+    # Bottom row: Alert Reduction (full width, spanning both columns)
+    bottom_card_top = cards_start_top + top_card_height + grid_spacing
+    bottom_card_width = right_panel_width  # Full width
+    
+    # Create bottom card background
+    bottom_card_shape = slide_resp_det.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, right_panel_left, bottom_card_top,
+        bottom_card_width, bottom_card_height
+    )
+    fill = bottom_card_shape.fill
+    fill.solid()
+    fill.fore_color.rgb = RGBColor(248, 250, 252)
+    line = bottom_card_shape.line
+    line.color.rgb = CS_GREEN
+    line.width = Pt(2)
+    
+    # Bottom card title
+    bottom_title_box = slide_resp_det.shapes.add_textbox(
+        right_panel_left + Inches(0.15), bottom_card_top + Inches(0.1),
+        bottom_card_width - Inches(0.3), Inches(0.25)
+    )
+    bt_frame = bottom_title_box.text_frame
+    bt_para = bt_frame.paragraphs[0]
+    bt_para.text = "Alert Reduction"  # Renamed from Threat Reduction
+    bt_para.font.name = TITLE_FONT_NAME
+    bt_para.font.size = Pt(12)
+    bt_para.font.bold = True
+    bt_para.font.color.rgb = CS_SLATE
+    bt_para.alignment = PP_ALIGN.CENTER
+    
+    # Bottom card value (2M → 267)
+    bottom_value_box = slide_resp_det.shapes.add_textbox(
+        right_panel_left + Inches(0.1), bottom_card_top + Inches(0.35),
+        bottom_card_width - Inches(0.2), Inches(0.35)
+    )
+    bv_frame = bottom_value_box.text_frame
+    bv_para = bv_frame.paragraphs[0]
+    bv_para.text = f"2M → {escalated}"
+    bv_para.font.name = TITLE_FONT_NAME
+    bv_para.font.size = Pt(28)
+    bv_para.font.bold = True
+    bv_para.font.color.rgb = CS_GREEN
+    bv_para.alignment = PP_ALIGN.CENTER
+    
+    # Bottom card detail
+    bottom_detail_box = slide_resp_det.shapes.add_textbox(
+        right_panel_left + Inches(0.1), bottom_card_top + Inches(0.7),
+        bottom_card_width - Inches(0.2), Inches(0.25)
+    )
+    bd_frame = bottom_detail_box.text_frame
+    bd_para = bd_frame.paragraphs[0]
+    bd_para.text = f"{reduction_percent:.2f}% resolved before escalation"
+    bd_para.font.name = BODY_FONT_NAME
+    bd_para.font.size = Pt(11)
+    bd_para.font.color.rgb = CS_SLATE
+    bd_para.alignment = PP_ALIGN.CENTER
+    
+    # Insight box at bottom - rewritten per Jan 2026 feedback to explain CORR context
+    # "Of 2M potential threats, only X alerts required your attention"
+    insight_top = bottom_card_top + bottom_card_height + Inches(0.15)
     insight_shape = slide_resp_det.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, Inches(0.5), insight_top,
-        prs.slide_width - Inches(1), Inches(0.6)
+        prs.slide_width - Inches(1), Inches(0.7)
     )
     fill = insight_shape.fill
     fill.solid()
@@ -2212,17 +2009,14 @@ def build_protection_achieved_slides(prs, data):
     line.color.rgb = CS_BLUE
     line.width = Pt(2)
     
-    # Generate dynamic insight text based on metric statuses
-    fp_status = get_metric_status("false_positive_rate", data.false_positive_rate)
-    containment_status = get_metric_status("containment_rate", data.containment_rate)
-    
-    fp_desc = "below target ↓" if fp_status and fp_status["status"] == "good" else "above threshold ↑"
-    containment_desc = "exceeding target ↑" if containment_status and containment_status["status"] == "good" else "below target ↓"
-    
+    # Generate insight text explaining CORR context - use correct language (potential threats, not events)
     insight_text = insight_shape.text_frame
-    insight_text.text = f"FP rate: {data.false_positive_rate}% ({fp_desc}) | Containment: {data.containment_rate}% ({containment_desc})"
+    insight_text.text = (
+        f"Of 2 million potential threats detected, only {data.incidents_escalated} alerts required your attention—"
+        f"Critical Start resolved 99.99% before escalation."
+    )
     insight_text.paragraphs[0].font.name = BODY_FONT_NAME
-    insight_text.paragraphs[0].font.size = Pt(14)
+    insight_text.paragraphs[0].font.size = Pt(13)
     insight_text.paragraphs[0].font.color.rgb = CS_NAVY
     insight_text.paragraphs[0].font.bold = True
     insight_text.paragraphs[0].alignment = PP_ALIGN.CENTER
@@ -2292,29 +2086,8 @@ def build_threat_landscape_slides(prs, data, include=True):
     subtitle_paragraph.font.color.rgb = CS_SLATE
     subtitle_paragraph.alignment = PP_ALIGN.LEFT
     
-    # Add chip with total escalations
-    chip_left = prs.slide_width - Inches(2.5)
-    chip_top = content_top_11 - Inches(0.6)
-    chip_width = Inches(1.8)
-    chip_height = Inches(0.4)
-    
-    chip_shape = slide11.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE, chip_left, chip_top,
-        chip_width, chip_height
-    )
-    fill = chip_shape.fill
-    fill.solid()
-    fill.fore_color.rgb = CS_BLUE
-    chip_shape.line.fill.background()
-    
-    chip_text = chip_shape.text_frame
-    chip_text.text = f"{total_escalations} escalations"
-    chip_text.paragraphs[0].font.name = BODY_FONT_NAME
-    chip_text.paragraphs[0].font.size = Pt(12)
-    chip_text.paragraphs[0].font.bold = True
-    chip_text.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
-    chip_text.paragraphs[0].alignment = PP_ALIGN.CENTER
-    chip_text.vertical_anchor = 1  # Middle
+    # Note: Removed "X escalations" chip per Jan 2026 stakeholder feedback.
+    # The three left-side narrative cards provide enough numerical context.
     
     # Calculate percentages for narrative cards
     upgrade_pct = (upgraded_count / total_escalations * 100) if total_escalations > 0 else 0
@@ -2330,22 +2103,26 @@ def build_threat_landscape_slides(prs, data, include=True):
     cards_start_top = subtitle_top + subtitle_height + Inches(0.25)
     
     # Narrative-driven stat cards with storytelling
+    # Per Jan 2026 feedback: show both percentage AND discrete count
     narrative_cards = [
         {
             "label": "Upgraded",
             "value": f"{upgrade_pct:.1f}%",
+            "count": upgraded_count,
             "narrative": "Added Value Beyond\nVendor Detection",
             "color": CS_RED
         },
         {
-            "label": "De-escalated",
+            "label": "Downgraded",  # Changed from "De-escalated" per Jan 2026 terminology update
             "value": f"{downgrade_pct:.1f}%",
+            "count": de_escalated_count,
             "narrative": "Analyst Time Returned\nto Client",
             "color": CS_BLUE
         },
         {
             "label": "Aligned",
             "value": f"{aligned_pct:.1f}%",
+            "count": aligned_count,
             "narrative": "Vendor Assessment\nConfirmed",
             "color": CS_NAVY
         }
@@ -2381,7 +2158,8 @@ def build_threat_landscape_slides(prs, data, include=True):
         label_para.font.color.rgb = card["color"]
         label_para.alignment = PP_ALIGN.CENTER
         
-        # Add percentage value (middle, prominent)
+        # Add percentage value with count (middle, prominent)
+        # Per Jan 2026 feedback: show "12.3% (33)" format with both percentage and discrete count
         value_box = slide11.shapes.add_textbox(
             card_left + Inches(0.1), card_top + Inches(0.22),
             card_width - Inches(0.2), Inches(0.35)
@@ -2389,9 +2167,9 @@ def build_threat_landscape_slides(prs, data, include=True):
         value_frame = value_box.text_frame
         value_frame.word_wrap = True
         value_para = value_frame.paragraphs[0]
-        value_para.text = card["value"]
+        value_para.text = f"{card['value']} ({card['count']})"
         value_para.font.name = TITLE_FONT_NAME
-        value_para.font.size = Pt(28)
+        value_para.font.size = Pt(22)  # Slightly smaller to fit both values
         value_para.font.bold = True
         value_para.font.color.rgb = card["color"]
         value_para.alignment = PP_ALIGN.CENTER
@@ -2440,11 +2218,12 @@ def build_threat_landscape_slides(prs, data, include=True):
     # Slide 9 - Threat & Detection Sources (Merged: MITRE Tactics + Detection Sources)
     slide_threats, content_top_threats = setup_content_slide(prs, "Threat & Detection Sources")
     
-    # Left half: MITRE ATT&CK chart placeholder (compact)
+    # Left half: MITRE ATT&CK chart placeholder (enlarged per Jan 2026 feedback)
+    # Reduced detection source card width to allow more chart space
     chart_left = Inches(0.5)
     chart_top = content_top_threats + Inches(0.1)
-    chart_width = (prs.slide_width - Inches(1.2)) / 2
-    chart_height = Inches(2.3)
+    chart_width = prs.slide_width * 0.55  # Increased from 50% to 55%
+    chart_height = Inches(3.0)  # Increased from 2.3"
     
     chart_placeholder = slide_threats.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, chart_left, chart_top,
@@ -2465,41 +2244,14 @@ def build_threat_landscape_slides(prs, data, include=True):
     placeholder_text.paragraphs[0].alignment = PP_ALIGN.CENTER
     placeholder_text.vertical_anchor = 1
     
-    # Chart legend below
-    legend_top = chart_top + chart_height + Inches(0.1)
-    legend_box = slide_threats.shapes.add_textbox(chart_left, legend_top, chart_width, Inches(0.3))
-    legend_frame = legend_box.text_frame
-    legend_para = legend_frame.paragraphs[0]
-    legend_para.text = "High | Medium | Low | Info"
-    legend_para.font.name = BODY_FONT_NAME
-    legend_para.font.size = Pt(10)
-    legend_para.font.color.rgb = CS_SLATE
-    legend_para.alignment = PP_ALIGN.CENTER
+    # Note: Removed redundant "High | Medium | Low | Info" legend text box
+    # and "Persistence: X escalations" insight text box per Jan 2026 feedback.
+    # The chart has a built-in legend, and annotations go directly on the chart.
     
-    # MITRE insight below legend
-    if len(data.tactics) > 0 and len(data.high_severity) > 0:
-        persistence_total = (data.high_severity[0] + data.medium_severity[0] + 
-                           data.low_severity[0] + data.info_severity[0])
-        persistence_high = data.high_severity[0]
-        mitre_insight = f"Persistence: {persistence_total} escalations, {persistence_high} high-severity"
-    else:
-        mitre_insight = "Persistence: 77 escalations, 12 high-severity"
-    
-    insight_top = legend_top + Inches(0.35)
-    insight_box = slide_threats.shapes.add_textbox(chart_left, insight_top, chart_width, Inches(0.4))
-    insight_frame = insight_box.text_frame
-    insight_para = insight_frame.paragraphs[0]
-    insight_para.text = mitre_insight
-    insight_para.font.name = BODY_FONT_NAME
-    insight_para.font.size = Pt(11)
-    insight_para.font.bold = True
-    insight_para.font.color.rgb = CS_NAVY
-    insight_para.alignment = PP_ALIGN.CENTER
-    
-    # Right half: Detection Sources (3 compact cards stacked)
-    right_left = chart_left + chart_width + Inches(0.2)
-    right_width = chart_width
-    source_card_height = Inches(1.0)
+    # Right half: Detection Sources (3 compact cards stacked, narrower)
+    right_left = chart_left + chart_width + Inches(0.15)
+    right_width = prs.slide_width - right_left - Inches(0.5)  # Narrower cards
+    source_card_height = Inches(0.95)  # Slightly reduced
     source_spacing = Inches(0.1)
     fp_threshold = 10.0
     
@@ -2541,7 +2293,7 @@ def build_threat_landscape_slides(prs, data, include=True):
         )
         i_frame = inc_box.text_frame
         i_para = i_frame.paragraphs[0]
-        i_para.text = f"{source['incidents']} incidents ({source['percent']}%)"
+        i_para.text = f"{source['incidents']} alerts ({source['percent']}%)"
         i_para.font.name = BODY_FONT_NAME
         i_para.font.size = Pt(11)
         i_para.font.color.rgb = CS_SLATE
@@ -2601,10 +2353,11 @@ def build_insights_slides(prs, data):
     slide14, content_top_14 = setup_content_slide(prs, "Prioritized Improvement Plan")
     
     # Create improvement items cards
-    card_start_top = content_top_14 + Inches(0.1)
+    # Reduced heights to prevent vertical overflow (per Jan 2026 feedback)
+    card_start_top = content_top_14 + Inches(0.05)
     card_width = prs.slide_width - Inches(1.0)
-    card_height = Inches(1.3)
-    card_spacing = Inches(0.2)
+    card_height = Inches(1.0)  # Reduced from 1.3"
+    card_spacing = Inches(0.12)  # Reduced from 0.2"
     card_left = Inches(0.5)
     
     # Map priority to colors
@@ -2614,7 +2367,14 @@ def build_insights_slides(prs, data):
         "LOW": CS_BLUE
     }
     
-    # Expected impact text for each item
+    # Sort improvement items by priority (HIGH -> MEDIUM -> LOW) per stakeholder feedback
+    priority_order = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
+    sorted_items = sorted(
+        data.improvement_items,
+        key=lambda x: priority_order.get(x.get("priority", "LOW"), 3)
+    )
+    
+    # Expected impact text for each item (will be matched by position after sorting)
     expected_impacts = [
         "Reduce escalations by ~20%",
         "Reduce manual review burden",
@@ -2624,11 +2384,11 @@ def build_insights_slides(prs, data):
     # Concise descriptions as per requirements
     concise_descriptions = [
         "Palo Alto Cortex XDR false positive rate is 11.2%, exceeding the 10.0% threshold",
-        "Manual escalations at 14% exceed 12% target. 38 incidents required analyst judgment",
-        "Persistence + Defense Evasion account for 67% of high-severity incidents"
+        "Manual escalations at 14% exceed 12% target. 38 alerts required analyst judgment",
+        "Persistence + Defense Evasion account for 67% of high-severity alerts"
     ]
     
-    for i, item in enumerate(data.improvement_items):
+    for i, item in enumerate(sorted_items):
         card_top = card_start_top + i * (card_height + card_spacing)
         
         # Determine priority color
@@ -2647,11 +2407,11 @@ def build_insights_slides(prs, data):
         line.color.rgb = border_color
         line.width = Pt(4)  # Thicker left border
         
-        # Add priority badge at top left
-        badge_width = Inches(1.0)
-        badge_height = Inches(0.35)
-        badge_left = card_left + Inches(0.2)
-        badge_top = card_top + Inches(0.15)
+        # Add priority badge at top left (reduced sizes for tighter layout)
+        badge_width = Inches(0.9)
+        badge_height = Inches(0.28)
+        badge_left = card_left + Inches(0.15)
+        badge_top = card_top + Inches(0.1)
         
         badge_shape = slide14.shapes.add_shape(
             MSO_SHAPE.RECTANGLE, badge_left, badge_top,
@@ -2665,16 +2425,16 @@ def build_insights_slides(prs, data):
         badge_text = badge_shape.text_frame
         badge_text.text = priority
         badge_text.paragraphs[0].font.name = TITLE_FONT_NAME
-        badge_text.paragraphs[0].font.size = Pt(12)
+        badge_text.paragraphs[0].font.size = Pt(10)  # Reduced from 12
         badge_text.paragraphs[0].font.bold = True
         badge_text.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
         badge_text.paragraphs[0].alignment = PP_ALIGN.CENTER
         badge_text.vertical_anchor = 1  # Middle
         
         # Add item title next to badge
-        item_title_left = badge_left + badge_width + Inches(0.2)
+        item_title_left = badge_left + badge_width + Inches(0.15)
         item_title_top = badge_top
-        item_title_width = card_width - badge_width - Inches(0.6)
+        item_title_width = card_width - badge_width - Inches(0.5)
         item_title_height = badge_height
         
         item_title_box = slide14.shapes.add_textbox(
@@ -2683,69 +2443,57 @@ def build_insights_slides(prs, data):
         item_title_frame = item_title_box.text_frame
         item_title_frame.word_wrap = True
         item_title_paragraph = item_title_frame.paragraphs[0]
-        item_title_paragraph.text = f"Item {i+1} - {item['title']}"
+        item_title_paragraph.text = item['title']  # Simplified title (removed "Item X -")
         item_title_paragraph.font.name = TITLE_FONT_NAME
-        item_title_paragraph.font.size = Pt(16)
+        item_title_paragraph.font.size = Pt(14)  # Reduced from 16
         item_title_paragraph.font.bold = True
         item_title_paragraph.font.color.rgb = CS_NAVY
         item_title_paragraph.alignment = PP_ALIGN.LEFT
         
         # Add description
-        desc_left = card_left + Inches(0.2)
-        desc_top = badge_top + badge_height + Inches(0.15)
-        desc_width = card_width - Inches(0.4)
-        desc_height = Inches(0.4)
+        desc_left = card_left + Inches(0.15)
+        desc_top = badge_top + badge_height + Inches(0.08)
+        desc_width = card_width - Inches(0.3)
+        desc_height = Inches(0.35)
         
         desc_box = slide14.shapes.add_textbox(desc_left, desc_top, desc_width, desc_height)
         desc_frame = desc_box.text_frame
         desc_frame.word_wrap = True
         desc_paragraph = desc_frame.paragraphs[0]
-        desc_paragraph.text = concise_descriptions[i]
+        # Use item's own description, with fallback to concise versions
+        desc_paragraph.text = concise_descriptions[i] if i < len(concise_descriptions) else item.get('description', '')[:100]
         desc_paragraph.font.name = BODY_FONT_NAME
-        desc_paragraph.font.size = Pt(12)
+        desc_paragraph.font.size = Pt(11)  # Reduced from 12
         desc_paragraph.font.color.rgb = CS_SLATE
         desc_paragraph.alignment = PP_ALIGN.LEFT
         
-        # Add metadata (Owner, Target, Expected Impact) in two rows
+        # Add metadata (Owner, Target, Expected Impact) in single row to save space
         meta_left = desc_left
-        meta_top = desc_top + desc_height + Inches(0.1)
-        meta_width = card_width - Inches(0.4)
-        meta_height = Inches(0.35)
+        meta_top = desc_top + desc_height + Inches(0.05)
+        meta_width = card_width - Inches(0.3)
+        meta_height = Inches(0.28)
         
-        # Row 1: Owner and Target
-        meta_text1 = f"Owner: {item['owner']} | Target: {item['target']}"
-        meta_box1 = slide14.shapes.add_textbox(meta_left, meta_top, meta_width, meta_height)
-        meta_frame1 = meta_box1.text_frame
-        meta_frame1.word_wrap = True
-        meta_paragraph1 = meta_frame1.paragraphs[0]
-        meta_paragraph1.text = meta_text1
-        meta_paragraph1.font.name = BODY_FONT_NAME
-        meta_paragraph1.font.size = Pt(11)
-        meta_paragraph1.font.color.rgb = CS_SLATE
-        meta_paragraph1.alignment = PP_ALIGN.LEFT
-        
-        # Row 2: Expected Impact
-        meta_top2 = meta_top + meta_height + Inches(0.05)
-        meta_text2 = f"Expected Impact: {expected_impacts[i]}"
-        meta_box2 = slide14.shapes.add_textbox(meta_left, meta_top2, meta_width, meta_height)
-        meta_frame2 = meta_box2.text_frame
-        meta_frame2.word_wrap = True
-        meta_paragraph2 = meta_frame2.paragraphs[0]
-        meta_paragraph2.text = meta_text2
-        meta_paragraph2.font.name = BODY_FONT_NAME
-        meta_paragraph2.font.size = Pt(11)
-        meta_paragraph2.font.bold = True
-        meta_paragraph2.font.color.rgb = CS_NAVY
-        meta_paragraph2.alignment = PP_ALIGN.LEFT
+        # Combined metadata row
+        impact_text = expected_impacts[i] if i < len(expected_impacts) else "Improved security posture"
+        meta_text = f"{item['owner']} | {item['target']} | Impact: {impact_text}"
+        meta_box = slide14.shapes.add_textbox(meta_left, meta_top, meta_width, meta_height)
+        meta_frame = meta_box.text_frame
+        meta_frame.word_wrap = True
+        meta_paragraph = meta_frame.paragraphs[0]
+        meta_paragraph.text = meta_text
+        meta_paragraph.font.name = BODY_FONT_NAME
+        meta_paragraph.font.size = Pt(10)  # Reduced from 11
+        meta_paragraph.font.color.rgb = CS_SLATE
+        meta_paragraph.alignment = PP_ALIGN.LEFT
     
-    # Add insight bar for Prioritized Improvements
-    improvements_insight_top = card_start_top + 3 * (card_height + card_spacing) - Inches(0.1)
+    # Add insight bar for Prioritized Improvements (reduced height)
+    improvements_insight_top = card_start_top + 3 * (card_height + card_spacing)
     add_insight_callout(
         slide14, prs,
         "Focus Areas for Continuous Improvement",
         "Three targeted actions to reduce noise, improve detection, and strengthen your security posture.",
         improvements_insight_top,
-        height=Inches(0.7)
+        height=Inches(0.55)  # Reduced from 0.7"
     )
     
     # Slide 11 - Operational Coverage (Merged: After-Hours + Operational Insights)
@@ -2792,6 +2540,19 @@ def build_insights_slides(prs, data):
     label_para.font.bold = True
     label_para.font.color.rgb = CS_NAVY
     label_para.alignment = PP_ALIGN.LEFT
+    
+    # Business hours definition (per Jan 2026 stakeholder feedback for clarity)
+    if data.business_hours_definition:
+        bh_box = slide_ops.shapes.add_textbox(left_left + Inches(0.2), panel_top + Inches(1.5), 
+                                              Inches(3.0), Inches(0.25))
+        bh_frame = bh_box.text_frame
+        bh_para = bh_frame.paragraphs[0]
+        bh_para.text = f"(Business hours: {data.business_hours_definition})"
+        bh_para.font.name = BODY_FONT_NAME
+        bh_para.font.size = Pt(10)
+        bh_para.font.italic = True
+        bh_para.font.color.rgb = CS_SLATE
+        bh_para.alignment = PP_ALIGN.LEFT
     
     # Breakdown stats
     weeknight_count = getattr(data, 'after_hours_weeknight', int(data.after_hours_escalations * 0.82))
@@ -2844,7 +2605,7 @@ def build_insights_slides(prs, data):
     
     # Collaboration metrics (3 compact rows)
     collab_data = [
-        {"label": "Average Touches", "value": str(data.avg_touches), "detail": "per incident"},
+        {"label": "Average Touches", "value": str(data.avg_touches), "detail": "per alert"},
         {"label": "Client Participation", "value": data.client_participation, "detail": "with client input"},
         {"label": "Client-Led Closures", "value": data.client_led_closures, "detail": "closed by team"}
     ]
@@ -2897,8 +2658,9 @@ def build_insights_slides(prs, data):
     line.color.rgb = CS_BLUE
     line.width = Pt(2)
     
+    # Rewritten insight text per Jan 2026 feedback - explain significance, don't just restate metrics
     insight_text = insight_shape.text_frame
-    insight_text.text = f"Continuous protection: {data.after_hours_escalations} off-hours incidents handled with {data.client_participation} client engagement"
+    insight_text.text = f"Critical Start handled {data.after_hours_escalations} alerts when your team was offline, maintaining 24/7 protection without gaps in coverage."
     insight_text.paragraphs[0].font.name = BODY_FONT_NAME
     insight_text.paragraphs[0].font.size = Pt(13)
     insight_text.paragraphs[0].font.color.rgb = CS_NAVY
@@ -2936,11 +2698,15 @@ def build_additional_content_slides(prs, data):
 
 
 def build_forward_direction_slide(prs, data):
-    """Create the Forward Direction slide (Slide 16).
+    """Create the Forward Direction slide (Slide 19 - Looking Ahead).
     
     Per CRITICALSTART branding guidelines:
     - All slides have transparent header and footer
     - Uses H1-H6 typography scale
+    
+    Note: Per Jan 2026 stakeholder feedback, this slide has NO insight box.
+    This slide IS the narrative (it contains strategic recommendations),
+    so an additional insight box would be redundant.
     
     Args:
         prs (Presentation): The presentation object.
@@ -2949,11 +2715,11 @@ def build_forward_direction_slide(prs, data):
     # Forward Direction slide
     slide16, content_top_16 = setup_content_slide(prs, "Looking Ahead")
     
-    # Section 1 - Next Period Targets
-    section1_top = content_top_16 + Inches(0.1)
+    # Section 1 - Next Period Targets (reduced heights to prevent overflow)
+    section1_top = content_top_16 + Inches(0.05)
     section1_left = Inches(0.5)
     section1_width = prs.slide_width - Inches(1.0)
-    section1_height = Inches(1.2)
+    section1_height = Inches(1.1)  # Reduced from 1.2"
     
     # Section 1 title
     section1_title_box = slide16.shapes.add_textbox(
@@ -2990,7 +2756,7 @@ def build_forward_direction_slide(prs, data):
             break
     
     # Calculate reduction (11.2% to 10% = ~4 fewer escalations)
-    # Assuming 189 incidents at 11.2% FP rate, reducing to 10% would save ~2-4 escalations
+    # Assuming 189 alerts at 11.2% FP rate, reducing to 10% would save ~2-4 escalations
     target1_text = f"Trim Palo Alto XDR false positives from {palo_alto_fp_rate}% to 10% threshold (~4 fewer escalations)"
     target2_text = f"Reduce manual escalations from {data.analyst_escalation['count']} ({data.analyst_escalation['percent']}%) to 32 or fewer (12% target)"
     
@@ -3012,8 +2778,8 @@ def build_forward_direction_slide(prs, data):
     para2.space_after = Pt(8)
     
     # Section 2 - Strategic Focus
-    section2_top = section1_top + section1_height + Inches(0.3)
-    section2_height = Inches(1.0)
+    section2_top = section1_top + section1_height + Inches(0.2)  # Reduced gap
+    section2_height = Inches(0.9)  # Reduced from 1.0"
     
     # Section 2 title
     section2_title_box = slide16.shapes.add_textbox(
@@ -3062,8 +2828,8 @@ def build_forward_direction_slide(prs, data):
     para4.space_after = Pt(8)
     
     # Section 3 - Your Partnership
-    section3_top = section2_top + section2_height + Inches(0.3)
-    section3_height = Inches(0.8)
+    section3_top = section2_top + section2_height + Inches(0.2)  # Reduced gap
+    section3_height = Inches(0.7)  # Reduced from 0.8"
     
     # Section 3 title
     section3_title_box = slide16.shapes.add_textbox(
@@ -3094,15 +2860,9 @@ def build_forward_direction_slide(prs, data):
     section3_content_paragraph.font.color.rgb = CS_SLATE
     section3_content_paragraph.alignment = PP_ALIGN.LEFT
     
-    # Add insight bar
-    insight_top = section3_top + section3_height + Inches(0.2)
-    add_insight_callout(
-        slide16, prs,
-        "Strategic Path Forward",
-        "Targeted recommendations to strengthen your security posture and maximize partnership value.",
-        insight_top,
-        height=Inches(0.7)
-    )
+    # Note: Per Jan 2026 stakeholder feedback, NO insight bar on this slide.
+    # This slide IS the narrative content, so a "Strategic Path Forward" box
+    # would be redundant. The slide title and content serve that purpose.
 
 
 def build_contact_slide(prs, data):
@@ -3181,24 +2941,36 @@ def build_contact_slide(prs, data):
     contact_para1 = contact_frame.paragraphs[0]
     contact_para1.text = "Your Customer Success Manager"
     contact_para1.font.name = TITLE_FONT_NAME
-    contact_para1.font.size = Pt(18)
+    contact_para1.font.size = Pt(16)
     contact_para1.font.bold = True
-    contact_para1.font.color.rgb = CS_NAVY
+    contact_para1.font.color.rgb = CS_SLATE
     contact_para1.alignment = PP_ALIGN.CENTER
     
+    # Dynamic CSM name per Jan 2026 stakeholder feedback
     contact_para2 = contact_frame.add_paragraph()
-    contact_para2.text = "support@criticalstart.com"
-    contact_para2.font.name = BODY_FONT_NAME
-    contact_para2.font.size = Pt(16)
-    contact_para2.font.color.rgb = CS_BLUE
+    csm_name = data.csm_name if data.csm_name else "Your CS Team"
+    contact_para2.text = csm_name
+    contact_para2.font.name = TITLE_FONT_NAME
+    contact_para2.font.size = Pt(22)
+    contact_para2.font.bold = True
+    contact_para2.font.color.rgb = CS_NAVY
     contact_para2.alignment = PP_ALIGN.CENTER
     
+    # Dynamic CSM email or fallback to support
     contact_para3 = contact_frame.add_paragraph()
-    contact_para3.text = "www.criticalstart.com"
+    csm_email = data.csm_email if data.csm_email else "support@criticalstart.com"
+    contact_para3.text = csm_email
     contact_para3.font.name = BODY_FONT_NAME
     contact_para3.font.size = Pt(14)
-    contact_para3.font.color.rgb = CS_SLATE
+    contact_para3.font.color.rgb = CS_BLUE
     contact_para3.alignment = PP_ALIGN.CENTER
+    
+    contact_para4 = contact_frame.add_paragraph()
+    contact_para4.text = "www.criticalstart.com"
+    contact_para4.font.name = BODY_FONT_NAME
+    contact_para4.font.size = Pt(12)
+    contact_para4.font.color.rgb = CS_SLATE
+    contact_para4.alignment = PP_ALIGN.CENTER
     
     # Report date footer
     report_date_box = slide_contact.shapes.add_textbox(
