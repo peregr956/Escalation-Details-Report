@@ -70,7 +70,7 @@ Data model containing all report metrics.
 
 ```python
 # Client Info
-client_name: str          # "Lennar Corporation"
+client_name: str          # "Acme Co."
 tier: str                 # "Signature Tier"
 period_start: str         # "August 1, 2025"
 period_end: str           # "August 31, 2025"
@@ -200,66 +200,6 @@ Chart generation module using Playwright and Chart.js.
 - Margin from edge: 0.5" horizontal, 0.3" vertical
 
 ---
-
-## Content Gaps Analysis
-
-### Missing Content (Present in HTML, Absent from PowerPoint)
-
-#### 1. After-Hours Customer Notifications
-**HTML Location:** `escalation_report_enhanced-3.html` lines 1069-1114
-**Content:**
-- 158 total after-hours escalations
-- Weeknight vs weekend breakdown
-- Notification methods
-- Response coverage details
-
-#### 2. Response Efficiency
-**HTML Location:** `escalation_report_enhanced-3.html` lines 1117-1144
-**Content:**
-- P90 response time details
-- Priority-based response breakdown
-- Efficiency metrics by severity
-
-#### 3. Collaboration Quality
-**HTML Location:** `escalation_report_enhanced-3.html` lines 1146-1174
-**Content:**
-- Average touches per incident (2.3)
-- Client participation rate (72%)
-- Client-led closures (21%)
-- Collaboration quality indicators
-
-#### 4. Detection Quality (Detailed)
-**HTML Location:** `escalation_report_enhanced-3.html` lines 1175-1230
-**Content:**
-- True threat precision (31.4%)
-- Signal fidelity (91%)
-- Client validated outcomes (86.9%)
-- Detailed breakdown with context
-
-#### 5. Security Outcomes This Period
-**HTML Location:** `escalation_report_enhanced-3.html` lines 1390-1470
-**Content:**
-- Comprehensive summary of all outcomes
-- Visual cards for key achievements
-- Consolidated view for executives
-
-#### 6. Operational Load (Detailed)
-**HTML Location:** `escalation_report_enhanced-3.html` lines 1032-1066
-**Content:**
-- Business hours: 51%
-- After hours: 41%
-- Weekends: 8%
-- CS SOC alert resolution breakdown
-
-### Partially Covered Content
-
-#### Detection Sources
-**Current:** Basic table with source, incidents, percent
-**Missing:** False positive rate per source, tuning recommendations
-
-#### Industry Comparison
-**Current:** Simple table comparison
-**Missing:** Context on benchmark sources, trend over time
 
 ---
 
@@ -402,7 +342,6 @@ xlsxwriter==3.2.9      # Excel support (optional)
 - Chart.js 4.4.0 (CDN in chart templates)
 - chartjs-chart-sankey (CDN in sankey template)
 - Google Fonts: Roboto (in chart templates)
-- Font Awesome 6.5.1 (in HTML report)
 
 ---
 

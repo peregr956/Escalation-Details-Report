@@ -47,6 +47,15 @@ temp_charts/
 # PowerPoint presentations are generated artifacts - do not track
 output/*.pptx
 
+# Client data files (sensitive - local only)
+data/*-export-*.xlsx
+data/alert-details-export-*.xlsx
+!data/alert-details-template.xlsx
+
+# Client-specific configurations (sensitive - local only)
+clients/*.yaml
+!clients/sample.yaml
+
 # Temporary chart images (generated during presentation build)
 *.png.tmp
 

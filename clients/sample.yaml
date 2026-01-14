@@ -1,0 +1,47 @@
+# Sample Client Configuration (Acme Co.)
+# ==========================================================
+#
+# This is an example client configuration using the placeholder "Acme Co."
+# Copy this file and customize for real clients. Client-specific configs
+# (except this sample) are gitignored and should not be committed.
+
+# Client Information
+tier: "Signature Tier"
+client_name_override: "Acme Co."  # Placeholder name for demos
+
+# Industry Benchmarks
+# Set to false when industry benchmarks are not available for a client
+industry_benchmarks_available: false
+industry_benchmarks:
+  mttr_minutes: 192
+  mttd_minutes: 66
+  incidents_per_day: 11.4
+
+# Cost Modeling Parameters
+cost_modeling:
+  analyst_hourly_rate: 85
+  coverage_hourly_rate: 220
+  breach_cost_estimate: 4200000
+
+# SLA Targets (in minutes)
+sla_targets:
+  Critical: 30
+  High: 60
+  Medium: 180
+  Low: 240
+
+# Business Hours Definition
+# Set to false when local timestamp data may not be reliable
+after_hours_available: false
+business_hours:
+  start: 8
+  end: 18
+
+# Threshold Settings
+thresholds:
+  fp_rate_good: 10.0
+  fp_rate_warning: 15.0
+  automation_target: 88.0
+  manual_escalation_max: 12.0
+  mttr_good: 150
+  mttr_warning: 200

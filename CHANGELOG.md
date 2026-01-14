@@ -33,6 +33,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.4.0] - 2026-01-14
+
+### Changed
+- Sample data updated with anonymized placeholder client ("Acme Co.")
+- Client configurations moved to `clients/` directory
+
+### Removed
+- Deprecated HTML report examples (`examples/` folder)
+- HTML report documentation and Quick Start instructions
+- Legacy sample data file
+
+### Added
+- Sample client configuration (`clients/sample.yaml`)
+- Headers-only data template for engineering reference
+- Data sensitivity handling (client data and configs gitignored)
+
+---
+
 ## [1.3.0] - 2026-01-09
 
 ### Changed

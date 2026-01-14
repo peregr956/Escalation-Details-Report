@@ -150,16 +150,16 @@ class ReportData:
 
 
 def get_report_data() -> ReportData:
-    """Returns a populated ReportData instance with all metrics from the HTML report."""
+    """Returns a populated ReportData instance with static sample data."""
     
     return ReportData(
         # Client Info
-        client_name="Lennar Corporation",
+        client_name="Acme Co.",
         tier="Signature Tier",
-        period_start="August 1, 2025",
-        period_end="August 31, 2025",
-        period_days=31,
-        report_date="November 5, 2025",
+        period_start="January 1, 2025",
+        period_end="December 31, 2025",
+        period_days=365,
+        report_date="January 14, 2026",
         
         # Hero Metrics
         alerts_triaged=2110,
@@ -171,7 +171,7 @@ def get_report_data() -> ReportData:
         p90_minutes=87,
         industry_median_minutes=192,
         after_hours_escalations=158,
-        coverage_hours=744,
+        coverage_hours=8760,
         automation_percent=86,
         
         # Executive Summary
@@ -293,7 +293,7 @@ def get_report_data() -> ReportData:
             {
                 "title": "Detection Tuning",
                 "priority": "HIGH",
-                "owner": "CS SOC + Lennar Security Team",
+                "owner": "CS SOC + Client Security Team",
                 "target": "Next 30 days",
                 "description": "Palo Alto Cortex XDR false positive rate is 11.2%, exceeding the 10.0% threshold and keeping the overall rate at 9.0%. Tuning these alerts will reduce client noise and improve SOC efficiency, directly lowering the 1,690 client-touch decisions surfaced in the hero."
             },
@@ -307,7 +307,7 @@ def get_report_data() -> ReportData:
             {
                 "title": "Threat Focus",
                 "priority": "HIGH",
-                "owner": "Joint - CS Threat Intel + Lennar",
+                "owner": "Joint - CS Threat Intel + Client Security",
                 "target": "Ongoing",
                 "description": "Persistence plus Defense Evasion account for 20 of the 30 high-severity incidents (67%) in the MITRE dataset, signaling concentrated foothold attempts that should drive proactive hunts and new detections."
             }
@@ -378,8 +378,8 @@ def get_report_data() -> ReportData:
         executive_summary_narrative="Your security posture remained strong this reporting period. CS SOC triaged 2,110 alerts, partnering with your team on 1,690 decisions and closing 420 end-to-end. Response speed landed 34% faster than sector medians (126-minute MTTR, 87-minute P90), while 158 escalations were absorbed after hours without gaps in coverage. Of the 267 alerts escalated, we identified 11 true positives and contained each before business impact, keeping false positives at 9.0%.",
         
         # New fields per Jan 2026 stakeholder feedback
-        csm_name="Sarah Chen",
-        csm_email="sarah.chen@criticalstart.com",
+        csm_name="Jane Smith",
+        csm_email="csm@criticalstart.com",
         business_hours_definition="9AM-5PM EST, Mon-Fri",
         cost_calculation_methodology="Ponemon Cost of a Data Breach 2025",
         cost_calculation_source="IBM Security / Ponemon Institute",

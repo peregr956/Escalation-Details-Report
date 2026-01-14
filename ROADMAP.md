@@ -9,7 +9,7 @@ The PowerPoint generation system produces branded executive-ready slides with a 
 **Target Audience:** C-suite executives, CISOs, and security leadership
 
 **Key Objectives:**
-1. Achieve 100% content parity with HTML report
+1. Achieve 100% content completeness in PowerPoint output
 2. Optimize messaging for executive audience
 3. Align visuals with Critical Start brand guidelines
 4. Improve code maintainability and documentation
@@ -31,6 +31,7 @@ The PowerPoint generation system produces branded executive-ready slides with a 
 - [x] Created requirements-dev.txt
 - [x] Created docs/DEVELOPER_GUIDE.md
 - [x] Updated README.md with new structure
+- [x] Deprecated legacy HTML report examples and documentation
 
 ---
 
@@ -38,8 +39,8 @@ The PowerPoint generation system produces branded executive-ready slides with a 
 
 **Priority:** High  
 **Timeline:** Next Sprint  
-**Status:** In Progress  
-**Goal:** Ensure all relevant content from HTML report is represented in PowerPoint
+**Status:** In Progress (data pipeline integration complete)  
+**Goal:** Ensure all relevant content is represented in PowerPoint
 
 ### 1.1 Add Missing Content Slides
 

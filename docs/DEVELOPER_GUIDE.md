@@ -9,9 +9,9 @@ Escalation-Details-Report/
 ├── assets/                  # Logo and image assets
 ├── brand/                   # Brand guidelines documentation
 ├── chart_templates/         # Chart.js HTML templates
-├── data/                    # Sample data files
+├── clients/                 # Client configurations (sample + local)
+├── data/                    # Data templates and local exports
 ├── docs/                    # Technical documentation
-├── examples/                # Sample HTML reports
 ├── output/                  # Generated presentations (gitignored)
 ├── scripts/                 # Utility scripts
 ├── tests/                   # Test files
@@ -93,7 +93,7 @@ from report_data import ReportData, get_report_data
 data = get_report_data()
 
 # Access metrics
-print(data.client_name)           # "Lennar Corporation"
+print(data.client_name)           # "Acme Co."
 print(data.incidents_escalated)   # 267
 print(data.mttr_minutes)          # 126
 ```
@@ -150,6 +150,19 @@ Chart templates are HTML files in `chart_templates/` that use Chart.js:
 | `sankey_chart.html` | Sankey diagram |
 
 Charts are rendered to PNG using Playwright and inserted into slides.
+
+## Creating a New Client Configuration
+
+1. Copy the sample config:
+   ```bash
+   cp clients/sample.yaml clients/[client].yaml
+   ```
+2. Update `clients/[client].yaml` with client-specific settings.
+3. Place the client export in `data/` using the pattern `alert-details-export-*.xlsx`.
+4. Generate the report with:
+   ```bash
+   python generate_presentation.py --data data/alert-details-export-*.xlsx --config clients/[client].yaml
+   ```
 
 ## Running Tests
 

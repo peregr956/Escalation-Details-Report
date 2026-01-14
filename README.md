@@ -1,6 +1,6 @@
 # Escalation to Client Details Report
 
-Interactive, single-page business review experience that quantifies the work Critical Start's Managed Detection & Response (MDR) team delivers for executive stakeholders. This repo stores the production-ready HTML artifact, sample data, and the Markdown-based brand system that replaced the legacy DOCX package.
+Executive business review deck generator that quantifies the work Critical Start's Managed Detection & Response (MDR) team delivers for executive stakeholders. This repo stores the PowerPoint generator, anonymized sample data, and the Markdown-based brand system that replaced the legacy DOCX package.
 
 ## Overview
 
@@ -29,8 +29,8 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
 | `constants.py` | Brand colors, fonts, typography scale, and layout constants. |
 | `helpers.py` | Reusable layout helper functions for slide creation. |
 | `chart_templates/` | HTML templates for chart rendering (pie, trend, stacked bar, sankey). |
-| `examples/` | Sample HTML reports (`escalation_report_enhanced-3.html`, `your_team_performance.html`). |
-| `data/` | Data files including `Report Extract.xlsx` for validation. |
+| `clients/` | Client configuration files (use `sample.yaml` as template). |
+| `data/` | Data files including `alert-details-template.xlsx` (headers only). |
 | `tests/` | Test scripts for branding and slide generation. |
 | `scripts/` | Utility scripts (e.g., `convert_logo_to_png.py`). |
 | `brand/` | Brand guidelines (`brand-guidelines.md`, `visual-identity.md`). |
@@ -42,12 +42,6 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
 
 ## Tech Stack
 
-### HTML Report
-- Static HTML5 document with inline CSS for easier PDF exports.
-- Vanilla JavaScript + Chart.js (line, pie, stacked bar, and Sankey via `chartjs-chart-sankey`).
-- Google Fonts (Roboto) and Font Awesome icons.
-- Fully responsive layout with print styles tuned for "Save as PDF".
-
 ### PowerPoint Generator
 - Python 3.10+ with `python-pptx` for presentation generation.
 - Playwright for headless browser chart rendering.
@@ -57,13 +51,6 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
 - Brand-compliant typography (Roboto/Arial fallback) and color palette.
 
 ## Quick Start
-
-### Preview the HTML report locally
-```bash
-cd examples
-python3 -m http.server 4173
-# Navigate to http://localhost:4173/escalation_report_enhanced-3.html
-```
 
 ### Generate PowerPoint Presentation
 
@@ -75,16 +62,13 @@ python3 -m http.server 4173
    playwright install chromium
    ```
 
-2. Generate the presentation from Excel data:
+2. Generate the presentation:
    ```bash
-   # From a single period Excel file
-   python generate_presentation.py --data report.xlsx --config client_config.yaml
+   # Using sample configuration (Acme Co.)
+   python generate_presentation.py --config clients/sample.yaml
 
-   # From multiple periods (for trend charts)
-   python generate_presentation.py --data aug.xlsx sep.xlsx oct.xlsx --config client_config.yaml
-
-   # Using static sample data (for demos/testing)
-   python generate_presentation.py
+   # Using real client data (local only)
+   python generate_presentation.py --data data/alert-details-export-*.xlsx --config clients/[client].yaml
    ```
 
 3. The presentation will be saved to `output/escalation_report_YYYY-MM-DD.pptx`
@@ -100,9 +84,14 @@ python generate_presentation.py --keep-charts                             # Keep
 ```
 
 ### Export or share
-- **HTML Report:** Use the browser's `Print → Save as PDF` workflow with "Background graphics" enabled.
 - **PowerPoint:** Open the generated `.pptx` file in PowerPoint or Google Slides.
 - For executive walkthroughs, keep the tab in full-screen (1920×1080) or export to PDF before sending.
+
+## Data Sensitivity
+
+- Client data files are gitignored (`data/*-export-*.xlsx`).
+- Client-specific configs are gitignored (`clients/*.yaml`) except `clients/sample.yaml`.
+- Use `clients/sample.yaml` as the template for new client configurations.
 
 ## Data-Driven Generation
 
@@ -110,7 +99,7 @@ The PowerPoint generator now supports fully dynamic data loading from Excel file
 
 ### Input Files
 - **Excel Data (1-3 files):** Standard 45-column incident export from CORR. Provide multiple files for trend comparison—the last file is treated as the current period.
-- **Config File (YAML):** Client-specific settings including tier, industry benchmarks, and SLA targets. Copy `client_config.yaml` as a template.
+- **Config File (YAML):** Client-specific settings including tier, industry benchmarks, and SLA targets. Copy `clients/sample.yaml` as a template or start from `client_config.yaml`.
 
 ### What Gets Computed
 All 120+ ReportData fields are automatically computed from the incident data:
@@ -127,15 +116,12 @@ The insight engine generates recommendations based on threshold comparisons:
 - Key achievements highlighting positive outcomes
 - Executive summary narrative with dynamic values
 
-### Legacy: HTML Report
-For the HTML report, update the `.hero-section` blocks and Chart.js configs directly. Use `data/Report Extract.xlsx` as the source reference.
-
 ## Sample configuration
 
-See `examples/escalation_report_enhanced-3.html` for a complete sample:
-- Client: **Example Corporation**
+`clients/sample.yaml` provides an anonymized baseline:
+- Client: **Acme Co.**
 - Tier: **Signature Tier MDR**
-- Period: **Aug 1–31, 2025** (31 days / 744 hours of coverage)
+- Period: **Jan 1–Dec 31, 2025** (365 days / 8,760 hours of coverage)
 - Incidents escalated: **267** (8.9 per day)
 - True positives contained: **11**; zero breaches reported
 - Response speed advantage: **34% faster** than peers
