@@ -364,47 +364,52 @@ def prepare_chart_data(data) -> Dict:
     """
     chart_data = {}
     
-    # Trend chart data (MTTR, MTTD, FP% trends) with industry benchmarks
-    # Industry benchmarks shown as horizontal dashed lines for comparison
+    # Trend chart data (MTTR, MTTD, FP% trends)
+    # Industry benchmarks shown as horizontal dashed lines for comparison (if available)
     num_periods = len(data.period_labels)
-    mttr_benchmark = data.mttr_industry_benchmark if data.mttr_industry_benchmark > 0 else 192.0
-    mttd_benchmark = data.mttd_industry_benchmark if data.mttd_industry_benchmark > 0 else 66.0
     
-    chart_data['trend'] = {
-        'labels': data.period_labels,
-        'datasets': [
-            {
-                'label': 'MTTR (min)',
-                'data': data.mttr_trend,
-                'borderColor': '#009CDE',
-                'backgroundColor': 'rgba(0, 156, 222, 0.1)',
-                'borderWidth': 3,
-                'tension': 0.4,
-                'pointRadius': 4,
-                'pointHoverRadius': 6
-            },
-            {
-                'label': 'MTTD (min)',
-                'data': data.mttd_trend,
-                'borderColor': '#004C97',
-                'backgroundColor': 'rgba(0, 76, 151, 0.1)',
-                'borderWidth': 3,
-                'tension': 0.4,
-                'pointRadius': 4,
-                'pointHoverRadius': 6
-            },
-            {
-                'label': 'FP %',
-                'data': data.fp_trend,
-                'borderColor': '#EF3340',
-                'backgroundColor': 'rgba(239, 51, 64, 0.1)',
-                'borderWidth': 3,
-                'borderDash': [8, 4],
-                'tension': 0.4,
-                'pointRadius': 4,
-                'pointHoverRadius': 6,
-                'yAxisID': 'y1'
-            },
+    # Build base datasets for trend chart
+    trend_datasets = [
+        {
+            'label': 'MTTR (min)',
+            'data': data.mttr_trend,
+            'borderColor': '#009CDE',
+            'backgroundColor': 'rgba(0, 156, 222, 0.1)',
+            'borderWidth': 3,
+            'tension': 0.4,
+            'pointRadius': 4,
+            'pointHoverRadius': 6
+        },
+        {
+            'label': 'MTTD (min)',
+            'data': data.mttd_trend,
+            'borderColor': '#004C97',
+            'backgroundColor': 'rgba(0, 76, 151, 0.1)',
+            'borderWidth': 3,
+            'tension': 0.4,
+            'pointRadius': 4,
+            'pointHoverRadius': 6
+        },
+        {
+            'label': 'FP %',
+            'data': data.fp_trend,
+            'borderColor': '#EF3340',
+            'backgroundColor': 'rgba(239, 51, 64, 0.1)',
+            'borderWidth': 3,
+            'borderDash': [8, 4],
+            'tension': 0.4,
+            'pointRadius': 4,
+            'pointHoverRadius': 6,
+            'yAxisID': 'y1'
+        }
+    ]
+    
+    # Add industry benchmark lines only if benchmarks are available
+    if data.industry_benchmarks_available:
+        mttr_benchmark = data.mttr_industry_benchmark if data.mttr_industry_benchmark > 0 else 192.0
+        mttd_benchmark = data.mttd_industry_benchmark if data.mttd_industry_benchmark > 0 else 66.0
+        
+        trend_datasets.extend([
             {
                 'label': f'Industry MTTR ({int(mttr_benchmark)} min)',
                 'data': [mttr_benchmark] * num_periods,
@@ -429,19 +434,31 @@ def prepare_chart_data(data) -> Dict:
                 'pointHoverRadius': 0,
                 'fill': False
             }
-        ]
+        ])
+    
+    chart_data['trend'] = {
+        'labels': data.period_labels,
+        'datasets': trend_datasets
     }
     
-    # Pie chart data (Operational Load)
-    chart_data['pie'] = {
-        'labels': ['Business Hours', 'After Hours', 'Weekend'],
-        'data': [
-            int(data.business_hours_percent),
-            int(data.after_hours_percent),
-            int(data.weekend_percent)
-        ],
-        'backgroundColor': ['#009CDE', '#702F8A', '#EF3340']
-    }
+    # Pie chart data (Operational Load) - only include if after-hours data available
+    if data.after_hours_data_available:
+        chart_data['pie'] = {
+            'labels': ['Business Hours', 'After Hours', 'Weekend'],
+            'data': [
+                int(data.business_hours_percent),
+                int(data.after_hours_percent),
+                int(data.weekend_percent)
+            ],
+            'backgroundColor': ['#009CDE', '#702F8A', '#EF3340']
+        }
+    else:
+        # Placeholder data when after-hours analysis not available
+        chart_data['pie'] = {
+            'labels': ['Data Analysis', 'Coming Soon'],
+            'data': [100, 0],
+            'backgroundColor': ['#E0E0E0', '#F5F5F5']
+        }
     
     # Sankey chart data (Severity Flow)
     chart_data['sankey'] = {
@@ -674,20 +691,30 @@ Examples:
                 period_label = "current" if i == len(args.data) - 1 else f"period -{len(args.data) - 1 - i}"
                 logger.info(f"  - {path} ({period_label})")
             
-            data = load_report_data(
-                excel_paths=args.data,
-                config_path=args.config,
-                client_name_override=args.client_name
-            )
-            logger.info("✓ Data loaded from Excel files")
+            excel_files = args.data
+            config_file = args.config
         else:
-            # Use static sample data (backward compatibility)
-            logger.info("No --data provided, using static sample data")
-            data = get_report_data()
+            # Interactive mode - prompt user for file selection
+            from interactive_upload import interactive_file_selection
             
-            # Override client name if provided
-            if args.client_name:
-                data.client_name = args.client_name
+            excel_files, config_file = interactive_file_selection()
+            
+            if not excel_files:
+                logger.error("No files selected. Exiting.")
+                return 1
+            
+            logger.info(f"Loading data from {len(excel_files)} Excel file(s)...")
+            for i, path in enumerate(excel_files):
+                period_label = "current" if i == len(excel_files) - 1 else f"period -{len(excel_files) - 1 - i}"
+                logger.info(f"  - {path} ({period_label})")
+        
+        # Load report data from selected files
+        data = load_report_data(
+            excel_paths=excel_files,
+            config_path=config_file,
+            client_name_override=args.client_name
+        )
+        logger.info("✓ Data loaded from Excel files")
         
         logger.info(f"✓ Loaded data for {data.client_name}")
         logger.info(f"  Period: {data.period_start} to {data.period_end}")
@@ -838,13 +865,27 @@ Examples:
         )
         
         logger.info("  Building key takeaways slide...")
-        # Build executive summary key takeaways
-        takeaways = [
-            f"{data.response_advantage_percent}% faster response than industry peers—threats are contained before spreading",
-            f"100% threat containment with zero breaches this period across {data.true_threats_contained} true positive alerts",
-            "Millions in modeled cost exposure avoided through proactive security operations",
-            f"{data.after_hours_escalations} after-hours escalations handled seamlessly with {int(data.automation_percent)}% automation"
-        ]
+        # Build executive summary key takeaways (conditionally include based on data availability)
+        takeaways = []
+        
+        # Industry comparison (only if benchmarks available)
+        if data.industry_benchmarks_available and data.response_advantage_percent > 0:
+            takeaways.append(f"{data.response_advantage_percent}% faster response than industry peers—threats are contained before spreading")
+        else:
+            takeaways.append(f"Average response time of {data.mttr_minutes} minutes with {data.p90_minutes}-minute P90")
+        
+        # Threat containment (always include)
+        takeaways.append(f"100% threat containment with zero breaches this period across {data.true_threats_contained} true positive alerts")
+        
+        # Cost avoidance (always include)
+        takeaways.append("Millions in modeled cost exposure avoided through proactive security operations")
+        
+        # After-hours (only if data available)
+        if data.after_hours_data_available and data.after_hours_escalations > 0:
+            takeaways.append(f"{data.after_hours_escalations} after-hours escalations handled seamlessly with {int(data.automation_percent)}% automation")
+        else:
+            takeaways.append(f"{int(data.automation_percent)}% of escalations handled via automated playbooks")
+        
         build_key_takeaways_slide(prs, "This Period", takeaways, data)
         
         logger.info("  Building forward direction slide...")
@@ -1032,8 +1073,10 @@ def build_executive_summary_slides(prs, data):
     period_paragraph.alignment = PP_ALIGN.LEFT
     
     # Add footer only (no header on title slide per branding guidelines)
+    # Use white text on blue gradient background for WCAG AA compliance
     add_master_slide_elements(slide1, prs, slide_number=None, 
-                               include_header=False, include_footer=True)
+                               include_header=False, include_footer=True,
+                               text_color=RGBColor(255, 255, 255))
     
     # Note: Report date is now in the footer per branding guidelines
     report_date_left = Inches(1)
@@ -1094,6 +1137,20 @@ def build_executive_summary_slides(prs, data):
     total_millions = data.total_modeled / 1000000
     after_hours_percent = int((data.after_hours_escalations / data.incidents_escalated) * 100) if data.incidents_escalated > 0 else 0
     
+    # Determine MTTR detail text based on industry benchmark availability
+    if data.industry_benchmarks_available and data.response_advantage_percent > 0:
+        mttr_detail = f"{int(data.response_advantage_percent)}% faster than industry ({data.industry_median_minutes}m)"
+    else:
+        mttr_detail = f"P90: {data.p90_minutes} minutes"
+    
+    # Determine after-hours display based on data availability
+    if data.after_hours_data_available:
+        after_hours_metric = f"{data.after_hours_escalations}"
+        after_hours_detail = f"{after_hours_percent}% of escalations"
+    else:
+        after_hours_metric = "—"
+        after_hours_detail = "Analysis coming soon"
+    
     # Consolidated 6 key metrics in 2 rows x 3 columns
     # Each metric includes a metric_name for threshold lookup and raw_value for status evaluation
     dashboard_metrics = [
@@ -1108,7 +1165,7 @@ def build_executive_summary_slides(prs, data):
         {
             "title": "MTTR",
             "metric": f"{data.mttr_minutes} min",
-            "detail": f"{int(data.response_advantage_percent)}% faster than industry ({data.industry_median_minutes}m)",
+            "detail": mttr_detail,
             "metric_name": "mttr",
             "raw_value": data.mttr_minutes
         },
@@ -1129,8 +1186,8 @@ def build_executive_summary_slides(prs, data):
         },
         {
             "title": "AFTER-HOURS",
-            "metric": f"{data.after_hours_escalations}",
-            "detail": f"{after_hours_percent}% of escalations",
+            "metric": after_hours_metric,
+            "detail": after_hours_detail,
             "metric_name": None,  # Informational only, no threshold
             "raw_value": None
         },

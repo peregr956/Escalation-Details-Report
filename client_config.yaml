@@ -17,6 +17,8 @@ client_name_override: null  # Set to override the Organization name from Excel
 # -------------------
 # These values are used for comparison metrics.
 # Source: Industry reports and Critical Start internal benchmarks
+# Set industry_benchmarks_available to false if benchmark data is not available for this client
+industry_benchmarks_available: false  # Set to true when industry benchmarks are available
 industry_benchmarks:
   mttr_minutes: 192        # Industry median Mean Time to Respond (minutes)
   mttd_minutes: 66         # Industry median Mean Time to Detect (minutes)
@@ -51,6 +53,8 @@ sla_targets:
 # -------------------------
 # Used for after-hours escalation calculations
 # 24-hour format (0-23)
+# Set after_hours_available to false if timestamp data is unreliable for after-hours analysis
+after_hours_available: false  # Set to true when local timestamps are reliable
 business_hours:
   start: 8   # 8:00 AM
   end: 18    # 6:00 PM

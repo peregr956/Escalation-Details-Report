@@ -19,6 +19,9 @@ class ClientConfig:
     # Client tier (e.g., "Signature Tier", "Standard Tier")
     tier: str = "Standard Tier"
     
+    # Industry benchmark availability flag
+    industry_benchmarks_available: bool = True  # Set to False when benchmarks not available
+    
     # Industry benchmark values
     industry_mttr_minutes: int = 192
     industry_mttd_minutes: int = 66
@@ -43,6 +46,9 @@ class ClientConfig:
         "Medium": 180,
         "Low": 240,
     })
+    
+    # After-hours data availability flag
+    after_hours_available: bool = True  # Set to False when timestamp data unreliable
     
     # Business hours definition (for after-hours calculation)
     business_hours_start: int = 8  # 8 AM
@@ -811,6 +817,102 @@ def calculate_trend_data(all_periods: List[List[Incident]], config: ClientConfig
     }
 
 
+def calculate_monthly_trend_data(incidents: List[Incident], config: ClientConfig) -> Dict[str, Any]:
+    """Calculate monthly trend data from a single period spanning multiple months.
+    
+    This function groups incidents by month and calculates metrics for each month,
+    enabling trend visualization when only a single Excel file is provided that
+    spans multiple months (e.g., a full year of data).
+    
+    Args:
+        incidents: List of all incidents from the data file
+        config: Client configuration
+        
+    Returns:
+        Dictionary with trend arrays and month labels
+    """
+    # Group incidents by month
+    monthly_incidents = defaultdict(list)
+    
+    for inc in incidents:
+        # Use the best available timestamp for grouping
+        # Priority: escalated > created > closed (escalated is most relevant for reporting)
+        dt = inc.escalated_datetime_utc or inc.created_datetime_utc or inc.closed_datetime_utc
+        if dt:
+            # Create a month key (year-month) for sorting
+            month_key = (dt.year, dt.month)
+            monthly_incidents[month_key].append(inc)
+    
+    if not monthly_incidents:
+        return {
+            "mttr_trend": [],
+            "mttd_trend": [],
+            "fp_trend": [],
+            "period_labels": [],
+        }
+    
+    # Sort months chronologically
+    sorted_months = sorted(monthly_incidents.keys())
+    
+    mttr_trend = []
+    mttd_trend = []
+    fp_trend = []
+    period_labels = []
+    
+    # Month abbreviations for labels
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    
+    for year, month in sorted_months:
+        month_incidents = monthly_incidents[(year, month)]
+        metrics = calculate_period_metrics(month_incidents, config)
+        
+        mttr_trend.append(metrics["mttr_minutes"])
+        mttd_trend.append(metrics["mttd_minutes"])
+        fp_trend.append(metrics["false_positive_rate"])
+        
+        # Generate month label (e.g., "Jan", "Feb", or "Jan '25" if spanning years)
+        if len(sorted_months) > 1:
+            first_year = sorted_months[0][0]
+            last_year = sorted_months[-1][0]
+            if first_year != last_year:
+                # Include year suffix if data spans multiple years
+                period_labels.append(f"{month_names[month - 1]} '{str(year)[-2:]}")
+            else:
+                period_labels.append(month_names[month - 1])
+        else:
+            period_labels.append(month_names[month - 1])
+    
+    return {
+        "mttr_trend": mttr_trend,
+        "mttd_trend": mttd_trend,
+        "fp_trend": fp_trend,
+        "period_labels": period_labels,
+    }
+
+
+def get_data_date_range(incidents: List[Incident]) -> Tuple[Optional[datetime], Optional[datetime]]:
+    """Get the date range covered by incident data.
+    
+    Args:
+        incidents: List of incidents
+        
+    Returns:
+        Tuple of (earliest_date, latest_date) or (None, None) if no dates
+    """
+    dates = []
+    for inc in incidents:
+        if inc.created_datetime_utc:
+            dates.append(inc.created_datetime_utc)
+        if inc.escalated_datetime_utc:
+            dates.append(inc.escalated_datetime_utc)
+    
+    if not dates:
+        return None, None
+    
+    return min(dates), max(dates)
+
+
 def calculate_all_metrics(all_periods: List[List[Incident]], 
                           client_name: str,
                           config: ClientConfig) -> Dict[str, Any]:
@@ -829,11 +931,15 @@ def calculate_all_metrics(all_periods: List[List[Incident]],
     # Current period is the last one
     current_period = all_periods[-1] if all_periods else []
     
-    # Calculate date range
+    # Calculate date range using all available timestamps
     dates = []
     for inc in current_period:
         if inc.created_datetime_utc:
             dates.append(inc.created_datetime_utc)
+        if inc.escalated_datetime_utc:
+            dates.append(inc.escalated_datetime_utc)
+        if inc.closed_datetime_utc:
+            dates.append(inc.closed_datetime_utc)
     
     if dates:
         period_start = min(dates)
@@ -850,17 +956,62 @@ def calculate_all_metrics(all_periods: List[List[Incident]],
     detection_sources = calculate_detection_sources(current_period)
     mitre = calculate_mitre_data(current_period)
     severity_flows = calculate_severity_flows(current_period)
-    after_hours = calculate_after_hours_metrics(current_period, config)
     detection_quality = calculate_detection_quality(current_period)
     collaboration = calculate_collaboration_metrics(current_period)
     response_by_priority = calculate_response_by_priority(current_period, config)
-    trends = calculate_trend_data(all_periods, config)
+    
+    # Calculate after-hours metrics (only if data is available per config)
+    if config.after_hours_available:
+        after_hours = calculate_after_hours_metrics(current_period, config)
+    else:
+        # Return zeros/placeholders when after-hours data is not available
+        after_hours = {
+            "after_hours_escalations": 0,
+            "after_hours_weeknight": 0,
+            "after_hours_weekend": 0,
+            "after_hours_critical": 0,
+            "after_hours_high": 0,
+            "after_hours_medium": 0,
+            "after_hours_low": 0,
+            "business_hours_percent": 0.0,
+            "after_hours_percent": 0.0,
+            "weekend_percent": 0.0,
+            "after_hours_data_available": False,
+        }
+    
+    # Calculate trend data - use monthly trends if single period spans multiple months
+    # First, check how many distinct months are in the data
+    distinct_months = set()
+    for inc in current_period:
+        dt = inc.escalated_datetime_utc or inc.created_datetime_utc or inc.closed_datetime_utc
+        if dt:
+            distinct_months.add((dt.year, dt.month))
+    
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"  Trend calculation: period_days={period_days}, distinct_months={len(distinct_months)}, all_periods={len(all_periods)}")
+    
+    # Use monthly trends if: single file AND (spans >31 days OR has multiple distinct months)
+    if len(all_periods) == 1 and (period_days > 31 or len(distinct_months) > 1):
+        # Single file spanning multiple months - use monthly trend calculation
+        trends = calculate_monthly_trend_data(current_period, config)
+        logger.info(f"  Using monthly trend data: {len(trends.get('period_labels', []))} months")
+    else:
+        # Multiple files provided - use standard multi-period trend calculation
+        trends = calculate_trend_data(all_periods, config)
+        logger.info(f"  Using standard trend data: {len(trends.get('period_labels', []))} periods")
     
     # Derived metrics
     incidents_per_day = round(len(current_period) / period_days, 1) if period_days > 0 else 0
     
     cost = calculate_cost_avoidance(current_period, config, response)
-    industry_comparison = calculate_industry_comparison(response, incidents_per_day, config)
+    
+    # Calculate industry comparison (only if benchmarks are available per config)
+    if config.industry_benchmarks_available:
+        industry_comparison = calculate_industry_comparison(response, incidents_per_day, config)
+    else:
+        # Return empty list when industry benchmarks are not available
+        industry_comparison = []
     
     # Combine all metrics
     metrics = {
@@ -913,6 +1064,14 @@ def calculate_all_metrics(all_periods: List[List[Incident]],
         "client_touch_decisions": volume["incidents_escalated"] - volume["closed_end_to_end"],
         "threats_blocked": volume["true_threats_contained"],
         "zero_breaches": True,  # Assumed unless data indicates otherwise
+        
+        # Data availability flags (for conditional rendering)
+        "industry_benchmarks_available": config.industry_benchmarks_available,
+        "after_hours_data_available": config.after_hours_available,
     }
+    
+    # Override response_advantage_percent if industry benchmarks not available
+    if not config.industry_benchmarks_available:
+        metrics["response_advantage_percent"] = 0.0
     
     return metrics

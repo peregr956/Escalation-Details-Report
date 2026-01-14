@@ -62,6 +62,10 @@ def parse_config(raw_config: Dict[str, Any]) -> ClientConfig:
     if "client_name_override" in raw_config and raw_config["client_name_override"]:
         config.client_name_override = str(raw_config["client_name_override"])
     
+    # Industry benchmarks availability
+    if "industry_benchmarks_available" in raw_config:
+        config.industry_benchmarks_available = bool(raw_config["industry_benchmarks_available"])
+    
     # Industry benchmarks
     benchmarks = raw_config.get("industry_benchmarks", {})
     if "mttr_minutes" in benchmarks:
@@ -92,6 +96,10 @@ def parse_config(raw_config: Dict[str, Any]) -> ClientConfig:
     sla = raw_config.get("sla_targets", {})
     if sla:
         config.sla_targets = {str(k): int(v) for k, v in sla.items()}
+    
+    # After-hours availability
+    if "after_hours_available" in raw_config:
+        config.after_hours_available = bool(raw_config["after_hours_available"])
     
     # Business hours
     hours = raw_config.get("business_hours", {})

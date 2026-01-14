@@ -143,6 +143,10 @@ class ReportData:
     # Industry benchmarks for comparative visualizations
     mttr_industry_benchmark: float = 0.0
     mttd_industry_benchmark: float = 0.0
+    
+    # Data availability flags (for conditional rendering in slides)
+    industry_benchmarks_available: bool = True
+    after_hours_data_available: bool = True
 
 
 def get_report_data() -> ReportData:

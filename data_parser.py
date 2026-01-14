@@ -85,21 +85,33 @@ class Incident:
 
 
 # Column mapping: Excel column name -> Incident field name
+# Includes aliases for different export formats (standard CORR, Burlington, etc.)
 COLUMN_MAPPING = {
+    # Identifiers
     "Incident Id": "incident_id",
+    "Incident ID": "incident_id",  # Burlington format (uppercase ID)
     "Incident URL": "incident_url",
     "Vendor Incident Id": "vendor_incident_id",
+    "Vendor Incident ID": "vendor_incident_id",  # Burlington format
     "Vendor Incident URL": "vendor_incident_url",
     "Incident Title": "incident_title",
+    
+    # Organization & Product
     "Organization": "organization",
     "Product": "product",
     "Deployment Status": "deployment_status",
+    
+    # Escalation Info
     "Initial Escalation Method": "initial_escalation_method",
     "Playbook URL": "playbook_url",
+    
+    # Status & Classification
     "Current Status": "current_status",
     "CS SOC Verdict": "cs_soc_verdict",
     "Current Priority": "current_priority",
     "Current Category": "current_category",
+    
+    # Timestamps - Standard CORR format
     "Created Datetime UTC": "created_datetime_utc",
     "Created Datetime (US/Central)": "created_datetime_local",
     "Last Updated Datetime UTC": "last_updated_datetime_utc",
@@ -108,13 +120,34 @@ COLUMN_MAPPING = {
     "Escalated Datetime (US/Central)": "escalated_datetime_local",
     "Closed Datetime UTC": "closed_datetime_utc",
     "Closed Datetime (US/Central)": "closed_datetime_local",
+    
+    # Timestamps - Burlington format (parentheses around UTC)
+    "Created Datetime (UTC)": "created_datetime_utc",
+    "Last Updated Datetime (UTC)": "last_updated_datetime_utc",
+    "Escalated Datetime (UTC)": "escalated_datetime_utc",
+    "Closed Datetime (UTC)": "closed_datetime_utc",
+    
+    # Timestamps - Burlington User TZ format (maps to local)
+    "Created Datetime (User TZ - US/Eastern)": "created_datetime_local",
+    "Last Updated Datetime (User TZ - US/Eastern)": "last_updated_datetime_local",
+    "Escalated Datetime (User TZ - US/Eastern)": "escalated_datetime_local",
+    "Closed Datetime (User TZ - US/Eastern)": "closed_datetime_local",
+    
+    # Paths & Groups
     "Escalation Paths": "escalation_paths",
+    "Escalation Path": "escalation_paths",  # Burlington format (singular)
     "Notification Groups": "notification_groups",
+    
+    # Users
     "Assigned Users": "assigned_users",
     "Touched By": "touched_by",
     "Closed By": "closed_by",
+    
+    # Comments
     "CS SOC Last Comment": "cs_soc_last_comment",
     "Customer Last Comment": "customer_last_comment",
+    
+    # Response Actions
     "Response Action": "response_action",
     "Action Target": "action_target",
     "Target Type": "target_type",
@@ -122,14 +155,22 @@ COLUMN_MAPPING = {
     "Executed Date": "executed_date",
     "Executed By": "executed_by",
     "Response Action Status": "response_action_status",
+    
+    # Response Times
     "CS SOC TTR (hh:mm)": "cs_soc_ttr",
     "CS SOC TTD (hh:mm)": "cs_soc_ttd",
     "Customer TTR (hh:mm)": "customer_ttr",
     "Customer TTD (hh:mm)": "customer_ttd",
+    
+    # MITRE ATT&CK
     "MITRE Tactic Id": "mitre_tactic_id",
+    "MITRE Tactic ID": "mitre_tactic_id",  # Burlington format
     "MITRE Tactic Name": "mitre_tactic_name",
     "MITRE Technique Id": "mitre_technique_id",
+    "MITRE Technique ID": "mitre_technique_id",  # Burlington format
     "MITRE Technique Name": "mitre_technique_name",
+    
+    # Vendor Severity
     "Vendor Severity": "vendor_severity",
 }
 
@@ -248,6 +289,9 @@ def load_excel_file(file_path: Path) -> List[Incident]:
         FileNotFoundError: If the file doesn't exist
         ValueError: If required columns are missing
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
         import openpyxl
     except ImportError:
@@ -263,10 +307,15 @@ def load_excel_file(file_path: Path) -> List[Incident]:
     # Build column index from header row
     header_row = next(ws.iter_rows(min_row=1, max_row=1, values_only=True))
     column_index = {}
+    datetime_columns_found = []
     for col_idx, header in enumerate(header_row):
         if header and header in COLUMN_MAPPING:
             field_name = COLUMN_MAPPING[header]
             column_index[col_idx] = field_name
+            if field_name in DATETIME_FIELDS:
+                datetime_columns_found.append(header)
+    
+    logger.info(f"  DateTime columns found: {datetime_columns_found}")
     
     # Validate required columns
     required_columns = {"organization", "current_status", "current_priority"}
@@ -277,6 +326,8 @@ def load_excel_file(file_path: Path) -> List[Incident]:
     
     # Parse data rows
     incidents = []
+    dates_parsed = {"created": 0, "escalated": 0, "closed": 0}
+    
     for row in ws.iter_rows(min_row=2, values_only=True):
         # Skip empty rows
         if all(cell is None for cell in row):
@@ -291,6 +342,14 @@ def load_excel_file(file_path: Path) -> List[Incident]:
                 # Parse special field types
                 if field_name in DATETIME_FIELDS:
                     value = parse_datetime(value)
+                    # Track successful datetime parsing
+                    if value is not None:
+                        if "created" in field_name:
+                            dates_parsed["created"] += 1
+                        elif "escalated" in field_name:
+                            dates_parsed["escalated"] += 1
+                        elif "closed" in field_name:
+                            dates_parsed["closed"] += 1
                 elif field_name in DURATION_FIELDS:
                     value = parse_duration(value)
                 
@@ -299,6 +358,20 @@ def load_excel_file(file_path: Path) -> List[Incident]:
         incidents.append(Incident(**incident_data))
     
     wb.close()
+    
+    logger.info(f"  Parsed {len(incidents)} incidents")
+    logger.info(f"  Dates parsed - created: {dates_parsed['created']}, escalated: {dates_parsed['escalated']}, closed: {dates_parsed['closed']}")
+    
+    # Log sample of dates found
+    if incidents:
+        sample_dates = []
+        for inc in incidents[:5]:
+            dt = inc.escalated_datetime_utc or inc.created_datetime_utc or inc.closed_datetime_utc
+            if dt:
+                sample_dates.append(dt.strftime("%Y-%m-%d"))
+        if sample_dates:
+            logger.info(f"  Sample dates: {sample_dates}")
+    
     return incidents
 
 

@@ -168,9 +168,13 @@ def generate_key_achievements(metrics: Dict[str, Any]) -> List[str]:
     """
     achievements = []
     
-    # Response advantage
+    # Check data availability flags
+    industry_available = metrics.get("industry_benchmarks_available", True)
+    after_hours_available = metrics.get("after_hours_data_available", True)
+    
+    # Response advantage (only if industry benchmarks available)
     response_advantage = metrics.get("response_advantage_percent", 0)
-    if response_advantage > 0:
+    if response_advantage > 0 and industry_available:
         achievements.append(f"{round(response_advantage)}% faster response than industry peers")
     
     # Threat containment
@@ -181,9 +185,9 @@ def generate_key_achievements(metrics: Dict[str, Any]) -> List[str]:
     elif threats_contained > 0:
         achievements.append(f"{threats_contained} threats successfully contained")
     
-    # After-hours coverage
+    # After-hours coverage (only if after-hours data available)
     after_hours = metrics.get("after_hours_escalations", 0)
-    if after_hours > 0:
+    if after_hours > 0 and after_hours_available:
         achievements.append(f"{after_hours} after-hours escalations handled seamlessly")
     
     # Cost avoidance
@@ -204,6 +208,12 @@ def generate_key_achievements(metrics: Dict[str, Any]) -> List[str]:
     automation = metrics.get("automation_percent", 0)
     if automation >= 85:
         achievements.append(f"{round(automation)}% of escalations handled via automated playbooks")
+    
+    # MTTR achievement (alternative when industry benchmarks not available)
+    if not industry_available:
+        mttr = metrics.get("mttr_minutes", 0)
+        if mttr > 0 and mttr < 120:
+            achievements.append(f"Average response time of {mttr} minutes")
     
     # Limit to top 4
     return achievements[:4]
@@ -337,6 +347,10 @@ def generate_executive_summary_narrative(metrics: Dict[str, Any]) -> str:
     Returns:
         Narrative string for executive summary
     """
+    # Check data availability flags
+    industry_available = metrics.get("industry_benchmarks_available", True)
+    after_hours_available = metrics.get("after_hours_data_available", True)
+    
     client_name = metrics.get("client_name", "Your organization")
     alerts_triaged = metrics.get("alerts_triaged", 0)
     client_touch = metrics.get("client_touch_decisions", 0)
@@ -357,7 +371,8 @@ def generate_executive_summary_narrative(metrics: Dict[str, Any]) -> str:
         f"{client_touch:,} decisions and closing {closed_e2e:,} end-to-end. "
     )
     
-    if response_advantage > 0:
+    # Response time narrative - varies based on industry benchmark availability
+    if response_advantage > 0 and industry_available:
         narrative += (
             f"Response speed landed {round(response_advantage)}% faster than sector medians "
             f"({mttr}-minute MTTR, {p90}-minute P90), "
@@ -365,7 +380,8 @@ def generate_executive_summary_narrative(metrics: Dict[str, Any]) -> str:
     else:
         narrative += f"Response times averaged {mttr}-minute MTTR ({p90}-minute P90), "
     
-    if after_hours > 0:
+    # After-hours narrative - only include if data is available
+    if after_hours > 0 and after_hours_available:
         narrative += (
             f"while {after_hours} escalations were absorbed after hours without gaps in coverage. "
         )
