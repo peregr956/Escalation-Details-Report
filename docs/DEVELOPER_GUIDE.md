@@ -14,12 +14,26 @@ Escalation-Details-Report/
 ├── docs/                    # Technical documentation
 ├── output/                  # Generated presentations (gitignored)
 ├── scripts/                 # Utility scripts
+├── slides/                  # Slide builder package (modular structure)
+│   ├── __init__.py          # Package docs and exports
+│   ├── common.py            # Shared slide layouts
+│   ├── executive_summary.py # Title and dashboard slides
+│   ├── value_delivered.py   # Cost avoidance slides
+│   ├── protection_achieved.py # Performance metrics slides
+│   ├── threat_landscape.py  # MITRE and severity slides
+│   ├── insights.py          # Improvement plan slides
+│   └── forward_direction.py # Closing slides
 ├── tests/                   # Test files
 ├── constants.py             # Brand colors, fonts, layout constants
 ├── helpers.py               # Reusable layout helper functions
-├── generate_presentation.py # Main presentation generator
-├── report_data.py           # Data model and sample data
+├── generate_presentation.py # Main presentation generator (CLI entry point)
+├── report_data.py           # Data model and dynamic data loading
+├── data_parser.py           # Excel file parser for incident data
+├── metrics_calculator.py    # Metrics aggregation from incidents
+├── insight_generator.py     # Rule-based insight generation
+├── config_loader.py         # Client configuration loader
 ├── chart_renderer.py        # Playwright chart rendering
+├── interactive_upload.py    # Interactive file selection UI
 ├── requirements.txt         # Production dependencies
 └── requirements-dev.txt     # Development dependencies
 ```
@@ -28,7 +42,7 @@ Escalation-Details-Report/
 
 ```bash
 # Clone the repository
-git clone https://github.com/peregr956/Escalation-Details-Report.git
+git clone https://github.com/criticalstart/Escalation-Details-Report.git
 cd Escalation-Details-Report
 
 # Create virtual environment

@@ -85,14 +85,14 @@ class Incident:
 
 
 # Column mapping: Excel column name -> Incident field name
-# Includes aliases for different export formats (standard CORR, Burlington, etc.)
+# Includes aliases for different export formats (standard CORR, alternate client formats, etc.)
 COLUMN_MAPPING = {
     # Identifiers
     "Incident Id": "incident_id",
-    "Incident ID": "incident_id",  # Burlington format (uppercase ID)
+    "Incident ID": "incident_id",  # Alternate format (uppercase ID)
     "Incident URL": "incident_url",
     "Vendor Incident Id": "vendor_incident_id",
-    "Vendor Incident ID": "vendor_incident_id",  # Burlington format
+    "Vendor Incident ID": "vendor_incident_id",  # Alternate format
     "Vendor Incident URL": "vendor_incident_url",
     "Incident Title": "incident_title",
     
@@ -121,13 +121,13 @@ COLUMN_MAPPING = {
     "Closed Datetime UTC": "closed_datetime_utc",
     "Closed Datetime (US/Central)": "closed_datetime_local",
     
-    # Timestamps - Burlington format (parentheses around UTC)
+    # Timestamps - Alternate format (parentheses around UTC)
     "Created Datetime (UTC)": "created_datetime_utc",
     "Last Updated Datetime (UTC)": "last_updated_datetime_utc",
     "Escalated Datetime (UTC)": "escalated_datetime_utc",
     "Closed Datetime (UTC)": "closed_datetime_utc",
     
-    # Timestamps - Burlington User TZ format (maps to local)
+    # Timestamps - Alternate User TZ format (maps to local)
     "Created Datetime (User TZ - US/Eastern)": "created_datetime_local",
     "Last Updated Datetime (User TZ - US/Eastern)": "last_updated_datetime_local",
     "Escalated Datetime (User TZ - US/Eastern)": "escalated_datetime_local",
@@ -135,7 +135,7 @@ COLUMN_MAPPING = {
     
     # Paths & Groups
     "Escalation Paths": "escalation_paths",
-    "Escalation Path": "escalation_paths",  # Burlington format (singular)
+    "Escalation Path": "escalation_paths",  # Alternate format (singular)
     "Notification Groups": "notification_groups",
     
     # Users
@@ -164,10 +164,10 @@ COLUMN_MAPPING = {
     
     # MITRE ATT&CK
     "MITRE Tactic Id": "mitre_tactic_id",
-    "MITRE Tactic ID": "mitre_tactic_id",  # Burlington format
+    "MITRE Tactic ID": "mitre_tactic_id",  # Alternate format
     "MITRE Tactic Name": "mitre_tactic_name",
     "MITRE Technique Id": "mitre_technique_id",
-    "MITRE Technique ID": "mitre_technique_id",  # Burlington format
+    "MITRE Technique ID": "mitre_technique_id",  # Alternate format
     "MITRE Technique Name": "mitre_technique_name",
     
     # Vendor Severity
