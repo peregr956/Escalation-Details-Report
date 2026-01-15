@@ -1,4 +1,4 @@
-# Development dependencies for Escalation Details Report
+# Development dependencies for Executive Business Review
 # Install with: pip install -r requirements-dev.txt
 
 # Include production dependencies

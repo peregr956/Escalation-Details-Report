@@ -1,4 +1,4 @@
-"""Interactive file upload module for the Escalation Details Report.
+"""Interactive file upload module for the Executive Business Review.
 
 This module provides interactive CLI prompts for selecting Excel data files
 and configuration files when the report generator is launched without
@@ -141,7 +141,7 @@ def prompt_for_excel_files() -> Optional[List[str]]:
         List of validated Excel file paths, or None if cancelled
     """
     print("\n" + "=" * 60)
-    print("  Escalation Details Report - Interactive File Selection")
+    print("  Executive Business Review - Interactive File Selection")
     print("=" * 60)
     print("\nNo data files specified. Please select your Excel report file(s).")
     print("\nYou can provide 1-3 Excel files for the report:")
@@ -358,6 +358,39 @@ def confirm_selection(excel_files: List[str], config_file: Optional[str]) -> boo
     confirm = input("Proceed with these files? [Y/n]: ").strip().lower()
     
     return confirm == '' or confirm == 'y' or confirm == 'yes'
+
+
+def prompt_for_trend_granularity() -> str:
+    """Interactive prompt for trend calculation granularity.
+
+    When using a single data file covering a date range, the user
+    can choose how trends should be calculated (daily, weekly, etc.).
+
+    Returns:
+        One of: 'daily', 'weekly', 'monthly', 'quarterly'
+    """
+    print("\n" + "-" * 60)
+    print("  Trend Granularity Selection")
+    print("-" * 60)
+    print("\nHow should trends be calculated from your data?")
+    print("  1. Daily     - Daily averages (best for 7-30 days of data)")
+    print("  2. Weekly    - Weekly averages (best for 4-12 weeks of data)")
+    print("  3. Monthly   - Monthly averages (best for 3+ months of data)")
+    print("  4. Quarterly - Quarterly averages (best for 6+ months of data)")
+    print()
+
+    options = {'1': 'daily', '2': 'weekly', '3': 'monthly', '4': 'quarterly'}
+
+    while True:
+        choice = input("Select option [1-4] (default: 3 - Monthly): ").strip()
+
+        if choice == '' or choice == '3':
+            return 'monthly'  # Default
+
+        if choice in options:
+            return options[choice]
+
+        print("Invalid option. Please enter 1, 2, 3, or 4.")
 
 
 def interactive_file_selection() -> Tuple[Optional[List[str]], Optional[str]]:

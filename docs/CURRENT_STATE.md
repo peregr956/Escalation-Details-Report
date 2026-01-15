@@ -1,6 +1,6 @@
 # Current State Documentation
 
-This document provides a comprehensive overview of the PowerPoint generation system for the Escalation to Client Details Report.
+This document provides a comprehensive overview of the PowerPoint generation system for the Executive Business Review.
 
 ## System Architecture
 
@@ -321,7 +321,7 @@ CS_ORANGE = RGBColor(255, 106, 20) # #FF6A14 - Secondary 3
 
 | File | Purpose |
 |------|---------|
-| `output/escalation_report_*.pptx` | Generated presentations |
+| `output/executive_business_review_*.pptx` | Generated presentations |
 
 ---
 

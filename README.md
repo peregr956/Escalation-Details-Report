@@ -1,10 +1,10 @@
-# Escalation to Client Details Report
+# Executive Business Review
 
 Executive business review deck generator that quantifies the work Critical Start's Managed Detection & Response (MDR) team delivers for executive stakeholders. This repo stores the PowerPoint generator, anonymized sample data, and the Markdown-based brand system that replaced the legacy DOCX package.
 
 ## Overview
 
-The Escalation to Client Details Report complements the always-on ROI dashboard by providing a deeper, semi-annual/annual walkthrough of operational outcomes, risk posture, and measurable protection. It is usually narrated by the Customer Success Manager (CSM) with C-suite, CISO, and SOC leaders but can also be generated on demand for custom date ranges.
+The Executive Business Review complements the always-on ROI dashboard by providing a deeper, semi-annual/annual walkthrough of operational outcomes, risk posture, and measurable protection. It is usually narrated by the Customer Success Manager (CSM) with C-suite, CISO, and SOC leaders but can also be generated on demand for custom date ranges.
 
 ## Objectives
 - **Drive renewals:** Quantify escalations handled, threats contained, efficiency gains, and compliance against contracted SLOs.
@@ -52,7 +52,17 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
 
 ## Quick Start
 
-### Generate PowerPoint Presentation
+### One-Command Setup
+
+```bash
+# Set up the environment (creates venv, installs dependencies, Playwright browsers)
+./setup.sh
+
+# Generate a presentation
+./run.sh --config clients/sample.yaml
+```
+
+### Manual Setup (Alternative)
 
 1. Set up the virtual environment:
    ```bash
@@ -71,16 +81,16 @@ The Escalation to Client Details Report complements the always-on ROI dashboard 
    python generate_presentation.py --data data/alert-details-export-*.xlsx --config clients/[client].yaml
    ```
 
-3. The presentation will be saved to `output/escalation_report_YYYY-MM-DD.pptx`
+3. The presentation will be saved to `output/executive_business_review_YYYY-MM-DD.pptx`
 
 **Command-line options:**
 ```bash
-python generate_presentation.py --help
-python generate_presentation.py --data report.xlsx --config client.yaml  # Load from Excel
-python generate_presentation.py --validate                                # Validate data only
-python generate_presentation.py --output-dir ./custom_output
-python generate_presentation.py --no-threat-landscape                     # Exclude threat slides
-python generate_presentation.py --keep-charts                             # Keep temp chart images
+./run.sh --help
+./run.sh --data report.xlsx --config client.yaml  # Load from Excel
+./run.sh --validate                                # Validate data only
+./run.sh --output-dir ./custom_output
+./run.sh --no-threat-landscape                     # Exclude threat slides
+./run.sh --keep-charts                             # Keep temp chart images
 ```
 
 ### Export or share

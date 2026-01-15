@@ -195,6 +195,192 @@ DURATION_FIELDS = {
     "customer_ttd",
 }
 
+# Header mapping profiles for different data formats
+# Each profile maps Excel column headers to internal field names
+HEADER_PROFILES = {
+    "standard": COLUMN_MAPPING,  # Default CORR format (defined above)
+
+    "burlington": {
+        # Burlington format - different column names, same internal fields
+        # Identifiers
+        "Case ID": "incident_id",
+        "Case Number": "incident_id",
+        "Incident Id": "incident_id",
+        "Case URL": "incident_url",
+        "Vendor Case ID": "vendor_incident_id",
+        "Vendor Case URL": "vendor_incident_url",
+        "Case Title": "incident_title",
+        "Alert Title": "incident_title",
+
+        # Organization & Product
+        "Client Name": "organization",
+        "Customer": "organization",
+        "Organization": "organization",
+        "Alert Source": "product",
+        "Source Product": "product",
+        "Product": "product",
+        "Deployment Status": "deployment_status",
+
+        # Escalation Info
+        "Escalation Method": "initial_escalation_method",
+        "Initial Escalation Method": "initial_escalation_method",
+        "Playbook URL": "playbook_url",
+
+        # Status & Classification
+        "Case Status": "current_status",
+        "Current Status": "current_status",
+        "Final Verdict": "cs_soc_verdict",
+        "CS SOC Verdict": "cs_soc_verdict",
+        "Priority Level": "current_priority",
+        "Alert Priority": "current_priority",
+        "Current Priority": "current_priority",
+        "Alert Category": "current_category",
+        "Current Category": "current_category",
+
+        # Timestamps - Burlington format variations
+        "Created (UTC)": "created_datetime_utc",
+        "Created Date (UTC)": "created_datetime_utc",
+        "Created Datetime UTC": "created_datetime_utc",
+        "Created Datetime (UTC)": "created_datetime_utc",
+        "Created (Local)": "created_datetime_local",
+        "Escalated (UTC)": "escalated_datetime_utc",
+        "Escalated Date (UTC)": "escalated_datetime_utc",
+        "Escalated Datetime UTC": "escalated_datetime_utc",
+        "Escalated Datetime (UTC)": "escalated_datetime_utc",
+        "Escalated (Local)": "escalated_datetime_local",
+        "Resolved (UTC)": "closed_datetime_utc",
+        "Resolved Date (UTC)": "closed_datetime_utc",
+        "Closed (UTC)": "closed_datetime_utc",
+        "Closed Datetime UTC": "closed_datetime_utc",
+        "Closed Datetime (UTC)": "closed_datetime_utc",
+        "Resolved (Local)": "closed_datetime_local",
+        "Last Updated (UTC)": "last_updated_datetime_utc",
+        "Last Updated Datetime UTC": "last_updated_datetime_utc",
+        "Last Updated Datetime (UTC)": "last_updated_datetime_utc",
+
+        # Paths & Groups
+        "Escalation Paths": "escalation_paths",
+        "Escalation Path": "escalation_paths",
+        "Notification Groups": "notification_groups",
+
+        # Users
+        "Assigned Users": "assigned_users",
+        "Assigned To": "assigned_users",
+        "Touched By": "touched_by",
+        "Analysts": "touched_by",
+        "Closed By": "closed_by",
+        "Resolved By": "closed_by",
+
+        # Comments
+        "CS SOC Last Comment": "cs_soc_last_comment",
+        "Last SOC Comment": "cs_soc_last_comment",
+        "Customer Last Comment": "customer_last_comment",
+        "Last Client Comment": "customer_last_comment",
+
+        # Response Actions
+        "Response Action": "response_action",
+        "Action Taken": "response_action",
+        "Action Target": "action_target",
+        "Target Type": "target_type",
+        "Action Provider": "action_provider",
+        "Executed Date": "executed_date",
+        "Action Date": "executed_date",
+        "Executed By": "executed_by",
+        "Response Action Status": "response_action_status",
+        "Action Status": "response_action_status",
+
+        # Response Times
+        "Time to Response (hh:mm)": "cs_soc_ttr",
+        "CS SOC TTR (hh:mm)": "cs_soc_ttr",
+        "TTR": "cs_soc_ttr",
+        "Time to Detection (hh:mm)": "cs_soc_ttd",
+        "CS SOC TTD (hh:mm)": "cs_soc_ttd",
+        "TTD": "cs_soc_ttd",
+        "Customer TTR (hh:mm)": "customer_ttr",
+        "Customer TTD (hh:mm)": "customer_ttd",
+
+        # MITRE ATT&CK
+        "MITRE Tactic ID": "mitre_tactic_id",
+        "Tactic ID": "mitre_tactic_id",
+        "MITRE Tactic Id": "mitre_tactic_id",
+        "MITRE Tactic Name": "mitre_tactic_name",
+        "Tactic": "mitre_tactic_name",
+        "MITRE Technique ID": "mitre_technique_id",
+        "Technique ID": "mitre_technique_id",
+        "MITRE Technique Id": "mitre_technique_id",
+        "MITRE Technique Name": "mitre_technique_name",
+        "Technique": "mitre_technique_name",
+
+        # Vendor Severity
+        "Vendor Severity": "vendor_severity",
+        "Original Severity": "vendor_severity",
+        "Source Severity": "vendor_severity",
+    },
+}
+
+
+def detect_header_profile(headers: List[str]) -> str:
+    """Auto-detect which header profile best matches the Excel file.
+
+    Scores each profile based on how many of its expected column names
+    appear in the provided headers.
+
+    Args:
+        headers: List of column header names from the Excel file
+
+    Returns:
+        Profile name ('standard', 'burlington', etc.) or 'unknown' if
+        no profile matches well enough
+    """
+    if not headers:
+        return "unknown"
+
+    # Normalize headers for comparison
+    header_set = {h for h in headers if h is not None}
+
+    profile_scores = {}
+    for profile_name, mapping in HEADER_PROFILES.items():
+        # Count how many mapped columns appear in the headers
+        score = sum(1 for header in header_set if header in mapping)
+        profile_scores[profile_name] = score
+
+    # Get the best-scoring profile
+    if not profile_scores:
+        return "unknown"
+
+    best_profile = max(profile_scores, key=profile_scores.get)
+    best_score = profile_scores[best_profile]
+
+    # Require at least 10 matching columns to consider it a valid match
+    if best_score >= 10:
+        return best_profile
+
+    return "unknown"
+
+
+def get_column_mapping(profile: str = "auto", headers: List[str] = None) -> dict:
+    """Get the column mapping for a specified profile.
+
+    Args:
+        profile: Profile name ('standard', 'burlington') or 'auto' for auto-detection
+        headers: Column headers from Excel file (required for auto-detection)
+
+    Returns:
+        Column name -> field name mapping dictionary
+    """
+    if profile == "auto" and headers:
+        detected = detect_header_profile(headers)
+        if detected != "unknown":
+            profile = detected
+        else:
+            profile = "standard"  # Fallback to standard
+
+    if profile in HEADER_PROFILES:
+        return HEADER_PROFILES[profile]
+
+    # Fallback to combined standard mapping
+    return COLUMN_MAPPING
+
 
 def parse_datetime(value) -> Optional[datetime]:
     """Parse a datetime value from Excel.
@@ -276,41 +462,49 @@ def parse_duration(value) -> Optional[timedelta]:
     return None
 
 
-def load_excel_file(file_path: Path) -> List[Incident]:
+def load_excel_file(file_path: Path, data_format: str = "auto") -> List[Incident]:
     """Load and parse a single Excel file into Incident records.
-    
+
     Args:
         file_path: Path to the Excel file
-        
+        data_format: Header format profile ('auto', 'standard', 'burlington')
+
     Returns:
         List of Incident records
-        
+
     Raises:
         FileNotFoundError: If the file doesn't exist
         ValueError: If required columns are missing
     """
     import logging
     logger = logging.getLogger(__name__)
-    
+
     try:
         import openpyxl
     except ImportError:
         raise ImportError("openpyxl is required. Install with: pip install openpyxl")
-    
+
     file_path = Path(file_path)
     if not file_path.exists():
         raise FileNotFoundError(f"Excel file not found: {file_path}")
-    
+
     wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
     ws = wb.active
-    
+
     # Build column index from header row
     header_row = next(ws.iter_rows(min_row=1, max_row=1, values_only=True))
+    headers = [h for h in header_row if h is not None]
+
+    # Get appropriate column mapping based on format
+    mapping = get_column_mapping(profile=data_format, headers=headers)
+    detected_profile = detect_header_profile(headers) if data_format == "auto" else data_format
+    logger.info(f"  Using data format profile: {detected_profile}")
+
     column_index = {}
     datetime_columns_found = []
     for col_idx, header in enumerate(header_row):
-        if header and header in COLUMN_MAPPING:
-            field_name = COLUMN_MAPPING[header]
+        if header and header in mapping:
+            field_name = mapping[header]
             column_index[col_idx] = field_name
             if field_name in DATETIME_FIELDS:
                 datetime_columns_found.append(header)
@@ -375,31 +569,32 @@ def load_excel_file(file_path: Path) -> List[Incident]:
     return incidents
 
 
-def load_multiple_periods(file_paths: List[Path]) -> Tuple[List[List[Incident]], str]:
+def load_multiple_periods(file_paths: List[Path], data_format: str = "auto") -> Tuple[List[List[Incident]], str]:
     """Load multiple Excel files representing different reporting periods.
-    
+
     The last file in the list is treated as the current period.
     Earlier files provide historical comparison data for trend charts.
-    
+
     Args:
         file_paths: List of paths to Excel files (ordered chronologically)
-        
+        data_format: Data format profile ('auto', 'standard', 'burlington')
+
     Returns:
         Tuple of:
         - List of incident lists (one per period)
         - Client name extracted from the data
-        
+
     Raises:
         ValueError: If files are empty or have inconsistent client names
     """
     if not file_paths:
         raise ValueError("At least one Excel file is required")
-    
+
     all_periods = []
     client_names = set()
-    
+
     for file_path in file_paths:
-        incidents = load_excel_file(file_path)
+        incidents = load_excel_file(file_path, data_format=data_format)
         all_periods.append(incidents)
         
         # Extract client names from this period

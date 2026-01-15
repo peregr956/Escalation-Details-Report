@@ -1,4 +1,4 @@
-"""Pytest configuration and fixtures for Escalation Details Report tests.
+"""Pytest configuration and fixtures for Executive Business Review tests.
 
 This module provides shared fixtures and configuration for all test modules.
 """
