@@ -40,6 +40,63 @@ from helpers import (
 
 
 # =============================================================================
+# ARCHITECTURE GUIDE FOR NEW DEVELOPERS
+# =============================================================================
+#
+# This file contains all slide builder functions for the PowerPoint presentation.
+# It is intentionally kept as a single file for now (see slides/ package for
+# planned modular refactoring).
+#
+# PRESENTATION STRUCTURE (19 slides total):
+# =========================================
+# 1. Title Slide                    - build_executive_summary_slides()
+# 2. Executive Summary (section)    - create_section_header_layout()
+# 3. Executive Dashboard            - build_executive_summary_slides()
+# 4. CORR Funnel                    - build_corr_funnel_slide()
+# 5. Value Delivered (section)      - create_section_header_layout()
+# 6. Value Delivered                - build_value_delivered_slides()
+# 7. Protection Achieved (section)  - create_section_header_layout()
+# 8. Performance Metrics            - build_protection_achieved_slides()
+# 9. Response & Detection           - build_protection_achieved_slides()
+# 10. Threat Landscape (section)    - create_section_header_layout()
+# 11. Severity Alignment            - build_threat_landscape_slides()
+# 12. Threat Sources                - build_threat_landscape_slides()
+# 13. Insights (section)            - create_section_header_layout()
+# 14. Improvement Plan              - build_insights_slides()
+# 15. Operational Coverage          - build_insights_slides()
+# 16. Forward Direction (section)   - create_section_header_layout()
+# 17. Key Takeaways                 - build_key_takeaways_slide()
+# 18. Looking Ahead                 - build_forward_direction_slide()
+# 19. Contact                       - build_contact_slide()
+#
+# KEY PATTERNS:
+# =============
+# 1. Each build_*_slides() function creates multiple related slides
+# 2. setup_content_slide() is the helper for standard slide layout
+# 3. create_section_header_layout() creates gray transition slides
+# 4. create_metric_card() / add_insight_callout() for reusable components
+# 5. Charts are rendered via chart_renderer.py and inserted as images
+#
+# DATA FLOW:
+# ==========
+# ReportData -> build_*_slides() -> python-pptx shapes -> .pptx file
+#
+# COMMON PARAMETERS:
+# ==================
+# - prs: Presentation object from python-pptx
+# - data: ReportData instance with all metrics (see report_data.py)
+#
+# MODIFICATION TIPS:
+# ==================
+# - To add a new slide: Create a new build_* function, call it from main()
+# - To change layout: Modify the relevant build_* function
+# - To change branding: Update constants.py (colors, fonts, sizes)
+# - To change data: Update metrics_calculator.py or report_data.py
+#
+# See docs/SLIDE_STRUCTURE.md for detailed slide specifications.
+# See docs/DEVELOPER_GUIDE.md for adding new slides.
+#
+# =============================================================================
 # SLIDE BUILDER FUNCTIONS
 # =============================================================================
 
@@ -991,6 +1048,30 @@ Examples:
 def build_executive_summary_slides(prs, data):
     """Create the Title slide and Executive Summary slides (Slides 1-3).
     
+    LAYOUT STRUCTURE:
+    -----------------
+    Slide 1 - Title Slide (Blue Gradient Background):
+        - Main title: "EXECUTIVE BUSINESS REVIEW" (H1 - 114pt)
+        - Client name (H5 - 16pt)
+        - Period dates with day count
+        - Report date at bottom
+        - Footer only, NO header per branding
+    
+    Slide 2 - Executive Summary Section Card:
+        - Gray background with section title and narrative
+        - Created via create_section_header_layout()
+    
+    Slide 3 - Executive Dashboard (2x3 Metric Grid):
+        Top Row: True Positives Contained, MTTR (with % advantage), Closed End-to-End
+        Bottom Row: Alerts Triaged, After-Hours Escalations, False Positive Rate
+        Insight bar at bottom with security posture summary
+    
+    KEY DATA FIELDS USED:
+    - client_name, period_start, period_end, report_date (title slide)
+    - true_threats_contained, mttr_minutes, response_advantage_percent
+    - closed_end_to_end, alerts_triaged, after_hours_escalations
+    - false_positive_rate, executive_summary_narrative
+    
     Per CRITICALSTART branding guidelines:
     - Title slide: No header, footer only, H1 typography for main title
     - Content slides: Header and footer with transparent background
@@ -1627,6 +1708,23 @@ def build_value_delivered_slides(prs, data):
 def build_protection_achieved_slides(prs, data):
     """Create the Protection section (Slides 7-10).
     
+    LAYOUT STRUCTURE:
+    -----------------
+    Slide 7 - Critical Start's Performance (Split Layout):
+        Left Panel (2.3"): MTTR by Severity cards (Crit/High, Med/Low, P90)
+        Right Panel (6.7"): Trend chart with industry benchmark lines
+    
+    Slide 8 - Response & Detection Quality (Dual Panel):
+        Left Panel: Response Efficiency (Remediation Rate, Automation, Human Review)
+        Right Panel: Detection Quality (TP Rate, FP Rate, Alert Reduction)
+    
+    KEY DATA FIELDS USED:
+    - critical_high_mttr, medium_low_mttr, p90_minutes (MTTR by severity)
+    - mttr_trend, mttd_trend, fp_trend (trend chart data)
+    - containment_rate, automation_percent (response efficiency)
+    - false_positive_rate, true_threat_precision (detection quality)
+    - industry_benchmarks_available (conditional benchmark display)
+    
     Args:
         prs (Presentation): The presentation object.
         data (ReportData): The report data object containing all metrics.
@@ -2083,6 +2181,23 @@ def build_protection_achieved_slides(prs, data):
 def build_threat_landscape_slides(prs, data, include=True):
     """Create the optional Threat Landscape section (Slides 11-13).
     
+    LAYOUT STRUCTURE:
+    -----------------
+    Slide 11 - Severity Alignment Flow (Split Layout):
+        Left Panel (~2"): Narrative cards (Upgraded, Downgraded, Aligned percentages)
+        Right Panel (~7"): Sankey diagram showing vendor → CS severity flows
+        
+    Slide 12 - Threat & Detection Sources (Split Layout):
+        Left Panel (~55%): MITRE ATT&CK stacked bar chart
+        Right Panel (~45%): Detection source cards with FP rates
+    
+    KEY DATA FIELDS USED:
+    - severity_flows (Sankey diagram data)
+    - tactics, high_severity, medium_severity, low_severity (MITRE data)
+    - detection_sources (source breakdown with FP rates)
+    
+    The 'include' parameter allows skipping these slides via --no-threat-landscape.
+    
     Per CRITICALSTART branding guidelines:
     - All slides have transparent header and footer
     - Uses H1-H6 typography scale
@@ -2397,6 +2512,23 @@ def build_threat_landscape_slides(prs, data, include=True):
 
 def build_insights_slides(prs, data):
     """Create the Insights section (Slides 14-15).
+    
+    LAYOUT STRUCTURE:
+    -----------------
+    Slide 14 - Prioritized Improvement Plan:
+        3 stacked improvement cards with priority badges (HIGH/MEDIUM/LOW)
+        Each card: Priority badge, title, description, owner, target
+        Insight bar at bottom with focus areas summary
+    
+    Slide 15 - Operational Coverage (Dual Panel):
+        Left Panel: After-hours hero metric + weeknight/weekend breakdown
+        Right Panel: Collaboration metrics (avg touches, participation, closures)
+    
+    KEY DATA FIELDS USED:
+    - improvement_items (list of dicts with priority, title, description, etc.)
+    - after_hours_escalations, after_hours_weeknight, after_hours_weekend
+    - avg_touches, client_participation, client_led_closures
+    - after_hours_data_available (conditional display)
     
     Per CRITICALSTART branding guidelines:
     - All slides have transparent header and footer

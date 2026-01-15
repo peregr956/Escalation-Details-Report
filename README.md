@@ -160,6 +160,46 @@ Markdown files under `brand/` are the authoritative branding system:
 - Maintain data lineage—if a figure cannot be derived from CORR or the approved export, don't surface it.
 - Prioritize reusable snippets and automation-friendly approaches when contributing code or copy.
 
+## Known Issues & Technical Debt
+
+This section documents known limitations and planned improvements. See `ROADMAP.md` for the full phased improvement plan.
+
+### Architecture
+
+| Issue | Impact | Mitigation |
+|-------|--------|------------|
+| `generate_presentation.py` is 3,000+ lines | Hard to navigate; merge conflict risk | See `slides/` package for planned modular structure |
+| `slides/` package contains stubs only | May confuse new developers | Import from `generate_presentation.py` directly |
+
+### Test Coverage
+
+| Area | Status | Notes |
+|------|--------|-------|
+| `metrics_calculator.py` | ✅ Covered | `tests/test_metrics_calculator.py` |
+| `data_parser.py` | ✅ Covered | `tests/test_data_parser.py` |
+| `generate_presentation.py` | ⚠️ Smoke tests only | Full unit tests planned |
+| `chart_renderer.py` | ❌ No tests | Async browser code is complex to test |
+| `insight_generator.py` | ❌ No tests | Rule-based logic needs coverage |
+
+### Known Limitations
+
+1. **Chart Rendering**: Playwright may timeout on slow systems. Charts show placeholder text when rendering fails.
+
+2. **Font Availability**: Roboto font must be installed system-wide; falls back to Arial if unavailable.
+
+3. **Gradient Support**: python-pptx has limited gradient support; using solid colors with pre-rendered background images as workaround.
+
+4. **Large Functions**: Several slide builder functions exceed 100 lines (see `docs/CURRENT_STATE.md` for details).
+
+### Planned Improvements
+
+See `ROADMAP.md` for the complete phased improvement plan:
+- **Phase 1**: Content completeness (add missing slides)
+- **Phase 2**: Audience optimization (executive messaging)
+- **Phase 3**: Aesthetic enhancements (typography, gradients)
+- **Phase 4**: Code refactoring (modularize slide builders)
+- **Phase 5**: Advanced features (templates, customization)
+
 ## License & Confidentiality
 
 This project is proprietary to Critical Start. All datasets, code, and visualizations remain confidential and should only be used by authorized internal teams and approved clients. No public redistribution.
