@@ -124,7 +124,7 @@ def create_default_config(output_path: Path) -> None:
     Args:
         output_path: Path where to write the config file
     """
-    default_content = '''# Client Configuration for Escalation Details Report
+    default_content = '''# Client Configuration for Executive Business Review
 # Copy this file and customize for each client.
 
 tier: "Standard Tier"

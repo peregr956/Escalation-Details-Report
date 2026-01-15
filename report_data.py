@@ -1,4 +1,4 @@
-"""Report data module for the Escalation Details Report.
+"""Report data module for the Executive Business Review.
 
 This module contains the ReportData dataclass and functions for loading
 report data either from static sample data or dynamically from Excel files.
@@ -143,7 +143,40 @@ class ReportData:
     # Industry benchmarks for comparative visualizations
     mttr_industry_benchmark: float = 0.0
     mttd_industry_benchmark: float = 0.0
-    
+
+    # Extended Industry Benchmark Data (for when data becomes available)
+    industry_benchmark_source: str = ""  # e.g., "Ponemon 2025", "Verizon DBIR"
+    industry_benchmark_date: str = ""    # e.g., "2025-06"
+    industry_benchmark_sample_size: int = 0
+
+    # Per-metric benchmarks (percentiles)
+    benchmark_mttr_p50: int = 0  # Median MTTR in minutes
+    benchmark_mttr_p75: int = 0  # 75th percentile
+    benchmark_mttr_p90: int = 0  # 90th percentile
+    benchmark_mttd_p50: int = 0  # Median MTTD
+    benchmark_false_positive_rate: float = 0.0  # Industry average FP rate
+    benchmark_incidents_per_fte: float = 0.0   # Industry incidents per analyst
+
+    # Benchmark comparison results (list of dicts for charts/tables)
+    benchmark_comparison: List[Dict[str, Any]] = field(default_factory=list)
+    # Format: [{"metric": "MTTR", "client": 126, "benchmark": 192, "percentile": 25}, ...]
+
+    # Extended After-Hours Data (for enhanced reporting)
+    after_hours_by_day: List[Dict[str, Any]] = field(default_factory=list)
+    # Format: [{"day": "Monday", "count": 42, "percent": 26.6}, ...]
+
+    after_hours_by_hour: List[Dict[str, Any]] = field(default_factory=list)
+    # Format: [{"hour": 18, "count": 12}, {"hour": 19, "count": 8}, ...]
+
+    after_hours_response_comparison: Dict[str, Any] = field(default_factory=dict)
+    # Format: {"business_hours_mttr": 120, "after_hours_mttr": 135, "delta_percent": 12.5}
+
+    # Client timezone and business hours (for accurate after-hours calculation)
+    client_timezone: str = ""  # e.g., "America/New_York"
+    business_hours_start_local: int = 9   # 9 AM local time
+    business_hours_end_local: int = 17    # 5 PM local time
+    business_days: List[str] = field(default_factory=lambda: ["Mon", "Tue", "Wed", "Thu", "Fri"])
+
     # Data availability flags (for conditional rendering in slides)
     industry_benchmarks_available: bool = True
     after_hours_data_available: bool = True
@@ -391,29 +424,31 @@ def get_report_data() -> ReportData:
 def load_report_data(
     excel_paths: Union[List[Path], List[str]],
     config_path: Optional[Union[Path, str]] = None,
-    client_name_override: Optional[str] = None
+    client_name_override: Optional[str] = None,
+    data_format: str = "auto"
 ) -> ReportData:
     """Load and compute report data from Excel files.
-    
+
     This function orchestrates the data loading pipeline:
     1. Parse Excel files into Incident records
     2. Calculate aggregated metrics
     3. Generate insights and recommendations
     4. Return populated ReportData instance
-    
+
     Args:
         excel_paths: List of paths to Excel files (1-3 files, chronological order).
                      The last file is treated as the current period.
         config_path: Optional path to client configuration YAML file.
         client_name_override: Optional override for client name.
-        
+        data_format: Data format profile ('auto', 'standard', 'burlington').
+
     Returns:
         ReportData instance with all metrics computed from the input data.
-        
+
     Raises:
         FileNotFoundError: If Excel or config files don't exist.
         ValueError: If required columns are missing or data is invalid.
-        
+
     Example:
         >>> data = load_report_data(
         ...     ["aug.xlsx", "sep.xlsx", "oct.xlsx"],
@@ -445,7 +480,7 @@ def load_report_data(
         config.client_name_override = client_name_override
     
     # Parse Excel files
-    all_periods, derived_client_name = load_multiple_periods(excel_paths)
+    all_periods, derived_client_name = load_multiple_periods(excel_paths, data_format=data_format)
     
     # Calculate all metrics
     metrics = calculate_all_metrics(all_periods, derived_client_name, config)

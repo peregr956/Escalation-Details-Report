@@ -1,4 +1,4 @@
-"""Escalation to Client Details Report - PowerPoint Presentation Generator
+"""Executive Business Review - PowerPoint Presentation Generator
 
 This module generates branded PowerPoint presentations from report data.
 """
@@ -674,7 +674,7 @@ def main():
     
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description='Generate Escalation Details Report PowerPoint presentation',
+        description='Generate Executive Business Review PowerPoint presentation',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
@@ -729,11 +729,30 @@ Examples:
         action='store_true',
         help='Validate data only without generating presentation'
     )
-    
+    parser.add_argument(
+        '--data-format',
+        type=str,
+        default='auto',
+        choices=['auto', 'standard', 'burlington'],
+        help='Data format profile for Excel parsing (default: auto-detect)'
+    )
+    parser.add_argument(
+        '--trend-granularity',
+        type=str,
+        choices=['daily', 'weekly', 'monthly', 'quarterly'],
+        help='Granularity for trend calculations from single data file. '
+             'If not specified, prompts interactively when using single file.'
+    )
+    parser.add_argument(
+        '--client',
+        type=str,
+        help='Client ID from registry (loads config from clients/registry.yaml)'
+    )
+
     args = parser.parse_args()
     
     logger.info("=" * 60)
-    logger.info("Starting Escalation Details Report Generation")
+    logger.info("Starting Executive Business Review Generation")
     logger.info("=" * 60)
     
     # Step 1: Import and load data
@@ -769,7 +788,8 @@ Examples:
         data = load_report_data(
             excel_paths=excel_files,
             config_path=config_file,
-            client_name_override=args.client_name
+            client_name_override=args.client_name,
+            data_format=args.data_format
         )
         logger.info("✓ Data loaded from Excel files")
         
@@ -816,29 +836,19 @@ Examples:
     # Step 3: Render charts
     logger.info("Step 3: Rendering charts...")
     try:
-        from chart_renderer import render_charts_sync, render_funnel_sync
-        
+        from chart_renderer import render_charts_sync
+
         temp_charts_dir = "temp_charts"
         chart_images = render_charts_sync(chart_data, output_dir=temp_charts_dir)
-        
-        # Also render the funnel chart separately (it's SVG-based, not in chart_data)
-        try:
-            funnel_path = str(Path(temp_charts_dir) / "funnel_chart.png")
-            chart_images['funnel'] = render_funnel_sync({}, funnel_path)
-            logger.info(f"  - funnel: {chart_images['funnel']}")
-        except Exception as e:
-            logger.warning(f"  - funnel: FAILED ({e})")
-            chart_images['funnel'] = None
-        
+
         # Log rendered charts
         rendered_count = sum(1 for v in chart_images.values() if v is not None)
         logger.info(f"✓ Rendered {rendered_count}/{len(chart_images)} charts")
         for chart_name, path in chart_images.items():
-            if chart_name != 'funnel':  # Already logged above
-                if path:
-                    logger.info(f"  - {chart_name}: {path}")
-                else:
-                    logger.warning(f"  - {chart_name}: FAILED")
+            if path:
+                logger.info(f"  - {chart_name}: {path}")
+            else:
+                logger.warning(f"  - {chart_name}: FAILED")
     except Exception as e:
         logger.error(f"Failed to render charts: {e}")
         return 1
@@ -909,10 +919,7 @@ Examples:
         
         logger.info("  Building insights slides...")
         build_insights_slides(prs, data)
-        
-        logger.info("  Building additional content slides...")
-        build_additional_content_slides(prs, data)
-        
+
         # Insert Forward Direction section title card
         logger.info("  Inserting 'Forward Direction' section card...")
         create_section_header_layout(
@@ -1014,7 +1021,7 @@ Examples:
         
         # Generate filename with date
         date_str = datetime.now().strftime("%Y-%m-%d")
-        output_filename = f"escalation_report_{date_str}.pptx"
+        output_filename = f"executive_business_review_{date_str}.pptx"
         output_path = output_dir / output_filename
         
         prs.save(str(output_path))
@@ -1392,7 +1399,7 @@ def build_executive_summary_slides(prs, data):
     )
     
     # Slide 4 - CORR Platform Funnel (AI Accelerated Security)
-    build_corr_funnel_slide(prs)
+    build_corr_funnel_slide(prs, data)
 
 
 def create_executive_summary_slide(prs, report_data):
@@ -1400,19 +1407,20 @@ def create_executive_summary_slide(prs, report_data):
     pass
 
 
-def build_corr_funnel_slide(prs, background_image_path: Optional[str] = None):
-    """Create the CORR Platform slide with a background image.
-    
+def build_corr_funnel_slide(prs, data=None, background_image_path: Optional[str] = None):
+    """Create the CORR Platform slide with a background image and data overlays.
+
     This slide displays a pre-designed PNG as the full-slide background,
     showing the AI-accelerated security pipeline visualization.
-    The background image contains all visual elements, so no title or
-    other overlays are added.
-    
+    Text boxes overlay the funnel stages with actual or placeholder values.
+
     Args:
         prs (Presentation): The presentation object.
+        data (ReportData, optional): Report data for populating text boxes.
+            If None, uses placeholder values.
         background_image_path (str, optional): Path to background PNG image.
             If None, uses the default 'assets/funnel diagram.png'.
-    
+
     Returns:
         Slide: The created slide object.
     """
@@ -1420,17 +1428,17 @@ def build_corr_funnel_slide(prs, background_image_path: Optional[str] = None):
     blank_slide_layout = prs.slide_layouts[6]  # Blank layout
     slide = prs.slides.add_slide(blank_slide_layout)
     slide_number = get_slide_number(prs)
-    
+
     # Add header and footer only (no title, no logo - background image is the content)
     add_master_slide_elements(slide, prs, slide_number=slide_number,
                                include_header=True, include_footer=True)
-    
+
     # Determine background image path
     if background_image_path is None:
         background_image_path = Path(__file__).parent / "assets" / "funnel diagram.png"
     else:
         background_image_path = Path(background_image_path)
-    
+
     # Add background image covering the full slide
     if background_image_path.exists():
         try:
@@ -1440,7 +1448,7 @@ def build_corr_funnel_slide(prs, background_image_path: Optional[str] = None):
                 Inches(0), Inches(0),
                 prs.slide_width, prs.slide_height
             )
-            
+
             # Move the background image to the back of the z-order
             # Access the shape tree and move the picture element to the first position
             spTree = slide.shapes._spTree
@@ -1448,15 +1456,106 @@ def build_corr_funnel_slide(prs, background_image_path: Optional[str] = None):
             spTree.remove(sp)
             # Insert after nvGrpSpPr (the first child is usually the group shape properties)
             spTree.insert(2, sp)
-            
+
             logging.info(f"Added background image to slide {slide_number}: {background_image_path}")
-            
+
         except Exception as e:
             logging.error(f"Failed to add background image: {e}")
     else:
         logging.warning(f"Background image not found: {background_image_path}")
-    
+
+    # Add text boxes overlaying funnel stages with data
+    _add_funnel_text_boxes(slide, prs, data)
+
     return slide
+
+
+def _add_funnel_text_boxes(slide, prs, data=None):
+    """Add positioned text boxes with data to the funnel slide.
+
+    Text boxes overlay the 4 funnel stages to display metrics:
+    - Stage 1 (leftmost): Security Events - total events analyzed
+    - Stage 2: Potential Threats - alerts requiring triage
+    - Stage 3: Alerts - incidents escalated to client
+    - Stage 4 (rightmost): Response Actions - threats contained
+
+    Note: Positions are calibrated for 'funnel diagram.png' at 16:9 dimensions.
+    Adjust positions if using a different funnel image.
+
+    Args:
+        slide: The PowerPoint slide object
+        prs: The presentation object (for dimensions)
+        data: ReportData object or None for placeholder values
+    """
+    from pptx.util import Inches, Pt
+    from pptx.dml.color import RGBColor
+
+    # Funnel stage positions calibrated to the PNG background
+    # Format: (left, top, width, height) - positions for text boxes
+    # These may need adjustment based on actual funnel diagram dimensions
+    STAGE_POSITIONS = {
+        'security_events': (Inches(1.0), Inches(2.0), Inches(1.8), Inches(1.0)),
+        'potential_threats': (Inches(3.0), Inches(2.2), Inches(1.8), Inches(0.9)),
+        'alerts': (Inches(5.2), Inches(2.4), Inches(1.6), Inches(0.8)),
+        'response_actions': (Inches(7.2), Inches(2.5), Inches(1.6), Inches(0.7)),
+    }
+
+    # Extract values from data or use placeholders
+    # Placeholders marked with asterisk to indicate they need real data
+    if data:
+        stage_values = {
+            'security_events': {
+                'value': '—*',  # Placeholder - data not yet available
+                'label': 'Security Events',
+            },
+            'potential_threats': {
+                'value': f'{data.alerts_triaged:,}' if hasattr(data, 'alerts_triaged') and data.alerts_triaged else '—*',
+                'label': 'Alerts Triaged',
+            },
+            'alerts': {
+                'value': f'{data.incidents_escalated}' if hasattr(data, 'incidents_escalated') and data.incidents_escalated else '—*',
+                'label': 'Escalated',
+            },
+            'response_actions': {
+                'value': f'{data.true_threats_contained}' if hasattr(data, 'true_threats_contained') and data.true_threats_contained else '—*',
+                'label': 'Contained',
+            },
+        }
+    else:
+        # Full placeholder mode
+        stage_values = {
+            'security_events': {'value': '—*', 'label': 'Security Events'},
+            'potential_threats': {'value': '—*', 'label': 'Alerts Triaged'},
+            'alerts': {'value': '—*', 'label': 'Escalated'},
+            'response_actions': {'value': '—*', 'label': 'Contained'},
+        }
+
+    # Add text boxes for each stage
+    for stage_name, pos in STAGE_POSITIONS.items():
+        left, top, width, height = pos
+        stage = stage_values[stage_name]
+
+        # Create text box
+        text_box = slide.shapes.add_textbox(left, top, width, height)
+        text_frame = text_box.text_frame
+        text_frame.word_wrap = True
+
+        # Add value (large, bold, white for visibility on colored background)
+        p_value = text_frame.paragraphs[0]
+        p_value.text = stage['value']
+        p_value.font.name = TITLE_FONT_NAME
+        p_value.font.size = Pt(28)
+        p_value.font.bold = True
+        p_value.font.color.rgb = RGBColor(255, 255, 255)  # White text
+        p_value.alignment = PP_ALIGN.CENTER
+
+        # Add label (smaller, white)
+        p_label = text_frame.add_paragraph()
+        p_label.text = stage['label']
+        p_label.font.name = BODY_FONT_NAME
+        p_label.font.size = Pt(11)
+        p_label.font.color.rgb = RGBColor(255, 255, 255)
+        p_label.alignment = PP_ALIGN.CENTER
 
 
 def build_value_delivered_slides(prs, data):
@@ -2804,34 +2903,6 @@ def build_insights_slides(prs, data):
     insight_text.paragraphs[0].font.bold = True
     insight_text.paragraphs[0].alignment = PP_ALIGN.CENTER
     insight_text.vertical_anchor = 1
-
-
-def build_additional_content_slides(prs, data):
-    """Create additional content slides for comprehensive coverage.
-    
-    Per CRITICALSTART branding guidelines:
-    - All slides have transparent header and footer
-    - Uses H1-H6 typography scale
-    
-    This function creates slides for:
-    - After-Hours Customer Notifications
-    - Response Efficiency
-    - Collaboration Quality
-    - Detection Quality (Detailed)
-    - Security Outcomes Summary
-    
-    Args:
-        prs (Presentation): The presentation object.
-        data (ReportData): The report data object containing all metrics.
-    """
-    # NOTE: After-Hours and Collaboration slides removed - merged into Operational Coverage in Insights section
-    # NOTE: Response Efficiency slide removed - covered in Protection Achieved section
-    # NOTE: Detection Quality slide removed - covered in Protection Achieved section
-    # NOTE: Security Outcomes Summary slide removed - redundant cost avoided metric (now shown only in Value Delivered)
-    
-    # This function is now deprecated - all slides have been consolidated into their respective sections.
-    # Keeping the function for potential future use.
-    pass
 
 
 def build_forward_direction_slide(prs, data):

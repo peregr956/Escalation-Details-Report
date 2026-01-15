@@ -1,11 +1,11 @@
 # Developer Guide
 
-This guide explains how to contribute to the Escalation to Client Details Report project.
+This guide explains how to contribute to the Executive Business Review project.
 
 ## Project Structure
 
 ```
-Escalation-Details-Report/
+executive-business-review/
 ├── assets/                  # Logo and image assets
 ├── brand/                   # Brand guidelines documentation
 ├── chart_templates/         # Chart.js HTML templates
@@ -42,17 +42,16 @@ Escalation-Details-Report/
 
 ```bash
 # Clone the repository
-git clone https://github.com/criticalstart/Escalation-Details-Report.git
-cd Escalation-Details-Report
+git clone https://github.com/criticalstart/executive-business-review.git
+cd executive-business-review
 
-# Create virtual environment
+# One-command setup (recommended)
+./setup.sh
+
+# Or manual setup:
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements-dev.txt
-
-# Install Playwright browsers
 playwright install chromium
 ```
 

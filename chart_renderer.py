@@ -21,7 +21,6 @@ CHART_TEMPLATES = {
     'trend': 'trend_chart.html',
     'stacked_bar': 'stacked_bar_chart.html',
     'sankey': 'sankey_chart.html',
-    'funnel': 'funnel_chart.html'
 }
 
 
@@ -217,90 +216,6 @@ async def render_chart(
         raise
 
 
-async def render_funnel_chart(
-    data: dict,
-    output_path: str,
-    width: int = 900,
-    height: int = 320,
-    scale: int = 2
-) -> str:
-    """
-    Render the CORR funnel chart from the HTML template to a PNG image.
-    
-    This function is specialized for the funnel chart which uses SVG/HTML
-    instead of Chart.js canvas, so it takes a screenshot of the container
-    element rather than a canvas.
-    
-    Args:
-        data: Dictionary containing funnel data (optional, uses defaults if empty)
-        output_path: Path where the rendered PNG image should be saved
-        width: Viewport width in pixels (default: 900)
-        height: Viewport height in pixels (default: 320)
-        scale: Device scale factor for high DPI rendering (default: 2)
-    
-    Returns:
-        Path to the saved image file
-    
-    Raises:
-        FileNotFoundError: If the template file doesn't exist
-        Exception: If chart rendering fails
-    """
-    # Resolve template path
-    template_path = get_template_path('funnel')
-    template_url = template_path.as_uri()
-    
-    # Ensure output directory exists
-    output_path_obj = Path(output_path)
-    output_path_obj.parent.mkdir(parents=True, exist_ok=True)
-    
-    logger.info(f"Rendering funnel chart to {output_path}")
-    
-    try:
-        async with async_playwright() as p:
-            # Launch headless Chromium
-            browser = await p.chromium.launch(headless=True)
-            
-            # Create context with high DPI settings
-            context = await browser.new_context(
-                viewport={'width': width, 'height': height},
-                device_scale_factor=scale
-            )
-            
-            # Create page
-            page = await context.new_page()
-            
-            # Inject chart data before navigation so it's available when DOMContentLoaded fires
-            if data:
-                await page.add_init_script(f"""
-                    window.CHART_DATA = {json.dumps(data)};
-                """)
-            
-            # Navigate to template file
-            await page.goto(template_url, wait_until='domcontentloaded')
-            
-            # Wait for fonts to load and content to render
-            await page.wait_for_timeout(500)
-            
-            # Find the funnel container element
-            container = await page.query_selector('#funnelContainer')
-            if not container:
-                raise Exception("Funnel container element not found in template")
-            
-            # Take screenshot of container element
-            await container.screenshot(path=output_path)
-            
-            logger.info(f"Funnel chart rendered successfully to {output_path}")
-            
-            return str(output_path)
-            
-    except FileNotFoundError:
-        logger.error(f"Template file not found: {template_path}")
-        raise
-    except Exception as e:
-        logger.error(f"Failed to render funnel chart: {e}")
-        raise
-
-
 async def render_all_charts(data: dict, output_dir: str = "temp_charts") -> Dict[str, str]:
     """
     Render all chart types and return a dictionary mapping chart names to image paths.
@@ -331,7 +246,6 @@ async def render_all_charts(data: dict, output_dir: str = "temp_charts") -> Dict
         'trend': {'width': 900, 'height': 350},
         'stacked_bar': {'width': 900, 'height': 350},
         'sankey': {'width': 900, 'height': 500},
-        'funnel': {'width': 900, 'height': 320}
     }
     
     for chart_name, template_file in CHART_TEMPLATES.items():
@@ -346,25 +260,15 @@ async def render_all_charts(data: dict, output_dir: str = "temp_charts") -> Dict
             output_filename = f"{chart_name}_chart.png"
             output_path = output_path_obj / output_filename
             
-            # Use specialized funnel renderer for funnel chart (SVG-based, not Chart.js)
-            if chart_name == 'funnel':
-                rendered_path = await render_funnel_chart(
-                    data=chart_data,
-                    output_path=str(output_path),
-                    width=config['width'],
-                    height=config['height'],
-                    scale=2
-                )
-            else:
-                # Render Chart.js-based chart
-                rendered_path = await render_chart(
-                    template_name=chart_name,
-                    data=chart_data,
-                    output_path=str(output_path),
-                    width=config['width'],
-                    height=config['height'],
-                    scale=2
-                )
+            # Render Chart.js-based chart
+            rendered_path = await render_chart(
+                template_name=chart_name,
+                data=chart_data,
+                output_path=str(output_path),
+                width=config['width'],
+                height=config['height'],
+                scale=2
+            )
             
             results[chart_name] = rendered_path
             logger.info(f"Successfully rendered {chart_name} chart")
@@ -395,27 +299,6 @@ def render_charts_sync(data: dict, output_dir: str = "temp_charts") -> Dict[str,
         return asyncio.run(render_all_charts(data, output_dir))
     except Exception as e:
         logger.error(f"Error in synchronous chart rendering: {e}")
-        raise
-
-
-def render_funnel_sync(data: dict = None, output_path: str = "temp_charts/funnel_chart.png") -> str:
-    """
-    Synchronous wrapper for render_funnel_chart().
-    
-    This function wraps the async render_funnel_chart() function to allow
-    synchronous usage in scripts that don't use async/await.
-    
-    Args:
-        data: Dictionary containing funnel data (optional)
-        output_path: Path where the rendered PNG should be saved
-    
-    Returns:
-        Path to the rendered funnel chart image
-    """
-    try:
-        return asyncio.run(render_funnel_chart(data or {}, output_path))
-    except Exception as e:
-        logger.error(f"Error in synchronous funnel chart rendering: {e}")
         raise
 
 

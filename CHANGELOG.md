@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Escalation to Client Details Report project are documented here.
+All notable changes to the Executive Business Review project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
