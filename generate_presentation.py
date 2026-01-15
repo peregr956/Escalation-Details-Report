@@ -1400,115 +1400,63 @@ def create_executive_summary_slide(prs, report_data):
     pass
 
 
-def build_corr_funnel_slide(prs, funnel_image_path: Optional[str] = None):
-    """Create the CORR Platform funnel slide showing security event flow.
+def build_corr_funnel_slide(prs, background_image_path: Optional[str] = None):
+    """Create the CORR Platform slide with a background image.
     
-    This slide visualizes the AI-accelerated security pipeline with 4 stages:
-    Security Events → Potential Threats → Alerts → Response Actions
-    
-    The funnel uses overlapping trapezoid-shaped cards with proper z-index stacking
-    to create a horizontal funnel visualization that shows how the CORR platform
-    filters and processes security events.
+    This slide displays a pre-designed PNG as the full-slide background,
+    showing the AI-accelerated security pipeline visualization.
+    The background image contains all visual elements, so no title or
+    other overlays are added.
     
     Args:
         prs (Presentation): The presentation object.
-        funnel_image_path (str, optional): Path to pre-rendered funnel chart image.
-            If provided, uses the image. If None, creates a placeholder.
+        background_image_path (str, optional): Path to background PNG image.
+            If None, uses the default 'assets/funnel diagram.png'.
     
     Returns:
         Slide: The created slide object.
     """
-    # Create slide with standard branding
-    slide, content_top = setup_content_slide(prs, "AI Accelerated, Human Validated Security")
+    # Create blank slide (no title, no standard branding elements)
+    blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+    slide = prs.slides.add_slide(blank_slide_layout)
+    slide_number = get_slide_number(prs)
     
-    # Add subtitle (updated per plan: "Prevent Incidents" instead of "Prevent Breaches")
-    subtitle_box = slide.shapes.add_textbox(
-        MARGIN_STANDARD, content_top,
-        prs.slide_width - Inches(2), Inches(0.4)
-    )
-    subtitle_frame = subtitle_box.text_frame
-    subtitle_para = subtitle_frame.paragraphs[0]
-    subtitle_para.text = "CORR Is Our Superpower to Finding the Right Alerts to Prevent Incidents"
-    subtitle_para.font.name = BODY_FONT_NAME
-    subtitle_para.font.size = Pt(14)
-    subtitle_para.font.color.rgb = CS_SLATE
-    subtitle_para.alignment = PP_ALIGN.LEFT
+    # Add header and footer only (no title, no logo - background image is the content)
+    add_master_slide_elements(slide, prs, slide_number=slide_number,
+                               include_header=True, include_footer=True)
     
-    # =========================================================================
-    # Funnel Visualization - Rendered Image Approach
-    # =========================================================================
-    # The funnel is rendered as an SVG-based HTML template and converted to PNG
-    # This allows for proper trapezoid shapes, overlap, shadows, and z-index
+    # Determine background image path
+    if background_image_path is None:
+        background_image_path = Path(__file__).parent / "assets" / "funnel diagram.png"
+    else:
+        background_image_path = Path(background_image_path)
     
-    funnel_top = content_top + Inches(0.55)
-    funnel_left = Inches(0.25)
-    funnel_width = prs.slide_width - Inches(0.5)
-    funnel_height = Inches(3.2)
-    
-    if funnel_image_path and Path(funnel_image_path).exists():
-        # Insert the pre-rendered funnel image
+    # Add background image covering the full slide
+    if background_image_path.exists():
         try:
-            # Get image dimensions for aspect ratio preservation
-            with Image.open(funnel_image_path) as img:
-                img_width_px, img_height_px = img.size
-                img_aspect_ratio = img_width_px / img_height_px
+            # Add picture covering full slide dimensions
+            bg_picture = slide.shapes.add_picture(
+                str(background_image_path),
+                Inches(0), Inches(0),
+                prs.slide_width, prs.slide_height
+            )
             
-            # Calculate dimensions preserving aspect ratio
-            placeholder_aspect_ratio = funnel_width / funnel_height
+            # Move the background image to the back of the z-order
+            # Access the shape tree and move the picture element to the first position
+            spTree = slide.shapes._spTree
+            sp = bg_picture._element
+            spTree.remove(sp)
+            # Insert after nvGrpSpPr (the first child is usually the group shape properties)
+            spTree.insert(2, sp)
             
-            if img_aspect_ratio > placeholder_aspect_ratio:
-                # Image is wider - fit to width
-                width = funnel_width
-                height = funnel_width / img_aspect_ratio
-                top = funnel_top + (funnel_height - height) / 2
-                left = funnel_left
-            else:
-                # Image is taller - fit to height
-                height = funnel_height
-                width = funnel_height * img_aspect_ratio
-                left = funnel_left + (funnel_width - width) / 2
-                top = funnel_top
-            
-            slide.shapes.add_picture(str(funnel_image_path), left, top, width, height)
-            logging.info(f"Inserted funnel chart image: {funnel_image_path}")
+            logging.info(f"Added background image to slide {slide_number}: {background_image_path}")
             
         except Exception as e:
-            logging.error(f"Failed to insert funnel image: {e}")
-            # Fall back to placeholder
-            _add_funnel_placeholder(slide, funnel_left, funnel_top, funnel_width, funnel_height)
+            logging.error(f"Failed to add background image: {e}")
     else:
-        # Add placeholder for funnel chart (will be replaced in post-processing)
-        _add_funnel_placeholder(slide, funnel_left, funnel_top, funnel_width, funnel_height)
+        logging.warning(f"Background image not found: {background_image_path}")
     
     return slide
-
-
-def _add_funnel_placeholder(slide, left, top, width, height):
-    """Add a placeholder shape for the funnel chart.
-    
-    This placeholder will be replaced with the rendered funnel image
-    during the chart insertion phase.
-    
-    Args:
-        slide: The slide object
-        left: Left position
-        top: Top position  
-        width: Width of placeholder
-        height: Height of placeholder
-    """
-    placeholder = slide.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE, left, top, width, height
-    )
-    placeholder.fill.solid()
-    placeholder.fill.fore_color.rgb = RGBColor(245, 245, 245)
-    placeholder.line.color.rgb = RGBColor(200, 200, 200)
-    placeholder.line.width = Pt(1)
-    
-    # Add placeholder text
-    placeholder.text_frame.text = "[Chart: CORR Funnel | ID: corr_funnel]"
-    placeholder.text_frame.paragraphs[0].font.size = Pt(12)
-    placeholder.text_frame.paragraphs[0].font.color.rgb = RGBColor(150, 150, 150)
-    placeholder.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
 
 def build_value_delivered_slides(prs, data):
